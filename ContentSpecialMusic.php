@@ -35,14 +35,14 @@
  * @author     Leo Feyer <leo@typolight.org>
  * @package    Controller
  */
-class ContentBackgroundMusic extends ContentElement
+class ContentSpecialMusic extends ContentElement
 {
 
 	/**
 	 * Template
 	 * @var string
 	 */
-	protected $strTemplate = 'ce_backgroundmusic';
+	protected $strTemplate = 'ce_specialmusic';
 
 	/**
 	 * Generate content element
@@ -74,7 +74,7 @@ class ContentBackgroundMusic extends ContentElement
 		}
 
 		$objSong = $this->Database->prepare("SELECT tl_broadcast_song.*, tl_song_cover.cover, tl_adventure.title adventuretitle, tl_adventure.numbering FROM tl_adventure, tl_broadcast, tl_broadcast_song LEFT JOIN tl_song_cover ON tl_broadcast_song.id = tl_song_cover.song WHERE tl_broadcast.id = tl_broadcast_song.pid AND tl_adventure.id = tl_broadcast.pid AND tl_broadcast_song.songtype = ? ORDER BY cast(tl_broadcast.date AS UNSIGNED) DESC")
-			->execute(3);
+			->execute($this->special_type);
 		while ($objSong->next())
 		{
 			$song_genres = deserialize($objSong->genres, true);

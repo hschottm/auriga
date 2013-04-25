@@ -30,7 +30,7 @@
 /**
  * Table tl_content
  */
-$GLOBALS['TL_DCA']['tl_content']['palettes']['backgroundlist'] = '{type_legend},type,headline;{redirect_legend},jumpTo_song;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+$GLOBALS['TL_DCA']['tl_content']['palettes']['speciallist'] = '{type_legend},type,headline;{special_legend},special_type;{redirect_legend},jumpTo_song;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo_song'] = array
 (
@@ -38,6 +38,16 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo_song'] = array
 	'exclude'                 => true,
 	'inputType'               => 'pageTree',
 	'eval'                    => array('fieldType'=>'radio')
+);
+
+$GLOBALS['TL_DCA']['tl_content']['fields']['special_type'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_content']['special_type'],
+	'exclude'                 => true,
+	'filter'                  => true,
+	'inputType'               => 'select',
+	'foreignKey'              => 'tl_song_type.songtype',
+	'eval'                    => array('includeBlankOption'=>true, 'tl_class'=>'w50')
 );
 
 ?>

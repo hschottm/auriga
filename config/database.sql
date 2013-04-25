@@ -142,7 +142,8 @@ CREATE TABLE `tl_module` (
 -- 
 
 CREATE TABLE `tl_content` (
-  `jumpTo_song` int(10) unsigned NOT NULL default '0'
+  `jumpTo_song` int(10) unsigned NOT NULL default '0',
+  `special_type` int(10) unsigned NOT NULL default '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- 
