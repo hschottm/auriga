@@ -1,0 +1,33 @@
+
+<div id="tl_buttons">
+<a href="<?php echo $this->hrefBack; ?>" class="header_back" title="<?php echo $this->goBack; ?>" accesskey="b" onclick="Backend.getScrollOffset();"><?php echo $this->goBack; ?></a>
+</div>
+
+<h2 class="sub_headline"><?php echo $this->headline; ?></h2>
+
+<form action="<?php echo $this->request; ?>" id="tl_import_popwelt" class="tl_form" method="post">
+<div class="tl_formbody_edit">
+<input type="hidden" name="FORM_SUBMIT" value="tl_import_popwelt" />
+<input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">
+
+<?php foreach ($this->broadcasts as $broadcast): ?>
+<div class="tl_tbox">
+<div><input type="checkbox" name="cb[]" value="<?php echo $broadcast['ausgabe']; ?>" id="cb_<?php echo $broadcast['ausgabe']; ?>" /> <label for="cb_<?php echo $broadcast['ausgabe']; ?>"><?php echo $broadcast['datum']; ?></label></div>
+<table>
+	<tr><td><?php echo $this->lngDate; ?>:</td><td><input type="text" name="date_<?php echo $broadcast['ausgabe']; ?>" size="10" /></td></tr>
+	<tr><td><?php echo $this->lngChapter; ?>:</td><td><input type="text" name="chapter_<?php echo $broadcast['ausgabe']; ?>" size="3" /></td></tr>
+	<tr><td><?php echo $this->lngTitle1; ?>:</td><td><input type="text" name="title1_<?php echo $broadcast['ausgabe']; ?>" size="35" /></td></tr>
+	<tr><td><?php echo $this->lngTitle2; ?>:</td><td><input type="text" name="title2_<?php echo $broadcast['ausgabe']; ?>" size="35" /></td></tr>
+</table>
+</div>
+<?php endforeach; ?>
+</div>
+
+<div class="tl_formbody_submit">
+
+<div class="tl_submit_container">
+<input type="submit" name="import" id="save" class="tl_submit" alt="<?php echo $this->submit; ?>" accesskey="s" value="<?php echo $this->submit; ?>" />
+</div>
+
+</div>
+</form>
