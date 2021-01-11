@@ -1,4 +1,6 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php 
+
+namespace Contao;
 
 /**
  * TYPOlight webCMS
@@ -35,7 +37,7 @@
  * @author     Leo Feyer <leo@typolight.org>
  * @package    Controller
  */
-class ContentSpecialMusic extends ContentElement
+class ContentSpecialMusic extends \ContentElement
 {
 
 	/**
@@ -137,5 +139,3 @@ class ContentSpecialMusic extends ContentElement
 		$this->Template->lngAdventure = $GLOBALS['TL_LANG']['tl_module']['adventure'];
 	}
 }
-
-?>

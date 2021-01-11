@@ -1,4 +1,6 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php 
+
+namespace Contao;
 
 /**
  * @copyright  Helmut Schottmüller 2009
@@ -16,7 +18,7 @@
  * @author     Helmut Schottmüller <typolight@aurealis.de>
  * @package    Controller
  */
-class AurigaHelper extends Backend
+class AurigaHelper extends \Backend
 {
 	private function getProviderId($initials)
 	{
@@ -629,5 +631,3 @@ class AurigaHelper extends Backend
 		return $this->Template->parse();
 	}
 }
-
-?>

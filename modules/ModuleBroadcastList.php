@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php 
+
+namespace Contao;
+
 
 /**
  * Class ModuleBroadcastList
@@ -8,7 +11,7 @@
  * @author     Helmut Schottmüller <typolight@aurealis.de>
  * @package    Controller
  */
-class ModuleBroadcastList extends ModulePTW
+class ModuleBroadcastList extends \ModulePTW
 {
 
 	/**
@@ -126,4 +129,3 @@ class ModuleBroadcastList extends ModulePTW
 	}
 }
 
-?>

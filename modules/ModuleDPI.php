@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php 
+
+namespace Contao;
+
 
 /**
  * Class ModuleDPI
@@ -8,7 +11,7 @@
  * @author     Helmut Schottmüller <typolight@aurealis.de>
  * @package    Controller
  */
-class ModuleDPI extends ModulePTW
+class ModuleDPI extends \ModulePTW
 {
 
 	/**
@@ -216,4 +219,3 @@ class ModuleDPI extends ModulePTW
 	}
 }
 
-?>

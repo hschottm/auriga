@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php 
+
+namespace Contao;
+
 
 /**
  * Class ModuleSong
@@ -8,7 +11,7 @@
  * @author     Helmut Schottmüller <typolight@aurealis.de>
  * @package    Controller
  */
-class ModuleSong extends ModulePTW implements uploadable
+class ModuleSong extends \ModulePTW implements uploadable
 {
 
 	/**
@@ -449,4 +452,3 @@ class ModuleSong extends ModulePTW implements uploadable
 	}
 }
 
-?>
