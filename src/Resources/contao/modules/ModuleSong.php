@@ -31,7 +31,7 @@ class ModuleSong extends ModulePTW implements uploadable
 	{
 		if (TL_MODE == 'BE')
 		{
-			$objTemplate = new BackendTemplate('be_wildcard');
+			$objTemplate = new \BackendTemplate('be_wildcard');
 
 			$objTemplate->wildcard = '### SONG ###';
 			$objTemplate->title = $this->headline;

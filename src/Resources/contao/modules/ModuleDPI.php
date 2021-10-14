@@ -28,7 +28,7 @@ class ModuleDPI extends ModulePTW
 	{
 		if (TL_MODE == 'BE')
 		{
-			$objTemplate = new BackendTemplate('be_wildcard');
+			$objTemplate = new \BackendTemplate('be_wildcard');
 
 			$objTemplate->wildcard = '### DPI ###';
 			$objTemplate->title = $this->headline;
@@ -188,7 +188,7 @@ class ModuleDPI extends ModulePTW
 		);
 
 		// Pagination
-		$objPagination = new Pagination($totalcount, $results);
+		$objPagination = new \Pagination($totalcount, $results);
 		$this->Template->pagination = $objPagination->generate("\n  ");
 
 		$this->loadLanguageFile('tl_module');

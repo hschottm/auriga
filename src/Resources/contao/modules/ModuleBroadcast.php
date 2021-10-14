@@ -27,7 +27,7 @@ class ModuleBroadcast extends ModulePTW
 	{
 		if (TL_MODE == 'BE')
 		{
-			$objTemplate = new BackendTemplate('be_wildcard');
+			$objTemplate = new \BackendTemplate('be_wildcard');
 
 			$objTemplate->wildcard = '### BROADCAST ###';
 			$objTemplate->title = $this->headline;
