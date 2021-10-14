@@ -1,0 +1,8 @@
+services:
+    auriga.listener.addcustomregexp:
+        class: Hschottm\AurigaBundle\Listener\ContaoHook\AddCustomRegexpListener
+        tags:
+            - { name: contao.hook, hook: addCustomRegexp, method: addCustomRegexp, priority: 0 }
+        arguments:
+            - "@contao.framework"
+        public: true
