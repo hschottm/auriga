@@ -151,7 +151,7 @@ class AurigaHelper extends \Backend
 			$files = null;
 			if (is_array($filedata) && strlen($filedata['filename']))
 			{
-				$filename = 'tl_files/auriga/recordings/ptw/' . sprintf("%03d", $line['dtAbenteuer']) . '/' . $filedata['filename'];
+				$filename = 'files/auriga/recordings/ptw/' . sprintf("%03d", $line['dtAbenteuer']) . '/' . $filedata['filename'];
 				$files ='a:1:{i:0;s:' . (strlen($filename)) . ':"' . $filename . '";}';
 			}
 
