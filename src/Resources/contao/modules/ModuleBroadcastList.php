@@ -11,7 +11,7 @@ namespace Hschottm\AurigaBundle;
  * @author     Helmut Schottmüller <typolight@aurealis.de>
  * @package    Controller
  */
-class ModuleBroadcastList extends \ModulePTW
+class ModuleBroadcastList extends ModulePTW
 {
 
 	/**

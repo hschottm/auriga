@@ -2,7 +2,6 @@
 
 namespace Hschottm\AurigaBundle;
 
-
 /**
  * Class ModuleAdventureList
  *
@@ -11,7 +10,7 @@ namespace Hschottm\AurigaBundle;
  * @author     Helmut Schottmüller <typolight@aurealis.de>
  * @package    Controller
  */
-class ModuleAdventureList extends \ModulePTW
+class ModuleAdventureList extends ModulePTW
 {
 
 	/**

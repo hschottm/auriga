@@ -11,7 +11,7 @@ namespace Hschottm\AurigaBundle;
  * @author     Helmut Schottmüller <typolight@aurealis.de>
  * @package    Controller
  */
-class ModuleSong extends \ModulePTW implements uploadable
+class ModuleSong extends ModulePTW implements uploadable
 {
 
 	/**
