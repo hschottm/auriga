@@ -28,7 +28,7 @@
 		<td><?php echo $broadcast['frequency']; ?></td>
 		<td><?php echo $broadcast['samplerate']; ?></td>
 		<td><?php echo join(array_keys($broadcast['providers']), ',') ; ?></td>
-		<td><?php foreach ($broadcast['files'] as $file) { echo '<a href="' . $file . '"><img src="bundles/auriga/images/song.gif" title="' . $file . '" /></a>'; } ?></td>
+		<td><?php foreach ($broadcast['files'] as $file) { echo '<a href="' . $file . '"><img src="bundles/hschottmauriga/images/song.gif" title="' . $file . '" /></a>'; } ?></td>
 	</tr>
 <?php endforeach; ?>
 	</tbody>

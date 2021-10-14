@@ -210,7 +210,7 @@ class tl_broadcast_song extends Backend
 	 */
 	public function addIcon($row, $label)
 	{
-		return sprintf('<div class="list_icon" style="background-image:url(\'bundles/auriga/images/broadcast.png\');">%s</div>', $label);
+		return sprintf('<div class="list_icon" style="background-image:url(\'bundles/hschottmauriga/images/broadcast.png\');">%s</div>', $label);
 	}
 	
 	/**

@@ -128,10 +128,10 @@ class ModuleDPI extends \ModulePTW
 				switch ($objSong->songtype)
 				{
 					case 1:
-						$special = '<img src="bundles/auriga/images/jukebox.gif" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['musicbox'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['musicbox'][1] . '" />';
+						$special = '<img src="bundles/hschottmauriga/images/jukebox.gif" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['musicbox'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['musicbox'][1] . '" />';
 						break;
 					case 2:
-						$special = '<img src="bundles/auriga/images/wunderwerk.gif" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['wunderwerk'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['wunderwerk'][1] . '" />';
+						$special = '<img src="bundles/hschottmauriga/images/wunderwerk.gif" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['wunderwerk'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['wunderwerk'][1] . '" />';
 						break;
 					default:
 						$special = '';
@@ -145,7 +145,7 @@ class ModuleDPI extends \ModulePTW
 				}
 				else
 				{
-					$cover = '<img src="bundles/auriga/images/cd.gif" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" />';
+					$cover = '<img src="bundles/hschottmauriga/images/cd.gif" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" />';
 				}
 				array_push($arrFoundSongs, array(
 					'adventure' => specialchars($objSong->numbering) . '. ' . specialchars($objSong->adventuretitle),

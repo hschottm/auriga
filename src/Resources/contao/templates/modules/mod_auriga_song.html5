@@ -22,6 +22,8 @@
 <?php endif; ?>
 <?php if (strlen($this->possibleImage)): ?>
 			<div class="coverquestion"><form method="POST" action="<?php echo $this->formaction; ?>">
+<input type="hidden" name="FORM_SUBMIT" value="image" />
+<input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>" />
 <?php if (strlen($this->urlShowPrev)): ?><a href="<?php echo $this->urlShowPrev; ?>"><?php endif; ?><img src="tl_files/auriga/images/control_rewind<?php echo (strlen($this->urlShowPrev)) ? '_blue' : ''; ?>.png" alt="<?php echo $this->lngShowPrevCover; ?>" title="<?php echo $this->lngShowPrevCover; ?>" /><?php if (strlen($this->urlShowPrev)): ?></a><?php endif; ?>
 <?php if (strlen($this->imagePosition)): ?> (<?php echo $this->imagePosition; ?>) <?php endif; ?>
 <?php if (strlen($this->urlShowNext)): ?><a href="<?php echo $this->urlShowNext; ?>"><?php endif; ?><img src="tl_files/auriga/images/control_fastforward<?php echo (strlen($this->urlShowNext)) ? '_blue' : ''; ?>.png" alt="<?php echo $this->lngShowNextCover; ?>" title="<?php echo $this->lngShowNextCover; ?>" /><?php if (strlen($this->urlShowNext)): ?></a><?php endif; ?>
@@ -31,10 +33,22 @@
 <?php if ($this->isAdmin): ?>
 <?php if (!strlen($this->albumcover)): ?>
 <div>	
-		<form method="POST" action"<?php echo $this->formaction; ?>"><label for="search_own"><?php echo $this->lngSearchOwn; ?></label> <input type="text" id="search_own" name="searchtext" <?php if (strlen($this->searchValue)): ?>value="<?php echo htmlspecialchars($this->searchValue); ?>" <?php endif; ?>/> <input type="submit" name="search" value="<?php echo $this->lngSearch; ?>" /></form>
+		<form method="POST" action"<?php echo $this->formaction; ?>">
+			<input type="hidden" name="FORM_SUBMIT" value="searchform" />
+			<input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>" />
+			<label for="search_own"><?php echo $this->lngSearchOwn; ?></label> 
+			<input type="text" id="search_own" name="searchtext" <?php if (strlen($this->searchValue)): ?>value="<?php echo htmlspecialchars($this->searchValue); ?>" <?php endif; ?>/> 
+			<input type="submit" name="search" value="<?php echo $this->lngSearch; ?>" />
+		</form>
 </div>
 <div>
-		<form method="POST" action"<?php echo $this->formaction; ?>" enctype="multipart/form-data"><label for="upload"><?php echo $this->lngUploadCover; ?></label> <input type="file" id="upload" name="uploadcover" /> <input type="submit" name="upload" value="<?php echo $this->lngUpload; ?>" /></form>
+		<form method="POST" action"<?php echo $this->formaction; ?>" enctype="multipart/form-data">
+			<input type="hidden" name="FORM_SUBMIT" value="uploadform" />
+			<input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>" />
+			<label for="upload"><?php echo $this->lngUploadCover; ?></label> 
+			<input type="file" id="upload" name="uploadcover" /> 
+			<input type="submit" name="upload" value="<?php echo $this->lngUpload; ?>" />
+		</form>
 </div>
 <?php endif; ?>
 <?php endif; ?>

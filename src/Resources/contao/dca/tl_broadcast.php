@@ -57,7 +57,7 @@ $GLOBALS['TL_DCA']['tl_broadcast'] = array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_broadcast']['songs'],
 				'href'                => 'table=tl_broadcast_song',
-				'icon'                => 'bundles/auriga/images/songs.png'
+				'icon'                => 'bundles/hschottmauriga/images/songs.png'
 			),
 			'copy' => array
 			(
@@ -238,7 +238,7 @@ class tl_broadcast extends Backend
 	 */
 	public function addIcon($row, $label)
 	{
-		return sprintf('<div class="list_icon" style="background-image:url(\'bundles/auriga/images/broadcast.png\');">%s</div>', $label);
+		return sprintf('<div class="list_icon" style="background-image:url(\'bundles/hschottmauriga/images/broadcast.png\');">%s</div>', $label);
 	}
 	
 	/**

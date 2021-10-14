@@ -216,7 +216,7 @@ class tl_adventure extends Backend
 	 */
 	public function addIcon($row, $label)
 	{
-		return sprintf('<div class="list_icon" style="background-image:url(\'bundles/auriga/images/adventure.png\');">%s</div>', $label);
+		return sprintf('<div class="list_icon" style="background-image:url(\'bundles/hschottmauriga/images/adventure.png\');">%s</div>', $label);
 	}
 	
 }
