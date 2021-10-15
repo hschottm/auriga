@@ -240,10 +240,10 @@ class ModuleSong extends ModulePTW implements \uploadable
 	{
 		global $objPage;
 
-		require_once(TL_ROOT . '/plugins/cloudfusion/cloudfusion.class.php');
-		require_once(TL_ROOT . '/plugins/cloudfusion/pas.class.php');
-		require_once(TL_ROOT . '/plugins/cloudfusion/_utilities.class.php');
-		require_once(TL_ROOT . '/plugins/cloudfusion/lib/requestcore/requestcore.class.php');
+		//require_once(TL_ROOT . '/plugins/cloudfusion/cloudfusion.class.php');
+		//require_once(TL_ROOT . '/plugins/cloudfusion/pas.class.php');
+		//require_once(TL_ROOT . '/plugins/cloudfusion/_utilities.class.php');
+		//require_once(TL_ROOT . '/plugins/cloudfusion/lib/requestcore/requestcore.class.php');
 		$songid = $this->Input->get('song');
 		if (!$songid) return;
 		$this->checkCoverForSong($songid);
@@ -388,35 +388,35 @@ class ModuleSong extends ModulePTW implements \uploadable
 				if (!is_array($foundimages)) $foundimages = array();
 				if (count($foundimages) == 0)
 				{
-					$pas = new AmazonPAS('0KTJZ8FG7FSTFQ2S9EG2', 'g58MVTP8MuXdKmSGEQg1uO4XgyoNDMmJz/C9txB2', '8102-4954-1410');
-					$album = preg_replace("/\\(.*?\\)/", "", $objSong->album);
-					$album = preg_replace("/-\\s*?CD.*/", "", $album);
-					$album = preg_replace("/-\\s*?Single.*/", "", $album);
-					$searchtext = ($ownsearch) ? $this->Input->post('searchtext') : $objSong->artist . " " . $album;
-				 	$items = $pas->item_search($searchtext, array('ResponseGroup' => 'Medium'), 'de');
-					if (count($items->body->Items->Item) == 0 && $ownsearch)
-					{
-						$items = $pas->item_search($album, array('ResponseGroup' => 'Medium'), 'de');
-						if (count($items->body->Items->Item) == 0)
-						{
-							$items = $pas->item_search($objSong->labelcode, array('ResponseGroup' => 'Medium'), 'de');
-						}
-					}
-					foreach ($items->body->Items->Item as $item)
-					{
-						$url = $item->DetailPageURL;
-						$title = $item->ItemAttributes->Title;
-						$ItemId = $item->ASIN;
-						$artist = $pas->util->try_these(array('Artist', 'Creator'), $item->ItemAttributes);
-						$artwork = $pas->util->try_these(array('LargeImage','MediumImage','SmallImage'), $item, null);
-						$preview = $artwork;
-						if ($artwork)
-						{
-							$artwork = $artwork->URL;
-							$foundimages[] = array("song" => $objSong->id, "id" => (string)$ItemId, "title" => (string)$title, "artist" => (string)$artist, "artwork" => (string)$artwork, "preview" => '<img src="' . $preview->URL . '" alt="' . htmlspecialchars($artist) . ': ' . htmlspecialchars($title) . '" title="' . htmlentities($artist) . ': ' . htmlentities($title) . '" />');
-						}
-					}
-					$this->Session->set('foundimages', $foundimages);
+					//$pas = new AmazonPAS('0KTJZ8FG7FSTFQ2S9EG2', 'g58MVTP8MuXdKmSGEQg1uO4XgyoNDMmJz/C9txB2', '8102-4954-1410');
+					//$album = preg_replace("/\\(.*?\\)/", "", $objSong->album);
+					//$album = preg_replace("/-\\s*?CD.*/", "", $album);
+					//$album = preg_replace("/-\\s*?Single.*/", "", $album);
+					//$searchtext = ($ownsearch) ? $this->Input->post('searchtext') : $objSong->artist . " " . $album;
+				 	//$items = $pas->item_search($searchtext, array('ResponseGroup' => 'Medium'), 'de');
+					//if (count($items->body->Items->Item) == 0 && $ownsearch)
+					//{
+					//	$items = $pas->item_search($album, array('ResponseGroup' => 'Medium'), 'de');
+					//	if (count($items->body->Items->Item) == 0)
+					//	{
+					//		$items = $pas->item_search($objSong->labelcode, array('ResponseGroup' => 'Medium'), 'de');
+					//	}
+					//}
+					//foreach ($items->body->Items->Item as $item)
+					//{
+					//	$url = $item->DetailPageURL;
+					//	$title = $item->ItemAttributes->Title;
+					//	$ItemId = $item->ASIN;
+					//	$artist = $pas->util->try_these(array('Artist', 'Creator'), $item->ItemAttributes);
+					//	$artwork = $pas->util->try_these(array('LargeImage','MediumImage','SmallImage'), $item, null);
+					//	$preview = $artwork;
+					//	if ($artwork)
+					//	{
+					//		$artwork = $artwork->URL;
+					//		$foundimages[] = array("song" => $objSong->id, "id" => (string)$ItemId, "title" => (string)$title, "artist" => (string)$artist, "artwork" => (string)$artwork, "preview" => '<img src="' . $preview->URL . '" alt="' . htmlspecialchars($artist) . ': ' . htmlspecialchars($title) . '" title="' . htmlentities($artist) . ': ' . htmlentities($title) . '" />');
+					//	}
+					//}
+					//$this->Session->set('foundimages', $foundimages);
 				}
 				$possibleIndex = strlen($this->Input->get('imgidx')) ? $this->Input->get('imgidx') : 0;
 				if (count($foundimages) > $possibleIndex+1) $this->Template->urlShowNext = $this->generateFrontendUrl($objPage->row(), '/song/' . $objSong->id . '/imgidx/' . ($possibleIndex+1));
