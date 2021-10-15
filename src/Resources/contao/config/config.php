@@ -26,7 +26,7 @@ $GLOBALS['FE_MOD']['auriga'] = array
 	'dpi'     			=> ModuleDPI::class
 );
 
-$GLOBALS['TL_CTE']['texts']['speciallist'] = 'ContentSpecialMusic';
+$GLOBALS['TL_CTE']['texts']['speciallist'] = ContentSpecialMusic::class;
 
 /**
  * BACK END FORM FIELDS
