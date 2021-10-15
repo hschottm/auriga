@@ -24,9 +24,9 @@
 			<div class="coverquestion"><form method="POST" action="<?php echo $this->formaction; ?>">
 <input type="hidden" name="FORM_SUBMIT" value="image" />
 <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>" />
-<?php if (strlen($this->urlShowPrev)): ?><a href="<?php echo $this->urlShowPrev; ?>"><?php endif; ?><img src="bundles/hschottmauriga/images/control_rewind<?php echo (strlen($this->urlShowPrev)) ? '_blue' : ''; ?>.png" alt="<?php echo $this->lngShowPrevCover; ?>" title="<?php echo $this->lngShowPrevCover; ?>" /><?php if (strlen($this->urlShowPrev)): ?></a><?php endif; ?>
+<?php if (strlen($this->urlShowPrev)): ?><a href="<?php echo $this->urlShowPrev; ?>"><?php endif; ?><img src="files/auriga/images/control_rewind<?php echo (strlen($this->urlShowPrev)) ? '_blue' : ''; ?>.png" alt="<?php echo $this->lngShowPrevCover; ?>" title="<?php echo $this->lngShowPrevCover; ?>" /><?php if (strlen($this->urlShowPrev)): ?></a><?php endif; ?>
 <?php if (strlen($this->imagePosition)): ?> (<?php echo $this->imagePosition; ?>) <?php endif; ?>
-<?php if (strlen($this->urlShowNext)): ?><a href="<?php echo $this->urlShowNext; ?>"><?php endif; ?><img src="bundles/hschottmauriga/images/control_fastforward<?php echo (strlen($this->urlShowNext)) ? '_blue' : ''; ?>.png" alt="<?php echo $this->lngShowNextCover; ?>" title="<?php echo $this->lngShowNextCover; ?>" /><?php if (strlen($this->urlShowNext)): ?></a><?php endif; ?>
+<?php if (strlen($this->urlShowNext)): ?><a href="<?php echo $this->urlShowNext; ?>"><?php endif; ?><img src="files/auriga/images/control_fastforward<?php echo (strlen($this->urlShowNext)) ? '_blue' : ''; ?>.png" alt="<?php echo $this->lngShowNextCover; ?>" title="<?php echo $this->lngShowNextCover; ?>" /><?php if (strlen($this->urlShowNext)): ?></a><?php endif; ?>
 <?php echo $this->lngCorrectCover; ?> <input type="hidden" name="usecover" value="<?php echo $this->usecover; ?>" /><input type="submit" name="submit" value="<?php echo $this->lngYes; ?>" /></form></div>
 <?php echo $this->possibleImage; ?>
 <?php endif; ?>
