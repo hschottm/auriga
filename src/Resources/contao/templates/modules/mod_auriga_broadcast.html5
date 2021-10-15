@@ -1,16 +1,21 @@
 <?php if (is_array($this->broadcasts)): ?>
 <div class="<?php echo $this->class; ?> ptw_broadcast"<?php echo $this->cssID; ?><?php if ($this->style): ?> style="<?php echo $this->style; ?>"<?php endif; ?>>
 <?php if ($this->headline): ?>
-
 <<?php echo $this->hl; ?>><?php echo $this->headline; ?></<?php echo $this->hl; ?>>
 <?php endif; ?>
-<div class="auriganav">
-	<?php if (strlen($this->nav_first_url)): ?><a href="<?php echo $this->nav_first_url; ?>"><?php endif; ?><img src="files/auriga/images/control_start<?php echo (strlen($this->nav_first_url)) ? '_blue' : ''; ?>.png" alt="<?php echo $this->nav_first_title; ?>" title="<?php echo $this->nav_first_title; ?>" /><?php if (strlen($this->nav_first_url)): ?></a><?php endif; ?>
-	<?php if (strlen($this->nav_prev_url)): ?><a href="<?php echo $this->nav_prev_url; ?>"><?php endif; ?><img src="files/auriga/images/control_rewind<?php echo (strlen($this->nav_prev_url)) ? '_blue' : ''; ?>.png" alt="<?php echo $this->nav_prev_title; ?>" title="<?php echo $this->nav_prev_title; ?>" /><?php if (strlen($this->nav_prev_url)): ?></a><?php endif; ?>
-	<?php if (strlen($this->nav_next_url)): ?><a href="<?php echo $this->nav_next_url; ?>"><?php endif; ?><img src="files/auriga/images/control_fastforward<?php echo (strlen($this->nav_next_url)) ? '_blue' : ''; ?>.png" alt="<?php echo $this->nav_next_title; ?>" title="<?php echo $this->nav_next_title; ?>" /><?php if (strlen($this->nav_next_url)): ?></a><?php endif; ?>
-	<?php if (strlen($this->nav_last_url)): ?><a href="<?php echo $this->nav_last_url; ?>"><?php endif; ?><img src="files/auriga/images/control_end<?php echo (strlen($this->nav_last_url)) ? '_blue' : ''; ?>.png" alt="<?php echo $this->nav_last_title; ?>" title="<?php echo $this->nav_last_title; ?>"/><?php if (strlen($this->nav_last_url)): ?></a><?php endif; ?> 
+<div class="row">
+	<div class="col-12 order-1 col-md-6 order-md-0">
+		<h2><a href="<?php echo $this->urlUp; ?>"><?php echo $this->adventure['numbering'] . '. ' . $this->adventure['title']; ?></a></h2>
+	</div>
+	<div class="col-12 order-0 col-md-6 order-md-1">
+		<div class="auriganav">
+			<?php if (strlen($this->nav_first_url)): ?><a href="<?php echo $this->nav_first_url; ?>"><?php endif; ?><img src="files/auriga/images/control_start<?php echo (strlen($this->nav_first_url)) ? '_blue' : ''; ?>.png" alt="<?php echo $this->nav_first_title; ?>" title="<?php echo $this->nav_first_title; ?>" /><?php if (strlen($this->nav_first_url)): ?></a><?php endif; ?>
+			<?php if (strlen($this->nav_prev_url)): ?><a href="<?php echo $this->nav_prev_url; ?>"><?php endif; ?><img src="files/auriga/images/control_rewind<?php echo (strlen($this->nav_prev_url)) ? '_blue' : ''; ?>.png" alt="<?php echo $this->nav_prev_title; ?>" title="<?php echo $this->nav_prev_title; ?>" /><?php if (strlen($this->nav_prev_url)): ?></a><?php endif; ?>
+			<?php if (strlen($this->nav_next_url)): ?><a href="<?php echo $this->nav_next_url; ?>"><?php endif; ?><img src="files/auriga/images/control_fastforward<?php echo (strlen($this->nav_next_url)) ? '_blue' : ''; ?>.png" alt="<?php echo $this->nav_next_title; ?>" title="<?php echo $this->nav_next_title; ?>" /><?php if (strlen($this->nav_next_url)): ?></a><?php endif; ?>
+			<?php if (strlen($this->nav_last_url)): ?><a href="<?php echo $this->nav_last_url; ?>"><?php endif; ?><img src="files/auriga/images/control_end<?php echo (strlen($this->nav_last_url)) ? '_blue' : ''; ?>.png" alt="<?php echo $this->nav_last_title; ?>" title="<?php echo $this->nav_last_title; ?>"/><?php if (strlen($this->nav_last_url)): ?></a><?php endif; ?> 
+		</div>
+	</div>
 </div>
-<h2><a href="<?php echo $this->urlUp; ?>"><?php echo $this->adventure['numbering'] . '. ' . $this->adventure['title']; ?></a></h2>
 <p class="shortstory"><?php echo $this->adventure['description']; ?></p>
 <h3><?php echo $this->broadcasts[0]['chapter']; ?>. Kapitel, gesendet am <?php echo $this->broadcasts[0]['date']; ?></h3>
 <?php foreach ($this->broadcasts as $broadcast): ?>
