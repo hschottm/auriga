@@ -2,6 +2,8 @@
 
 namespace Hschottm\AurigaBundle;
 
+use Symfony\Component\HttpClient\HttpClient;
+
 
 /**
  * Class ModuleSong
@@ -369,11 +371,20 @@ class ModuleSong extends ModulePTW implements \uploadable
 				$size[0] = 300;
 				$size[1] = floor(300 * $arrImageSize[1] / $arrImageSize[0]);
 
-				$this->Template->albumcover = '<img src="' . $imagename . '" alt="' . htmlspecialchars($objSong->artist) . ': ' . htmlspecialchars($objSong->album) . '" width="' . $size[0] . '" height="' . $size[1] . '" />';
+				$this->Template->albumcover = '<img src="' . $imagename . '" alt="' . htmlspecialchars($objSong->artist) . ': ' . htmlspecialchars($objSong->album) . '" class="img-fluid albumart" />';
 			}
 		}
 		else
 		{
+			$client = HttpClient::create([
+				'headers' => [
+					'User-Agent' => 'Auriga Secret Society Pop Index',
+				],
+			]);
+			$response = $client->request('GET', 'https://musicbrainz.org/ws/2/recording?query=' . System::urlEncode($data['album']));
+			$content = $response->getContent();
+			$this->Template->boris = $content;
+
 			if ($is_admin)
 			{
 				$ownsearch = strlen($this->Input->post('search')) & strlen($this->Input->post('searchtext'));
