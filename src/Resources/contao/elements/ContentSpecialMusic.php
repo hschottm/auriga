@@ -46,6 +46,16 @@ class ContentSpecialMusic extends \ContentElement
 	 */
 	protected $strTemplate = 'ce_specialmusic';
 
+	public function generate()
+	{
+		if ($this->aurigaTpl)
+		{
+			$this->strTemplate = $this->aurigaTpl;
+		}
+	
+		return parent::generate();
+	}
+
 	/**
 	 * Generate content element
 	 */

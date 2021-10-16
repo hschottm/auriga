@@ -30,7 +30,7 @@
 /**
  * Table tl_content
  */
-$GLOBALS['TL_DCA']['tl_content']['palettes']['speciallist'] = '{type_legend},type,headline;{special_legend},special_type;{redirect_legend},jumpTo_song;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+$GLOBALS['TL_DCA']['tl_content']['palettes']['speciallist'] = '{type_legend},type,headline;{special_legend},special_type;{template_legend:hide},aurigaTpl;{redirect_legend},jumpTo_song;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo_song'] = array
 (
@@ -50,3 +50,14 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['special_type'] = array
 	'eval'                    => array('includeBlankOption'=>true, 'tl_class'=>'w50')
 );
 
+$GLOBALS['TL_DCA']['tl_content']['fields']['aurigaTpl'] = array
+(
+	'exclude'                 => true,
+	'inputType'               => 'select',
+	'options_callback' => static function ()
+	{
+		return Controller::getTemplateGroup('ce_');
+	},
+	'eval'                    => array('includeBlankOption'=>true, 'chosen'=>true, 'tl_class'=>'w50'),
+	'sql'                     => "varchar(64) NOT NULL default ''"
+);
