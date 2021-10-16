@@ -381,7 +381,7 @@ class ModuleSong extends ModulePTW implements \uploadable
 						'User-Agent' => 'Auriga Secret Society Pop Index',
 				],
 			]);
-			$response = $client->request('GET', 'https://musicbrainz.org/ws/2/recording?query=' . \System::urlEncode($data['album']) . "&limit=10");
+			$response = $client->request('GET', 'https://musicbrainz.org/ws/2/recording?query=' . \System::urlEncode($data['album']));// . "&limit=10");
 			$content = $response->getContent();
 			$xml = simplexml_load_string($content);
 			$json = json_encode($xml);
@@ -392,8 +392,12 @@ class ModuleSong extends ModulePTW implements \uploadable
 				],
 			]);
 			$thumbs = array();
+			$mbids = array();
 			foreach ($array['recording-list']['recording'] as $recording) {
 				$mbid = $recording['release-list']['release']["@attributes"]['id'];
+				if (!in_array($mbid, $mbids)) $mbids[] = $mbid;
+			}
+			foreach ($mbids as $mbid) {
 				$coverresponse = $coverclient->request('GET', 'https://coverartarchive.org/release/' . $mbid);
 				if ($coverresponse->getStatusCode() < 400) {
 					$covercontent = $coverresponse->getContent();
