@@ -12,7 +12,7 @@ use Hschottm\AurigaBundle\ModuleSong;
 
 $GLOBALS['TL_CONFIG']['auriga']['coverpath'] = 'files/auriga/covers/';
 $GLOBALS['TL_CONFIG']['auriga']['fileroot'] = 'files/auriga/recordings/';
-$GLOBALS['TL_CONFIG']['auriga']['filedownloadroot'] = 'http://mp3.nasbrill-soft.de/';
+$GLOBALS['TL_CONFIG']['auriga']['filedownloadroot'] = 'https://mp3.nasbrill-soft.de/';
 
 /**
  * Front end modules
