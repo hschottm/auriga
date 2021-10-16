@@ -383,7 +383,10 @@ class ModuleSong extends ModulePTW implements \uploadable
 			]);
 			$response = $client->request('GET', 'https://musicbrainz.org/ws/2/recording?query=' . \System::urlEncode($data['album']));
 			$content = $response->getContent();
-			$this->Template->boris = $content;
+			$xml = simplexml_load_string($content);
+			$json = json_encode($xml);
+			$array = json_decode($json,TRUE);
+			$this->Template->boris = $array;
 
 			if ($is_admin)
 			{
