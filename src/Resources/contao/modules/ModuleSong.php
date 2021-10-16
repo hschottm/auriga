@@ -381,7 +381,7 @@ class ModuleSong extends ModulePTW implements \uploadable
 					'User-Agent' => 'Auriga Secret Society Pop Index',
 				],
 			]);
-			$response = $client->request('GET', 'https://musicbrainz.org/ws/2/recording?query=' . System::urlEncode($data['album']));
+			$response = $client->request('GET', 'https://musicbrainz.org/ws/2/recording?query=' . \System::urlEncode($data['album']));
 			$content = $response->getContent();
 			$this->Template->boris = $content;
 
