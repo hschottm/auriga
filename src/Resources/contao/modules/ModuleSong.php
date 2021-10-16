@@ -387,14 +387,32 @@ class ModuleSong extends ModulePTW implements \uploadable
 			$xml = simplexml_load_string($content);
 			$json = json_encode($xml);
 			$array = json_decode($json,TRUE);
+
+			if ($array['release-list']["@attributes"]['count'] == 0) {
+				$album = $data["album"];
+				if (strpos($album, "(") > 0) {
+					$album = substr($album, 0, strpos($album, "("));
+				}
+				$response = $client->request('GET', 'https://musicbrainz.org/ws/2/release?query=' . "release:" . \System::urlEncode(trim($album)));// . "&limit=10");
+				$content = $response->getContent();
+				$xml = simplexml_load_string($content);
+				$json = json_encode($xml);
+				$array = json_decode($json,TRUE);
+			}
+
 			$coverclient = HttpClient::create([
 				'headers' => [
 						'User-Agent' => 'Auriga Secret Society Pop Index',
 				],
 			]);
 			$mbids = array();
-			foreach ($array['release-list']['release'] as $release) {
-				$mbid = $release["@attributes"]['id'];
+			if ($array['release-list']["@attributes"]['count'] > 1) {
+				foreach ($array['release-list']['release'] as $release) {
+					$mbid = $release["@attributes"]['id'];
+					if (!in_array($mbid, $mbids)) $mbids[] = $mbid;
+				}
+			} else if ($array['release-list']["@attributes"]['count'] == 1) {
+				$mbid = $array['release-list']['release']["@attributes"]['id'];
 				if (!in_array($mbid, $mbids)) $mbids[] = $mbid;
 			}
 			foreach ($mbids as $mbid) {
