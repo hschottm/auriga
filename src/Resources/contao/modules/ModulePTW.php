@@ -13,6 +13,16 @@ namespace Hschottm\AurigaBundle;
  */
 class ModulePTW extends \Module
 {
+	public function generate()
+	{
+		if ($this->aurigaTpl)
+		{
+			$this->strTemplate = $this->aurigaTpl;
+		}
+	
+		return parent::generate();
+	}
+
 	/**
 	 * Generate module
 	 */
