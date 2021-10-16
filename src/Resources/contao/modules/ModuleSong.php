@@ -378,26 +378,37 @@ class ModuleSong extends ModulePTW implements \uploadable
 		{
 			$client = HttpClient::create([
 				'headers' => [
-					'User-Agent' => 'Auriga Secret Society Pop Index',
+						'User-Agent' => 'Auriga Secret Society Pop Index',
 				],
 			]);
-			$response = $client->request('GET', 'https://musicbrainz.org/ws/2/recording?query=' . \System::urlEncode($data['album']));
+			$response = $client->request('GET', 'https://musicbrainz.org/ws/2/recording?query=' . \System::urlEncode($data['album']) . "&limit=10");
 			$content = $response->getContent();
 			$xml = simplexml_load_string($content);
 			$json = json_encode($xml);
 			$array = json_decode($json,TRUE);
 			$coverclient = HttpClient::create([
 				'headers' => [
-					'User-Agent' => 'Auriga Secret Society Pop Index',
+						'User-Agent' => 'Auriga Secret Society Pop Index',
 				],
 			]);
+			$thumbs = array();
 			foreach ($array['recording-list']['recording'] as $recording) {
-				$mbid = $recording['@attributes']['id'];
+				$mbid = $recording['release-list']['release']["@attributes"]['id'];
 				$coverresponse = $coverclient->request('GET', 'https://coverartarchive.org/release/' . $mbid);
-				$covercontent = $coverresponse->getContent();
-				$this->Template->boris = $covercontent;
+				if ($coverresponse->getStatusCode() < 400) {
+					$covercontent = $coverresponse->getContent();
+					$coverjson = json_decode($covercontent, TRUE);
+					foreach ($coverjson['images'] as $imagedata) {
+						if ($imagedata['front']) {
+							if (!in_array($imagedata['thumbnails']['large'], $thumbs))
+							{
+								$thumbs[] = $imagedata['thumbnails']['large'];
+							}
+						}
+					}
+				}
 			}
-			//$this->Template->boris = $json;
+			$this->Template->coversearch = $thumbs;
 
 			if ($is_admin)
 			{
