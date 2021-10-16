@@ -386,7 +386,18 @@ class ModuleSong extends ModulePTW implements \uploadable
 			$xml = simplexml_load_string($content);
 			$json = json_encode($xml);
 			$array = json_decode($json,TRUE);
-			$this->Template->boris = $json;
+			$coverclient = HttpClient::create([
+				'headers' => [
+					'User-Agent' => 'Auriga Secret Society Pop Index',
+				],
+			]);
+			foreach ($array['recording-list']['recording'] as $recording) {
+				$mbid = $recording['@attributes']['id'];
+				$coverresponse = $coverclient->request('GET', 'https://coverartarchive.org/release/' . $mbid);
+				$covercontent = $coverresponse->getContent();
+				$this->Template->boris = $covercontent;
+			}
+			//$this->Template->boris = $json;
 
 			if ($is_admin)
 			{
