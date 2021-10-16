@@ -386,7 +386,7 @@ class ModuleSong extends ModulePTW implements \uploadable
 			$xml = simplexml_load_string($content);
 			$json = json_encode($xml);
 			$array = json_decode($json,TRUE);
-			$this->Template->boris = $array;
+			$this->Template->boris = $json;
 
 			if ($is_admin)
 			{
