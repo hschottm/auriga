@@ -249,6 +249,7 @@ class ModuleSong extends ModulePTW implements \uploadable
 		$songid = $this->Input->get('song');
 		if (!$songid) return;
 		$this->checkCoverForSong($songid);
+		$thumbs = array();
 		$adventure = $this->getAdventureForSong($song_id);
 		$objSong = $this->Database->prepare("SELECT * FROM tl_broadcast_song WHERE `id` = ?")
 			->execute($songid);
@@ -391,7 +392,6 @@ class ModuleSong extends ModulePTW implements \uploadable
 						'User-Agent' => 'Auriga Secret Society Pop Index',
 				],
 			]);
-			$thumbs = array();
 			$mbids = array();
 			foreach ($array['recording-list']['recording'] as $recording) {
 				$mbid = $recording['release-list']['release']["@attributes"]['id'];
@@ -412,7 +412,6 @@ class ModuleSong extends ModulePTW implements \uploadable
 					}
 				}
 			}
-			$this->Template->coversearch = $thumbs;
 
 			if ($is_admin)
 			{
@@ -468,6 +467,8 @@ class ModuleSong extends ModulePTW implements \uploadable
 			}
 		}
 		$this->Template->song = $data;
+		$this->Template->coverSearch = $thumbs;
+		$this->Template->coverSearchCount = count($thumbs);
 		$this->Template->isAdmin = $is_admin;
 		$this->Template->lngTitle = $GLOBALS['TL_LANG']['tl_module']['song_title'];
 		$this->Template->lngCorrectCover = $GLOBALS['TL_LANG']['tl_module']['qst_correct_cover'];
