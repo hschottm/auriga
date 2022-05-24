@@ -20,7 +20,7 @@ namespace Hschottm\AurigaBundle\Listener\ContaoHook;
  */
 class AddCustomRegexpListener
 {
-	public function addCustomRegexp($strRegexp, $varValue, Widget $objWidget)
+	public function addCustomRegexp($strRegexp, $varValue, $objWidget)
 	{
 		if ($strRegexp == 'length')
 		{

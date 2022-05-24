@@ -594,7 +594,7 @@ class AurigaHelper extends \Backend
 		$this->Template->hrefBack = ampersand(str_replace('&key=popwelt', '', $this->Environment->request));
 		$this->Template->goBack = $GLOBALS['TL_LANG']['MSC']['goBack'];
 		$this->Template->headline = $GLOBALS['TL_LANG']['MSC']['import_popwelt'][0];
-		$this->Template->request = ampersand($this->Environment->request, ENCODE_AMPERSANDS);
+		$this->Template->request = ampersand(\Environment::get('request'));
 		$this->Template->submit = specialchars($GLOBALS['TL_LANG']['tl_broadcast']['import'][0]);
 
 //		$broadcasts = $this->Session->get('broadcasts');

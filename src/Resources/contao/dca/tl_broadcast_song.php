@@ -149,7 +149,11 @@ $GLOBALS['TL_DCA']['tl_broadcast_song'] = array
 			'filter'                  => true,
 			'inputType'               => 'select',
 			'foreignKey'              => 'tl_song_type.songtype',
-			'eval'                    => array('includeBlankOption' => true, 'multiple'=>false, 'tl_class'=>'w50')
+			'eval'                    => array('includeBlankOption' => true, 'multiple'=>false, 'tl_class'=>'w50'),
+			'save_callback' => array
+			(
+				array('tl_broadcast_song', 'saveSongType')
+			)
 		),
 		'length' => array
 		(
@@ -200,6 +204,22 @@ class tl_broadcast_song extends Backend
 	protected function __construct()
 	{
 		parent::__construct();
+	}
+
+		/**
+	 * Autogenerate an adventure alias if it has not been set yet
+	 * @param mixed
+	 * @param object
+	 * @return string
+	 */
+	public function saveSongType($varValue, DataContainer $dc)
+	{
+		// Generate alias if there is none
+		if (!strlen($varValue))
+		{
+			$varValue = '0';
+		}
+		return $varValue;
 	}
 
 	/**
