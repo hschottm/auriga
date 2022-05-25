@@ -1,6 +1,6 @@
 <?php
 
-namespace Hschottm\AurigaBundle\Listener\ContaoHook;
+namespace Hschottm\AurigaBundle\EventListener;
 
 /**
  * @copyright  Helmut Schottmüller 2009
