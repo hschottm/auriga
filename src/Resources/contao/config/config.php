@@ -9,6 +9,7 @@ use Hschottm\AurigaBundle\ModuleBroadcast;
 use Hschottm\AurigaBundle\ModuleBroadcastList;
 use Hschottm\AurigaBundle\ModuleDPI;
 use Hschottm\AurigaBundle\ModuleSong;
+use Hschottm\AurigaBundle\EventListener\AddCustomRegexpListener;
 
 $GLOBALS['TL_CONFIG']['auriga']['coverpath'] = 'files/auriga/covers/';
 $GLOBALS['TL_CONFIG']['auriga']['fileroot'] = 'files/auriga/recordings/';
