@@ -2,6 +2,8 @@
 
 namespace Hschottm\AurigaBundle;
 
+use Contao\PageModel;
+
 /**
  * Class ModuleBroadcast
  *
@@ -52,9 +54,7 @@ class ModuleBroadcast extends ModulePTW
 		// Redirect to jumpTo page
 		if (strlen($this->jumpTo_adventure))
 		{
-			$objPageAdventure = $this->Database->prepare("SELECT id, alias FROM tl_page WHERE id=?")
-										  ->limit(1)
-										  ->execute($this->jumpTo_adventure);
+			$objPageAdventure = PageModel::findById($this->jumpTo_adventure);
 		}
 		else
 		{
@@ -62,9 +62,7 @@ class ModuleBroadcast extends ModulePTW
 		}
 		if (strlen($this->jumpTo_broadcast))
 		{
-			$objPageBroadcast = $this->Database->prepare("SELECT id, alias FROM tl_page WHERE id=?")
-										  ->limit(1)
-										  ->execute($this->jumpTo_broadcast);
+			$objPageBroadcast = PageModel::findById($this->jumpTo_broadcast);
 		}
 		else
 		{
@@ -72,9 +70,7 @@ class ModuleBroadcast extends ModulePTW
 		}
 		if (strlen($this->jumpTo_search))
 		{
-			$objPageSearch = $this->Database->prepare("SELECT id, alias FROM tl_page WHERE id=?")
-										  ->limit(1)
-										  ->execute($this->jumpTo_search);
+			$objPageSearch = PageModel::findById($this->jumpTo_search);
 		}
 		else
 		{
@@ -82,9 +78,7 @@ class ModuleBroadcast extends ModulePTW
 		}
 		if (strlen($this->jumpTo_song))
 		{
-			$objPageSong = $this->Database->prepare("SELECT id, alias FROM tl_page WHERE id=?")
-										  ->limit(1)
-										  ->execute($this->jumpTo_song);
+			$objPageSong = PageModel::findById($this->jumpTo_song);
 		}
 		else
 		{
@@ -173,11 +167,11 @@ class ModuleBroadcast extends ModulePTW
 					'year' => specialchars($objSong->year),
 					'special' => $special,
 					'cover' => $cover,
-					'idurl' => $objPage->getFrontendUrl('/song/' . $objSong->id),
-					'titleurl' => $objPage->getFrontendUrl('/search/' . specialchars($objSong->title) . '/field/title'),
-					'labelurl' => $objPage->getFrontendUrl('/search/' . specialchars($objSong->labelcode) . '/field/labelcode'),
-					'albumurl' => $objPage->getFrontendUrl('/search/' . specialchars($objSong->album) . '/field/album'),
-					'artisturl' => $objPage->getFrontendUrl('/search/' . specialchars($objSong->artist) . '/field/artist'),
+					'idurl' => $objPageSong->getFrontendUrl('/song/' . $objSong->id),
+					'titleurl' => $objPageSearch->getFrontendUrl('/search/' . specialchars($objSong->title) . '/field/title'),
+					'labelurl' => $objPageSearch->getFrontendUrl('/search/' . specialchars($objSong->labelcode) . '/field/labelcode'),
+					'albumurl' => $objPageSearch->getFrontendUrl('/search/' . specialchars($objSong->album) . '/field/album'),
+					'artisturl' => $objPageSearch->getFrontendUrl('/search/' . specialchars($objSong->artist) . '/field/artist'),
 					'labelcode' => specialchars($objSong->labelcode),
 					'length' => specialchars($objSong->length),
 					'composer' => specialchars($objSong->composer),
@@ -202,7 +196,7 @@ class ModuleBroadcast extends ModulePTW
 				'files' => $arrFiles,
 				'songs' => $arrSongs,
 				'providers' => $foundproviders,
-				'url' => $objPage->getFrontendUrl('/broadcast/' . $objBroadcast->id),
+				'url' => $objPageBroadcast->getFrontendUrl('/broadcast/' . $objBroadcast->id),
 				'id' => $objBroadcast->id
 			);
 		}
@@ -255,7 +249,7 @@ class ModuleBroadcast extends ModulePTW
 							$special = '';
 							break;
 					}
-					$titlesong['titleurl'] = $objPage->getFrontendUrl('/song/' . $titlesong['id']);
+					$titlesong['titleurl'] = $objPageSong->getFrontendUrl('/song/' . $titlesong['id']);
 					$titlesong['special'] = $special;
 					$this->Template->titlesong = $titlesong;
 					continue;
@@ -265,7 +259,7 @@ class ModuleBroadcast extends ModulePTW
 
 		$this->loadLanguageFile('tl_module');
 		$this->Template->adventure = $objAdventure->row();
-		$this->Template->urlUp = $objPage->getFrontendUrl('/adventure/' . $objBroadcast->pid);
+		$this->Template->urlUp = $objPageAdventure->getFrontendUrl('/adventure/' . $objBroadcast->pid);
 		$this->Template->broadcasts = $arrBroadcasts;
 		$this->Template->lngBackgroundMusic = $GLOBALS['TL_LANG']['tl_module']['background_music'];
 		$this->Template->lngTitle = $GLOBALS['TL_LANG']['tl_module']['song_title'];
@@ -287,7 +281,7 @@ class ModuleBroadcast extends ModulePTW
 		}
 		else
 		{
-			$this->Template->nav_first_url = $objPage->getFrontendUrl('/broadcast/' . $firstBroadcast['date']);
+			$this->Template->nav_first_url = $objPageBroadcast->getFrontendUrl('/broadcast/' . $firstBroadcast['date']);
 		}
 		$lastBroadcast = $this->Database->prepare("SELECT * FROM tl_broadcast WHERE pid = ? ORDER BY sorting DESC")
 			->execute($objBroadcast->pid)
@@ -298,7 +292,7 @@ class ModuleBroadcast extends ModulePTW
 		}
 		else
 		{
-			$this->Template->nav_last_url = $objPage->getFrontendUrl('/broadcast/' . $lastBroadcast['date']);
+			$this->Template->nav_last_url = $objPageBroadcast->getFrontendUrl('/broadcast/' . $lastBroadcast['date']);
 		}
 		$nextBroadcast = $this->Database->prepare("SELECT * FROM tl_broadcast WHERE pid = ? AND `date` > ? ORDER BY sorting ASC")
 			->execute($objBroadcast->pid, $objBroadcast->date)
@@ -309,7 +303,7 @@ class ModuleBroadcast extends ModulePTW
 		}
 		else
 		{
-			$this->Template->nav_next_url = $objPage->getFrontendUrl('/broadcast/' . $nextBroadcast['date']);
+			$this->Template->nav_next_url = $objPageBroadcast->getFrontendUrl('/broadcast/' . $nextBroadcast['date']);
 		}
 		$prevBroadcast = $this->Database->prepare("SELECT * FROM tl_broadcast WHERE pid = ? AND `date` < ? ORDER BY sorting DESC")
 			->execute($objBroadcast->pid, $objBroadcast->date)
@@ -320,7 +314,7 @@ class ModuleBroadcast extends ModulePTW
 		}
 		else
 		{
-			$this->Template->nav_prev_url = $objPage->getFrontendUrl('/broadcast/' . $prevBroadcast['date']);
+			$this->Template->nav_prev_url = $objPageBroadcast->getFrontendUrl('/broadcast/' . $prevBroadcast['date']);
 		}
 		$this->Template->nav_first_title = $GLOBALS['TL_LANG']['tl_module']['goto_first_broadcast'];
 		$this->Template->nav_prev_title = $GLOBALS['TL_LANG']['tl_module']['goto_previous_broadcast'];

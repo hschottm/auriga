@@ -2,6 +2,9 @@
 
 namespace Hschottm\AurigaBundle;
 
+use Contao\PageModel;
+
+
 /**
  * Class ModuleAdventureList
  *
@@ -56,9 +59,7 @@ class ModuleAdventureList extends ModulePTW
 		// Redirect to jumpTo page
 		if (strlen($this->jumpTo_adventure))
 		{
-			$objNextPage = $this->Database->prepare("SELECT id, alias FROM tl_page WHERE id=?")
-										  ->limit(1)
-										  ->execute($this->jumpTo_adventure);
+			$objNextPage = PageModel::findById($this->jumpTo_adventure);
 		}
 		else
 		{

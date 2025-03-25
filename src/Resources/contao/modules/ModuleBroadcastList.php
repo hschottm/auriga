@@ -2,6 +2,7 @@
 
 namespace Hschottm\AurigaBundle;
 
+use Contao\PageModel;
 
 /**
  * Class ModuleBroadcastList
@@ -53,9 +54,7 @@ class ModuleBroadcastList extends ModulePTW
 		// Redirect to jumpTo page
 		if (strlen($this->jumpTo_broadcast))
 		{
-			$objPageBroadcast = $this->Database->prepare("SELECT id, alias FROM tl_page WHERE id=?")
-										  ->limit(1)
-										  ->execute($this->jumpTo_broadcast);
+			$objPageBroadcast = PageModel::findById($this->jumpTo_broadcast);
 		}
 		else
 		{
@@ -109,7 +108,7 @@ class ModuleBroadcastList extends ModulePTW
 				'samplerate' => $objBroadcast->samplerate,
 				'files' => $files,
 				'providers' => $foundproviders,
-				'url' => $objPage->getFrontendUrl('/broadcast/' . $objBroadcast->date),
+				'url' => $objPageBroadcast->getFrontendUrl('/broadcast/' . $objBroadcast->date),
 				'id' => $objBroadcast->id
 			);
 		}

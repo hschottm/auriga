@@ -3,6 +3,7 @@
 namespace Hschottm\AurigaBundle;
 
 use Symfony\Component\HttpClient\HttpClient;
+use Contao\PageModel;
 
 
 /**
@@ -248,6 +249,14 @@ class ModuleSong extends ModulePTW implements \uploadable
 		//require_once(TL_ROOT . '/plugins/cloudfusion/lib/requestcore/requestcore.class.php');
 		$songid = $this->Input->get('song');
 		if (!$songid) return;
+		if (strlen($this->jumpTo_song))
+		{
+			$objPageSong = PageModel::findById($this->jumpTo_song);
+		}
+		else
+		{
+			$objPageSong = $objPage;
+		}
 		$this->checkCoverForSong($songid);
 		$thumbs = array();
 		$adventure = $this->getAdventureForSong($song_id);
@@ -306,7 +315,7 @@ class ModuleSong extends ModulePTW implements \uploadable
 					}
 				}
 			}
-			$this->redirect($objPage->getFrontendUrl('/song/' . $objSong->id));
+			$this->redirect($objPageSong->getFrontendUrl('/song/' . $objSong->id));
 		}
 
 		$arrCover = $this->Database->prepare("SELECT cover FROM tl_song_cover WHERE song = ?")
@@ -363,7 +372,7 @@ class ModuleSong extends ModulePTW implements \uploadable
 					->execute($arrCover['cover']);
 				$objResult = $this->Database->prepare("DELETE FROM tl_song_cover WHERE cover = ?")
 					->execute($arrCover['cover']);
-				$this->redirect($objPage->getFrontendUrl('/song/' . $objSong->id));
+				$this->redirect($objPageSong->getFrontendUrl('/song/' . $objSong->id));
 			}
 			else
 			{
@@ -476,11 +485,11 @@ class ModuleSong extends ModulePTW implements \uploadable
 					//$this->Session->set('foundimages', $foundimages);
 				}
 				$possibleIndex = strlen($this->Input->get('imgidx')) ? $this->Input->get('imgidx') : 0;
-				if (count($foundimages) > $possibleIndex+1) $this->Template->urlShowNext = $objPage->getFrontendUrl('/song/' . $objSong->id . '/imgidx/' . ($possibleIndex+1));
-				if ($possibleIndex > 0) $this->Template->urlShowPrev = $objPage->getFrontendUrl('/song/' . $objSong->id . '/imgidx/' . ($possibleIndex-1));
+				if (count($foundimages) > $possibleIndex+1) $this->Template->urlShowNext = $objPageSong->getFrontendUrl('/song/' . $objSong->id . '/imgidx/' . ($possibleIndex+1));
+				if ($possibleIndex > 0) $this->Template->urlShowPrev = $objPageSong->getFrontendUrl('/song/' . $objSong->id . '/imgidx/' . ($possibleIndex-1));
 				$this->Template->possibleImage = $foundimages[$possibleIndex]['preview'];
 				$this->Template->imagePosition = ($possibleIndex+1) . '/' . count($foundimages);
-				$this->Template->formaction = $objPage->getFrontendUrl('/song/' . $objSong->id);
+				$this->Template->formaction = $objPageSong->getFrontendUrl('/song/' . $objSong->id);
 				$this->Template->usecover = $possibleIndex;
 			}
 		}

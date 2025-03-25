@@ -2,6 +2,7 @@
 
 namespace Hschottm\AurigaBundle;
 
+use Contao\PageModel;
 
 /**
  * Class ModulePTW
@@ -81,9 +82,7 @@ class ModulePTW extends \Module
 		// Redirect to jumpTo page
 		if (strlen($this->jumpTo_adventure))
 		{
-			$objPageAdventure = $this->Database->prepare("SELECT id, alias FROM tl_page WHERE id=?")
-										  ->limit(1)
-										  ->execute($this->jumpTo_adventure);
+			$objPageAdventure = PageModel::findById($this->jumpTo_adventure);
 		}
 		else
 		{
@@ -91,9 +90,7 @@ class ModulePTW extends \Module
 		}
 		if (strlen($this->jumpTo_broadcast))
 		{
-			$objPageBroadcast = $this->Database->prepare("SELECT id, alias FROM tl_page WHERE id=?")
-										  ->limit(1)
-										  ->execute($this->jumpTo_broadcast);
+			$objPageBroadcast = PageModel::findById($this->jumpTo_broadcast);
 		}
 		else
 		{
@@ -101,9 +98,7 @@ class ModulePTW extends \Module
 		}
 		if (strlen($this->jumpTo_song))
 		{
-			$objPageSong = $this->Database->prepare("SELECT id, alias FROM tl_page WHERE id=?")
-										  ->limit(1)
-										  ->execute($this->jumpTo_song);
+			$objPageSong = PageModel::findById($this->jumpTo_song);
 		}
 		else
 		{
@@ -117,8 +112,8 @@ class ModulePTW extends \Module
 			->execute($arrBroadcast['id'])
 			->fetchAssoc();
 		return array(
-			array('title' => $arrAdventure['numbering'] . '. ' . $arrAdventure['title'], 'url' => $objPage->getFrontendUrl('/adventure/' . $arrAdventure['id'])),
-			array('title' => $arrBroadcast['chapter'] . '. ' . $arrBroadcast['title'], 'url' => $objPage->getFrontendUrl('/broadcast/' . $arrBroadcast['date']))
+			array('title' => $arrAdventure['numbering'] . '. ' . $arrAdventure['title'], 'url' => $objPageAdventure->getFrontendUrl('/adventure/' . $arrAdventure['id'])),
+			array('title' => $arrBroadcast['chapter'] . '. ' . $arrBroadcast['title'], 'url' => $objPageBroadcast->getFrontendUrl('/broadcast/' . $arrBroadcast['date']))
 		);
 	}
 

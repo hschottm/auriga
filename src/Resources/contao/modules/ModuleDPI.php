@@ -2,6 +2,7 @@
 
 namespace Hschottm\AurigaBundle;
 
+use Contao\PageModel;
 
 /**
  * Class ModuleDPI
@@ -53,9 +54,7 @@ class ModuleDPI extends ModulePTW
 		// Redirect to jumpTo page
 		if (strlen($this->jumpTo_adventure))
 		{
-			$objPageAdventure = $this->Database->prepare("SELECT id, alias FROM tl_page WHERE id=?")
-										  ->limit(1)
-										  ->execute($this->jumpTo_adventure);
+			$objPageAdventure = PageModel::findById($this->jumpTo_adventure);
 		}
 		else
 		{
@@ -63,9 +62,7 @@ class ModuleDPI extends ModulePTW
 		}
 		if (strlen($this->jumpTo_broadcast))
 		{
-			$objPageBroadcast = $this->Database->prepare("SELECT id, alias FROM tl_page WHERE id=?")
-										  ->limit(1)
-										  ->execute($this->jumpTo_broadcast);
+			$objPageBroadcast = PageModel::findById($this->jumpTo_broadcast);
 		}
 		else
 		{
@@ -73,9 +70,7 @@ class ModuleDPI extends ModulePTW
 		}
 		if (strlen($this->jumpTo_song))
 		{
-			$objPageSong = $this->Database->prepare("SELECT id, alias FROM tl_page WHERE id=?")
-										  ->limit(1)
-										  ->execute($this->jumpTo_song);
+			$objPageSong = PageModel::findById($this->jumpTo_song);
 		}
 		else
 		{
@@ -155,12 +150,12 @@ class ModuleDPI extends ModulePTW
 					'year' => specialchars($objSong->year),
 					'special' => $special,
 					'cover' => $cover,
-					'idurl' => $objPage->getFrontendUrl('/song/' . $objSong->id),
-					'titleurl' => $objPage->getFrontendUrl('/search/' . specialchars($objSong->title) . '/field/title'),
-					'advurl' => $objPage->getFrontendUrl('/adventure/' . $objSong->adventureid),
-					'labelurl' => $objPage->getFrontendUrl('/search/' . specialchars($objSong->labelcode) . '/field/labelcode'),
-					'albumurl' => $objPage->getFrontendUrl('/search/' . specialchars($objSong->album) . '/field/album'),
-					'artisturl' => $objPage->getFrontendUrl('/search/' . specialchars($objSong->artist) . '/field/artist'),
+					'idurl' => $objPageSong->getFrontendUrl('/song/' . $objSong->id),
+					'titleurl' => $objPageSearch->getFrontendUrl('/search/' . specialchars($objSong->title) . '/field/title'),
+					'advurl' => $objPageAdventure->getFrontendUrl('/adventure/' . $objSong->adventureid),
+					'labelurl' => $objPageSearch->getFrontendUrl('/search/' . specialchars($objSong->labelcode) . '/field/labelcode'),
+					'albumurl' => $objPageSearch->getFrontendUrl('/search/' . specialchars($objSong->album) . '/field/album'),
+					'artisturl' => $objPageSearch->getFrontendUrl('/search/' . specialchars($objSong->artist) . '/field/artist'),
 					'labelcode' => specialchars($objSong->labelcode),
 					'length' => specialchars($objSong->length),
 					'composer' => specialchars($objSong->composer),

@@ -28,6 +28,7 @@ namespace Hschottm\AurigaBundle;
  * @filesource
  */
 
+use Contao\PageModel;
 
 /**
  * Class ContentBackgroundMusic
@@ -76,9 +77,7 @@ class ContentSpecialMusic extends \ContentElement
 
 		if (strlen($this->jumpTo_song))
 		{
-			$objPageSong = $this->Database->prepare("SELECT id, alias FROM tl_page WHERE id=?")
-										  ->limit(1)
-										  ->execute($this->jumpTo_song);
+			$objPageSong = PageModel::findById($this->jumpTo_song);
 		}
 		else
 		{
@@ -126,7 +125,7 @@ class ContentSpecialMusic extends \ContentElement
 				'year' => specialchars($objSong->year),
 				'special' => $special,
 				'cover' => $cover,
-				'titleurl' => $objPage->getFrontendUrl('/song/' . $objSong->id),
+				'titleurl' => $objPageSong->getFrontendUrl('/song/' . $objSong->id),
 				'labelcode' => specialchars($objSong->labelcode),
 				'length' => specialchars($objSong->length),
 				'composer' => specialchars($objSong->composer),
