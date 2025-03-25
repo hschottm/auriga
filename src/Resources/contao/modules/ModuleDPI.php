@@ -76,6 +76,7 @@ class ModuleDPI extends ModulePTW
 		{
 			$objPageSong = $objPage;
 		}
+		$objPageSearch = $objPage;
 		$arrGenres = $this->Database->prepare("SELECT * FROM tl_genre")
 			->execute()
 			->fetchAllAssoc();
