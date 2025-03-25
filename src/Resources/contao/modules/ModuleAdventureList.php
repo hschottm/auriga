@@ -59,11 +59,11 @@ class ModuleAdventureList extends ModulePTW
 		// Redirect to jumpTo page
 		if (strlen($this->jumpTo_adventure))
 		{
-			$objNextPage = PageModel::findById($this->jumpTo_adventure);
+			$objPageAdventure = PageModel::findById($this->jumpTo_adventure);
 		}
 		else
 		{
-			$objNextPage = $objPage;
+			$objPageAdventure = $objPage;
 		}
 		while ($objAdventure->next())
 		{
@@ -73,7 +73,7 @@ class ModuleAdventureList extends ModulePTW
 				'description' => specialchars($objAdventure->description),
 				'alias' => $objAdventure->alias,
 				'numbering' => $objAdventure->numbering,
-				'url' => $objPage->getFrontendUrl('/adventure/' . $objAdventure->id),    
+				'url' => $objPageAdventure->getFrontendUrl('/adventure/' . $objAdventure->id),    
 				'id' => $objAdventure->id
 			);
 		}
