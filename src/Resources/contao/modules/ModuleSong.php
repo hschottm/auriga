@@ -306,7 +306,7 @@ class ModuleSong extends ModulePTW implements \uploadable
 					}
 				}
 			}
-			$this->redirect($this->generateFrontendUrl($objPage->row(), '/song/' . $objSong->id));
+			$this->redirect($objPage->getFrontendUrl('/song/' . $objSong->id));
 		}
 
 		$arrCover = $this->Database->prepare("SELECT cover FROM tl_song_cover WHERE song = ?")
@@ -363,7 +363,7 @@ class ModuleSong extends ModulePTW implements \uploadable
 					->execute($arrCover['cover']);
 				$objResult = $this->Database->prepare("DELETE FROM tl_song_cover WHERE cover = ?")
 					->execute($arrCover['cover']);
-				$this->redirect($this->generateFrontendUrl($objPage->row(), '/song/' . $objSong->id));
+				$this->redirect($objPage->getFrontendUrl('/song/' . $objSong->id));
 			}
 			else
 			{
@@ -476,11 +476,11 @@ class ModuleSong extends ModulePTW implements \uploadable
 					//$this->Session->set('foundimages', $foundimages);
 				}
 				$possibleIndex = strlen($this->Input->get('imgidx')) ? $this->Input->get('imgidx') : 0;
-				if (count($foundimages) > $possibleIndex+1) $this->Template->urlShowNext = $this->generateFrontendUrl($objPage->row(), '/song/' . $objSong->id . '/imgidx/' . ($possibleIndex+1));
-				if ($possibleIndex > 0) $this->Template->urlShowPrev = $this->generateFrontendUrl($objPage->row(), '/song/' . $objSong->id . '/imgidx/' . ($possibleIndex-1));
+				if (count($foundimages) > $possibleIndex+1) $this->Template->urlShowNext = $objPage->getFrontendUrl('/song/' . $objSong->id . '/imgidx/' . ($possibleIndex+1));
+				if ($possibleIndex > 0) $this->Template->urlShowPrev = $objPage->getFrontendUrl('/song/' . $objSong->id . '/imgidx/' . ($possibleIndex-1));
 				$this->Template->possibleImage = $foundimages[$possibleIndex]['preview'];
 				$this->Template->imagePosition = ($possibleIndex+1) . '/' . count($foundimages);
-				$this->Template->formaction = $this->generateFrontendUrl($objPage->row(), '/song/' . $objSong->id);
+				$this->Template->formaction = $objPage->getFrontendUrl('/song/' . $objSong->id);
 				$this->Template->usecover = $possibleIndex;
 			}
 		}

@@ -72,7 +72,7 @@ class ModuleAdventureList extends ModulePTW
 				'description' => specialchars($objAdventure->description),
 				'alias' => $objAdventure->alias,
 				'numbering' => $objAdventure->numbering,
-				'url' => $this->generateFrontendUrl($objNextPage->row(), '/adventure/' . $objAdventure->id),
+				'url' => $objPage->getFrontendUrl('/adventure/' . $objAdventure->id),    
 				'id' => $objAdventure->id
 			);
 		}

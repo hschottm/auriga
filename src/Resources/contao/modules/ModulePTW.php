@@ -117,8 +117,8 @@ class ModulePTW extends \Module
 			->execute($arrBroadcast['id'])
 			->fetchAssoc();
 		return array(
-			array('title' => $arrAdventure['numbering'] . '. ' . $arrAdventure['title'], 'url' => $this->generateFrontendUrl($objPageAdventure->row(), '/adventure/' . $arrAdventure['id'])),
-			array('title' => $arrBroadcast['chapter'] . '. ' . $arrBroadcast['title'], 'url' => $this->generateFrontendUrl($objPageBroadcast->row(), '/broadcast/' . $arrBroadcast['date']))
+			array('title' => $arrAdventure['numbering'] . '. ' . $arrAdventure['title'], 'url' => $objPage->getFrontendUrl('/adventure/' . $arrAdventure['id'])),
+			array('title' => $arrBroadcast['chapter'] . '. ' . $arrBroadcast['title'], 'url' => $objPage->getFrontendUrl('/broadcast/' . $arrBroadcast['date']))
 		);
 	}
 

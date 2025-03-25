@@ -109,7 +109,7 @@ class ModuleBroadcastList extends ModulePTW
 				'samplerate' => $objBroadcast->samplerate,
 				'files' => $files,
 				'providers' => $foundproviders,
-				'url' => $this->generateFrontendUrl($objPageBroadcast->row(), '/broadcast/' . $objBroadcast->date),
+				'url' => $objPage->getFrontendUrl('/broadcast/' . $objBroadcast->date),
 				'id' => $objBroadcast->id
 			);
 		}

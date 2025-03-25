@@ -126,7 +126,7 @@ class ContentSpecialMusic extends \ContentElement
 				'year' => specialchars($objSong->year),
 				'special' => $special,
 				'cover' => $cover,
-				'titleurl' => $this->generateFrontendUrl($objPageSong->row(), '/song/' . $objSong->id),
+				'titleurl' => $objPage->getFrontendUrl('/song/' . $objSong->id),
 				'labelcode' => specialchars($objSong->labelcode),
 				'length' => specialchars($objSong->length),
 				'composer' => specialchars($objSong->composer),

@@ -173,11 +173,11 @@ class ModuleBroadcast extends ModulePTW
 					'year' => specialchars($objSong->year),
 					'special' => $special,
 					'cover' => $cover,
-					'idurl' => $this->generateFrontendUrl($objPageSong->row(), '/song/' . $objSong->id),
-					'titleurl' => $this->generateFrontendUrl($objPageSearch->row(), '/search/' . specialchars($objSong->title) . '/field/title'),
-					'labelurl' => $this->generateFrontendUrl($objPageSearch->row(), '/search/' . specialchars($objSong->labelcode) . '/field/labelcode'),
-					'albumurl' => $this->generateFrontendUrl($objPageSearch->row(), '/search/' . specialchars($objSong->album) . '/field/album'),
-					'artisturl' => $this->generateFrontendUrl($objPageSearch->row(), '/search/' . specialchars($objSong->artist) . '/field/artist'),
+					'idurl' => $objPage->getFrontendUrl('/song/' . $objSong->id),
+					'titleurl' => $objPage->getFrontendUrl('/search/' . specialchars($objSong->title) . '/field/title'),
+					'labelurl' => $objPage->getFrontendUrl('/search/' . specialchars($objSong->labelcode) . '/field/labelcode'),
+					'albumurl' => $objPage->getFrontendUrl('/search/' . specialchars($objSong->album) . '/field/album'),
+					'artisturl' => $objPage->getFrontendUrl('/search/' . specialchars($objSong->artist) . '/field/artist'),
 					'labelcode' => specialchars($objSong->labelcode),
 					'length' => specialchars($objSong->length),
 					'composer' => specialchars($objSong->composer),
@@ -202,7 +202,7 @@ class ModuleBroadcast extends ModulePTW
 				'files' => $arrFiles,
 				'songs' => $arrSongs,
 				'providers' => $foundproviders,
-				'url' => $this->generateFrontendUrl($objPageBroadcast->row(), '/broadcast/' . $objBroadcast->id),
+				'url' => $objPage->getFrontendUrl('/broadcast/' . $objBroadcast->id),
 				'id' => $objBroadcast->id
 			);
 		}
@@ -255,7 +255,7 @@ class ModuleBroadcast extends ModulePTW
 							$special = '';
 							break;
 					}
-					$titlesong['titleurl'] = $this->generateFrontendUrl($objPageSong->row(), '/song/' . $titlesong['id']);
+					$titlesong['titleurl'] = $objPage->getFrontendUrl('/song/' . $titlesong['id']);
 					$titlesong['special'] = $special;
 					$this->Template->titlesong = $titlesong;
 					continue;
@@ -265,7 +265,7 @@ class ModuleBroadcast extends ModulePTW
 
 		$this->loadLanguageFile('tl_module');
 		$this->Template->adventure = $objAdventure->row();
-		$this->Template->urlUp = $this->generateFrontendUrl($objPageAdventure->row(), '/adventure/' . $objBroadcast->pid);
+		$this->Template->urlUp = $objPage->getFrontendUrl('/adventure/' . $objBroadcast->pid);
 		$this->Template->broadcasts = $arrBroadcasts;
 		$this->Template->lngBackgroundMusic = $GLOBALS['TL_LANG']['tl_module']['background_music'];
 		$this->Template->lngTitle = $GLOBALS['TL_LANG']['tl_module']['song_title'];
@@ -287,7 +287,7 @@ class ModuleBroadcast extends ModulePTW
 		}
 		else
 		{
-			$this->Template->nav_first_url = $this->generateFrontendUrl($objPage->row(), '/broadcast/' . $firstBroadcast['date']);
+			$this->Template->nav_first_url = $objPage->getFrontendUrl('/broadcast/' . $firstBroadcast['date']);
 		}
 		$lastBroadcast = $this->Database->prepare("SELECT * FROM tl_broadcast WHERE pid = ? ORDER BY sorting DESC")
 			->execute($objBroadcast->pid)
@@ -298,7 +298,7 @@ class ModuleBroadcast extends ModulePTW
 		}
 		else
 		{
-			$this->Template->nav_last_url = $this->generateFrontendUrl($objPage->row(), '/broadcast/' . $lastBroadcast['date']);
+			$this->Template->nav_last_url = $objPage->getFrontendUrl('/broadcast/' . $lastBroadcast['date']);
 		}
 		$nextBroadcast = $this->Database->prepare("SELECT * FROM tl_broadcast WHERE pid = ? AND `date` > ? ORDER BY sorting ASC")
 			->execute($objBroadcast->pid, $objBroadcast->date)
@@ -309,7 +309,7 @@ class ModuleBroadcast extends ModulePTW
 		}
 		else
 		{
-			$this->Template->nav_next_url = $this->generateFrontendUrl($objPage->row(), '/broadcast/' . $nextBroadcast['date']);
+			$this->Template->nav_next_url = $objPage->getFrontendUrl('/broadcast/' . $nextBroadcast['date']);
 		}
 		$prevBroadcast = $this->Database->prepare("SELECT * FROM tl_broadcast WHERE pid = ? AND `date` < ? ORDER BY sorting DESC")
 			->execute($objBroadcast->pid, $objBroadcast->date)
@@ -320,7 +320,7 @@ class ModuleBroadcast extends ModulePTW
 		}
 		else
 		{
-			$this->Template->nav_prev_url = $this->generateFrontendUrl($objPage->row(), '/broadcast/' . $prevBroadcast['date']);
+			$this->Template->nav_prev_url = $objPage->getFrontendUrl('/broadcast/' . $prevBroadcast['date']);
 		}
 		$this->Template->nav_first_title = $GLOBALS['TL_LANG']['tl_module']['goto_first_broadcast'];
 		$this->Template->nav_prev_title = $GLOBALS['TL_LANG']['tl_module']['goto_previous_broadcast'];

@@ -155,12 +155,12 @@ class ModuleDPI extends ModulePTW
 					'year' => specialchars($objSong->year),
 					'special' => $special,
 					'cover' => $cover,
-					'idurl' => $this->generateFrontendUrl($objPageSong->row(), '/song/' . $objSong->id),
-					'titleurl' => $this->generateFrontendUrl($objPage->row(), '/search/' . specialchars($objSong->title) . '/field/title'),
-					'advurl' => $this->generateFrontendUrl($objPageAdventure->row(), '/adventure/' . $objSong->adventureid),
-					'labelurl' => $this->generateFrontendUrl($objPage->row(), '/search/' . specialchars($objSong->labelcode) . '/field/labelcode'),
-					'albumurl' => $this->generateFrontendUrl($objPage->row(), '/search/' . specialchars($objSong->album) . '/field/album'),
-					'artisturl' => $this->generateFrontendUrl($objPage->row(), '/search/' . specialchars($objSong->artist) . '/field/artist'),
+					'idurl' => $objPage->getFrontendUrl('/song/' . $objSong->id),
+					'titleurl' => $objPage->getFrontendUrl('/search/' . specialchars($objSong->title) . '/field/title'),
+					'advurl' => $objPage->getFrontendUrl('/adventure/' . $objSong->adventureid),
+					'labelurl' => $objPage->getFrontendUrl('/search/' . specialchars($objSong->labelcode) . '/field/labelcode'),
+					'albumurl' => $objPage->getFrontendUrl('/search/' . specialchars($objSong->album) . '/field/album'),
+					'artisturl' => $objPage->getFrontendUrl('/search/' . specialchars($objSong->artist) . '/field/artist'),
 					'labelcode' => specialchars($objSong->labelcode),
 					'length' => specialchars($objSong->length),
 					'composer' => specialchars($objSong->composer),
@@ -197,7 +197,7 @@ class ModuleDPI extends ModulePTW
 		$this->Template->savedResults = $results;
 		$this->Template->options = $options;
 		$this->Template->results = $arrResults;
-		$this->Template->formaction = $this->generateFrontendUrl($objPage->row());
+		$this->Template->formaction = $objPage->getFrontendUrl('');
 		$this->Template->foundResults = $foundResults;
 		$this->Template->foundsongs = $arrFoundSongs;
 		$this->Template->resFrom = ($page-1)*$results+1;
