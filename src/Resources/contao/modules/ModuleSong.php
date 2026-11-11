@@ -67,7 +67,7 @@ class ModuleSong extends ModulePTW
 
 	protected function coverSearch(): CoverSearch
 	{
-		return new CoverSearch();
+		return new CoverSearch(provider: (string) (\Contao\Config::get('aurigaCoverProvider') ?: 'musicbrainz'), discogsToken: (string) \Contao\Config::get('aurigaDiscogsToken'));
 	}
 
 	protected function uploadCoverFile($song_id, $data)

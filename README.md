@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.3.7**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.3.8**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:^1.3.7 --with-all-dependencies
+composer require hschottm/auriga:^1.3.8 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -134,3 +134,26 @@ Service errors do not trigger broader MusicBrainz searches. Existing positive
 (24 hours) and empty-result (10 minutes) caching remains; the cache key version
 was changed so old limited results are not reused. The URL-list return format
 and manual cover selection/storage are unchanged.
+
+## Cover search provider in 1.3.8
+
+Under **System → Settings → Auriga – Cover search**, select MusicBrainz / Cover Art
+Archive (the default, no credentials required) or Discogs. For Discogs, enter a
+personal API token from your Discogs developer settings. Save the settings.
+Existing Bootstrap overrides and the cover save form need no changes.
+
+The token field always renders empty. Leave it empty to retain the token, enter a
+new token to replace it, or select the delete checkbox to remove it. Deletion wins
+if both are submitted. The token is stored in the installation's
+`system/config/localconfig.php`, outside the public document root; keep this local
+configuration and its backups out of source control. It is not encrypted at rest.
+The secret is not included in Contao's configuration change log or frontend HTML.
+Only Discogs API requests receive the authorization header; image downloads do not.
+
+Discogs searches releases by album and artist, then tries a cleaned edition title,
+then the album alone if no covers were found. At most three API calls and eight
+unique cover images are returned, within a 15-second budget. Missing tokens,
+authorization errors and rate limits leave the page usable with no suggestions;
+they do not silently switch providers. Results are cached separately per provider
+and token (24 hours for matches, 10 minutes for empty results). Existing saved
+covers are unchanged. Search uses the Discogs API's `cover_image` URLs.

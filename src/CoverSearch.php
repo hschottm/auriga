@@ -14,7 +14,7 @@ final class CoverSearch
     private ?float $deadline = null;
     private float $lastMusicBrainzRequest = 0.0;
 
-    public function __construct(?HttpClientInterface $client = null, ?\Psr\Cache\CacheItemPoolInterface $cache = null)
+    public function __construct(?HttpClientInterface $client = null, ?\Psr\Cache\CacheItemPoolInterface $cache = null, private string $provider = 'musicbrainz', private string $discogsToken = '')
     {
         $this->cache = $cache;
         if ($cache === null && \Contao\System::getContainer() !== null) {
@@ -29,13 +29,13 @@ final class CoverSearch
         ]);
     }
 
-    private function content(string $url, int $limit): ?string
+    private function content(string $url, int $limit, array $options = []): ?string
     {
         $response = null;
         try {
             $remaining = $this->deadline === null ? 5.0 : min(5.0, $this->deadline - microtime(true));
             if ($remaining <= 0) return null;
-            $response = $this->client->request('GET', $url, ['timeout' => min(3.0, $remaining), 'max_duration' => $remaining]);
+            $response = $this->client->request('GET', $url, ['timeout' => min(3.0, $remaining), 'max_duration' => $remaining] + $options);
             if ($response->getStatusCode() !== 200) return null;
             $content = '';
             foreach ($this->client->stream($response) as $chunk) {
@@ -50,9 +50,9 @@ final class CoverSearch
         }
     }
 
-    private function json(string $url): array
+    private function json(string $url, array $options = []): array
     {
-        $content = $this->content($url, 1000000);
+        $content = $this->content($url, 1000000, $options);
         if ($content === null) return [];
         $data = json_decode($content, true);
         return is_array($data) ? $data : [];
@@ -60,7 +60,7 @@ final class CoverSearch
 
     public function search(string $album, string $artist): array
     {
-        $key = hash('sha256', serialize(['v2', trim($album), trim($artist)]));
+        $key = hash('sha256', serialize(['v3', $this->provider, hash('sha256', $this->discogsToken), trim($album), trim($artist)]));
         $item = null;
         try {
             if ($this->cache !== null) {
@@ -70,7 +70,7 @@ final class CoverSearch
         } catch (\Exception $exception) {
             // A cache failure must not break the song page.
         }
-        $images = $this->searchRemote($album, $artist);
+        $images = $this->provider === 'discogs' ? $this->searchDiscogs($album, $artist) : $this->searchRemote($album, $artist);
         try {
             if ($item !== null) $this->cache->save($item->set($images)->expiresAfter($images ? 86400 : 600));
         } catch (\Exception $exception) {
@@ -161,6 +161,50 @@ final class CoverSearch
                 if ($images !== []) return $images;
             }
             return $images;
+        } finally {
+            $this->deadline = null;
+        }
+    }
+
+    private function searchDiscogs(string $album, string $artist): array
+    {
+        $album = trim($album);
+        $artist = trim($artist);
+        // Tokens are opaque credentials, never query parameters or global client headers.
+        if ($album === '' || !preg_match('/^[A-Za-z0-9_-]+$/D', $this->discogsToken)) return [];
+        $clean = $this->cleanAlbum($album);
+        $queries = array_unique([
+            http_build_query(['release_title' => $album, 'artist' => $artist]),
+            http_build_query(['release_title' => $clean, 'artist' => $artist]),
+            http_build_query(['release_title' => $clean, 'artist' => '']),
+        ]);
+        $this->deadline = microtime(true) + 15;
+        try {
+            foreach ($queries as $query) {
+                $data = $this->json('https://api.discogs.com/database/search?type=release&per_page=10&page=1&'.$query, [
+                    'headers' => [
+                        'Authorization' => 'Discogs token='.$this->discogsToken,
+                        'User-Agent' => 'Auriga/1.0 (https://github.com/hschottm/auriga)',
+                    ],
+                    'max_redirects' => 0,
+                ]);
+                // Stop on authorization failures, rate limits and malformed responses.
+                if (!is_array($data['results'] ?? null)) return [];
+                $images = [];
+                foreach (array_slice($data['results'], 0, 10) as $result) {
+                    if (!is_array($result)) continue;
+                    $url = $result['cover_image'] ?? null;
+                    if (!is_string($url) || !filter_var($url, FILTER_VALIDATE_URL)) continue;
+                    $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+                    if (parse_url($url, PHP_URL_SCHEME) !== 'https' ||
+                        !in_array($host, ['i.discogs.com', 'img.discogs.com'], true) ||
+                        str_contains($url, 'spacer.gif')) continue;
+                    $images[] = $url;
+                }
+                $images = array_values(array_unique($images));
+                if ($images) return array_slice($images, 0, 8);
+            }
+            return [];
         } finally {
             $this->deadline = null;
         }
