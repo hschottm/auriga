@@ -20,6 +20,7 @@ export AURIGA_TEST_PROJECT=/absolute/path/to/disposable-contao57
 export DATABASE_URL='mysql://USER:PASSWORD@HOST/auriga57_test_local?serverVersion=mariadb-10.11.19'
 php tests/contao57-integration.php
 php tests/template-output.php
+php tests/song-carousel.php
 php tests/contao57-http.php
 ```
 
@@ -28,3 +29,5 @@ php tests/contao57-http.php
 The template-output test uses the real Contao Twig/legacy bridge (no PHP-template stubs) to cover escaping, HTML attributes, form tokens and cover states.
 
 The scripts test rendering, backend callbacks, missing records, search input validation, UUID/path handling, real cover persistence and rollback. External image requests are mocked. The manual browser file-upload transport and production data are not covered.
+
+The carousel test checks per-slide selection indexes and CSRF tokens, selected-slide state, guest/admin controls, inherited search/upload forms and empty/single-result states.

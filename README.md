@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.3.4**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.3.5**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:^1.3.4 --with-all-dependencies
+composer require hschottm/auriga:^1.3.5 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -83,3 +83,20 @@ an initially expanded Bootstrap collapse panel with a generated ID, avoiding
 one fixed target shared by different lists. Without a headline, the list remains
 visible. Both examples inherit the data rows and preserve escaping and provider
 URL validation. Clear the production cache after updating templates.
+
+## Song cover customization in 1.3.5
+
+`mod_auriga_song.html.twig` now exposes `cover_display` and `cover_tools` blocks.
+Its default output is unchanged. The Bootstrap example in
+`examples/templates/mod_auriga_song_bootstrap.html.twig` replaces only the cover
+display with a non-autoplay carousel. Each slide has its own save form with the
+candidate index and CSRF token; save controls are shown only to users allowed to
+edit covers. Search, upload, errors and song metadata remain inherited.
+
+Copy the example into the project's `templates/` directory and select
+`mod_auriga_song_bootstrap` in the song module. Bootstrap 5's bundle must be loaded
+by the page layout. Existing PHP overrides must be reconciled separately.
+Carousel rendering tests cover selection indexes, CSRF tokens, guest/admin
+controls, existing covers and empty/single-result states. Saving the second
+candidate was also verified in the isolated integration installation with mocked
+image downloads and real database/file persistence.
