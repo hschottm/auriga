@@ -27,15 +27,15 @@ class ModuleDPI extends ModulePTW
 	 */
 	public function generate()
 	{
-		if (TL_MODE == 'BE')
+		if ($this->isBackendRequest())
 		{
-			$objTemplate = new \BackendTemplate('be_wildcard');
+			$objTemplate = new \Contao\BackendTemplate('be_wildcard');
 
 			$objTemplate->wildcard = '### DPI ###';
 			$objTemplate->title = $this->headline;
 			$objTemplate->id = $this->id;
 			$objTemplate->link = $this->name;
-			$objTemplate->href = 'typolight/main.php?do=modules&amp;act=edit&amp;id=' . $this->id;
+			$objTemplate->href = \Contao\System::getContainer()->get('router')->generate('contao_backend', ['do' => 'themes', 'table' => 'tl_module', 'act' => 'edit', 'id' => $this->id]);
 
 			return $objTemplate->parse();
 		}
@@ -69,28 +69,28 @@ class ModuleDPI extends ModulePTW
 		$options = array('title', 'artist', 'album', 'year', 'labelcode');
 		$arrResults = array(10, 20, 50, 100, 1000);
 		$scalar = static function ($value) { return is_scalar($value) ? (string) $value : ''; };
-		$savedField = $scalar($this->Session->get('dpi_field'));
-		$savedSearch = $scalar($this->Session->get('dpi_search'));
-		if ($scalar($this->Input->get('page')) === '') $savedSearch = '';
-		$field = $scalar($this->Input->post('field'));
-		if ($field === '') $field = $scalar($this->Input->get('field'));
+		$savedField = $scalar($this->session()->get('dpi_field'));
+		$savedSearch = $scalar($this->session()->get('dpi_search'));
+		if ($scalar(\Contao\Input::get('page')) === '') $savedSearch = '';
+		$field = $scalar(\Contao\Input::post('field'));
+		if ($field === '') $field = $scalar(\Contao\Input::get('field'));
 		if ($field === '') $field = $savedField;
 		if (!in_array($field, $options, true)) $field = 'title';
-		$search = $scalar($this->Input->post('search'));
-		if ($search === '') $search = $scalar($this->Input->get('search'));
+		$search = $scalar(\Contao\Input::post('search'));
+		if ($search === '') $search = $scalar(\Contao\Input::get('search'));
 		if ($search === '') $search = $savedSearch;
-		$results = $scalar($this->Input->post('results'));
-		if ($results === '') $results = $scalar($this->Session->get('dpi_results'));
+		$results = $scalar(\Contao\Input::post('results'));
+		if ($results === '') $results = $scalar($this->session()->get('dpi_results'));
 		$results = (int) $results;
 		if (!in_array($results, $arrResults, true)) $results = 10;
-		$page = filter_var($this->Input->get('page'), FILTER_VALIDATE_INT, array(
+		$page = filter_var(\Contao\Input::get('page'), FILTER_VALIDATE_INT, array(
 			'options' => array('min_range' => 1, 'max_range' => intdiv(PHP_INT_MAX, $results) - 1)
 		));
 		if ($page === false) $page = 1;
 
-		$this->Session->set('dpi_field', $field);
-		$this->Session->set('dpi_search', $search);
-		$this->Session->set('dpi_results', $results);
+		$this->session()->set('dpi_field', $field);
+		$this->session()->set('dpi_search', $search);
+		$this->session()->set('dpi_results', $results);
 		$arrFoundSongs = array();
 		$foundResults = false;
 		$totalcount = 0;
@@ -108,7 +108,7 @@ class ModuleDPI extends ModulePTW
 				
 			while ($objSong->next())
 			{
-				$song_genres = deserialize($objSong->genres, true);
+				$song_genres = \Contao\StringUtil::deserialize($objSong->genres, true);
 				$foundgenres = array();
 				foreach ($song_genres as $key => $genre)
 				{
@@ -137,32 +137,32 @@ class ModuleDPI extends ModulePTW
 					$cover = '<img src="bundles/hschottmauriga/images/cd.gif" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" />';
 				}
 				array_push($arrFoundSongs, array(
-					'adventure' => specialchars($objSong->numbering) . '. ' . specialchars($objSong->adventuretitle),
-					'title' => specialchars($objSong->title),
-					'artist' => specialchars($objSong->artist),
-					'album' => specialchars($objSong->album),
-					'year' => specialchars($objSong->year),
+					'adventure' => \Contao\StringUtil::specialchars($objSong->numbering) . '. ' . \Contao\StringUtil::specialchars($objSong->adventuretitle),
+					'title' => \Contao\StringUtil::specialchars($objSong->title),
+					'artist' => \Contao\StringUtil::specialchars($objSong->artist),
+					'album' => \Contao\StringUtil::specialchars($objSong->album),
+					'year' => \Contao\StringUtil::specialchars($objSong->year),
 					'special' => $special,
 					'cover' => $cover,
 					'idurl' => $objPageSong->getFrontendUrl('/song/' . $objSong->id),
-					'titleurl' => $objPageSearch->getFrontendUrl('/search/' . specialchars($objSong->title) . '/field/title'),
+					'titleurl' => $objPageSearch->getFrontendUrl('/search/' . \Contao\StringUtil::specialchars($objSong->title) . '/field/title'),
 					'advurl' => $objPageAdventure->getFrontendUrl('/adventure/' . $objSong->adventureid),
-					'labelurl' => $objPageSearch->getFrontendUrl('/search/' . specialchars($objSong->labelcode) . '/field/labelcode'),
-					'albumurl' => $objPageSearch->getFrontendUrl('/search/' . specialchars($objSong->album) . '/field/album'),
-					'artisturl' => $objPageSearch->getFrontendUrl('/search/' . specialchars($objSong->artist) . '/field/artist'),
-					'labelcode' => specialchars($objSong->labelcode),
-					'length' => specialchars($objSong->length),
-					'composer' => specialchars($objSong->composer),
-					'sequence' => specialchars($objSong->sequence),
+					'labelurl' => $objPageSearch->getFrontendUrl('/search/' . \Contao\StringUtil::specialchars($objSong->labelcode) . '/field/labelcode'),
+					'albumurl' => $objPageSearch->getFrontendUrl('/search/' . \Contao\StringUtil::specialchars($objSong->album) . '/field/album'),
+					'artisturl' => $objPageSearch->getFrontendUrl('/search/' . \Contao\StringUtil::specialchars($objSong->artist) . '/field/artist'),
+					'labelcode' => \Contao\StringUtil::specialchars($objSong->labelcode),
+					'length' => \Contao\StringUtil::specialchars($objSong->length),
+					'composer' => \Contao\StringUtil::specialchars($objSong->composer),
+					'sequence' => \Contao\StringUtil::specialchars($objSong->sequence),
 					'genres' => $foundgenres,
-					'sorting' => specialchars($objSong->sorting),
+					'sorting' => \Contao\StringUtil::specialchars($objSong->sorting),
 				));
 				$foundResults = true;
 			}
 		}
 		
 		// Pagination
-		$objPagination = new \Pagination($totalcount, $results);
+		$objPagination = new \Contao\Pagination($totalcount, $results);
 		$this->Template->pagination = $objPagination->generate("\n  ");
 
 		$this->loadLanguageFile('tl_module');

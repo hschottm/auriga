@@ -1,6 +1,4 @@
 services:
     auriga.listener.addcustomregexp:
         class: Hschottm\AurigaBundle\EventListener\AddCustomRegexpListener
-        arguments:
-            - "@contao.framework"
         public: true

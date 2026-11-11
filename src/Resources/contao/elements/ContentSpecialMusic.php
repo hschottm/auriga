@@ -38,7 +38,7 @@ use Contao\PageModel;
  * @author     Leo Feyer <leo@typolight.org>
  * @package    Controller
  */
-class ContentSpecialMusic extends \ContentElement
+class ContentSpecialMusic extends \Contao\ContentElement
 {
 
 	/**
@@ -82,7 +82,7 @@ class ContentSpecialMusic extends \ContentElement
 		$arrSongs = array();
 		while ($objSong->next())
 		{
-			$song_genres = deserialize($objSong->genres, true);
+			$song_genres = \Contao\StringUtil::deserialize($objSong->genres, true);
 			$foundgenres = array();
 			foreach ($song_genres as $key => $genre)
 			{
@@ -112,20 +112,20 @@ class ContentSpecialMusic extends \ContentElement
 			}
 			$arrSongs[] = array
 			(
-				'adventure' => specialchars($objSong->numbering) . '. ' . specialchars($objSong->adventuretitle),
-				'title' => specialchars($objSong->title),
-				'artist' => specialchars($objSong->artist),
-				'album' => specialchars($objSong->album),
-				'year' => specialchars($objSong->year),
+				'adventure' => \Contao\StringUtil::specialchars($objSong->numbering) . '. ' . \Contao\StringUtil::specialchars($objSong->adventuretitle),
+				'title' => \Contao\StringUtil::specialchars($objSong->title),
+				'artist' => \Contao\StringUtil::specialchars($objSong->artist),
+				'album' => \Contao\StringUtil::specialchars($objSong->album),
+				'year' => \Contao\StringUtil::specialchars($objSong->year),
 				'special' => $special,
 				'cover' => $cover,
 				'titleurl' => $objPageSong->getFrontendUrl('/song/' . $objSong->id),
-				'labelcode' => specialchars($objSong->labelcode),
-				'length' => specialchars($objSong->length),
-				'composer' => specialchars($objSong->composer),
-				'sequence' => specialchars($objSong->sequence),
+				'labelcode' => \Contao\StringUtil::specialchars($objSong->labelcode),
+				'length' => \Contao\StringUtil::specialchars($objSong->length),
+				'composer' => \Contao\StringUtil::specialchars($objSong->composer),
+				'sequence' => \Contao\StringUtil::specialchars($objSong->sequence),
 				'genres' => $foundgenres,
-				'sorting' => specialchars($objSong->sorting),
+				'sorting' => \Contao\StringUtil::specialchars($objSong->sorting),
 			);
 		}
 		$this->Template->songs = $arrSongs;

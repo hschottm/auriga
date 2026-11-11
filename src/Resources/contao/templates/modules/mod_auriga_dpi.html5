@@ -8,7 +8,7 @@
 
 <form method="POST" action="<?php echo $escape($this->formaction); ?>">
 <input type="hidden" name="FORM_SUBMIT" value="dpi" />
-<input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>" />
+<input type="hidden" name="REQUEST_TOKEN" value="<?php echo $this->requestToken; ?>" />
 <div>
 <?php echo $this->lngSearch; ?> <input type="text" name="search" <?php if (strlen((string) ($this->savedSearch ?? ''))) echo 'value="' . $escape($this->savedSearch) . '" ' ?>/> <?php echo $this->lngIn; ?>
 <select name="field"><?php foreach ($this->options as $option): ?><option value="<?php echo $option; ?>" <?php if (strcmp($option, $this->savedField) == 0) echo ' selected="selected"' ?>><?php echo $this->$option; ?></option><?php endforeach; ?></select>

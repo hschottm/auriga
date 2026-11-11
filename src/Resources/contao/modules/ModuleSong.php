@@ -13,7 +13,7 @@ use Contao\PageModel;
  * @author     Helmut Schottmüller <typolight@aurealis.de>
  * @package    Controller
  */
-class ModuleSong extends ModulePTW implements \uploadable
+class ModuleSong extends ModulePTW
 {
 
 	/**
@@ -31,15 +31,15 @@ class ModuleSong extends ModulePTW implements \uploadable
 	 */
 	public function generate()
 	{
-		if (TL_MODE == 'BE')
+		if ($this->isBackendRequest())
 		{
-			$objTemplate = new \BackendTemplate('be_wildcard');
+			$objTemplate = new \Contao\BackendTemplate('be_wildcard');
 
 			$objTemplate->wildcard = '### SONG ###';
 			$objTemplate->title = $this->headline;
 			$objTemplate->id = $this->id;
 			$objTemplate->link = $this->name;
-			$objTemplate->href = 'typolight/main.php?do=modules&amp;act=edit&amp;id=' . $this->id;
+			$objTemplate->href = \Contao\System::getContainer()->get('router')->generate('contao_backend', ['do' => 'themes', 'table' => 'tl_module', 'act' => 'edit', 'id' => $this->id]);
 
 			return $objTemplate->parse();
 		}
@@ -57,6 +57,14 @@ class ModuleSong extends ModulePTW implements \uploadable
 		return count($this->errors) > 0;
 	}
 	
+    protected function canEditCovers(array $groups): bool
+    {
+        return $groups !== [] && \Contao\System::getContainer()->get('security.authorization_checker')->isGranted(
+            \Contao\CoreBundle\Security\ContaoCorePermissions::MEMBER_IN_GROUPS,
+            $groups,
+        );
+    }
+
 	protected function coverSearch(): CoverSearch
 	{
 		return new CoverSearch();
@@ -74,7 +82,7 @@ class ModuleSong extends ModulePTW implements \uploadable
 		$maxlength_kb = $this->getReadableSize($this->maxlength);
 
 		// Romanize the filename
-		$file['name'] = utf8_romanize($file['name']);
+		$file['name'] = basename($file['name']);
 
 		// File was not uploaded
 		if (!is_uploaded_file($file['tmp_name']))
@@ -82,13 +90,11 @@ class ModuleSong extends ModulePTW implements \uploadable
 			if (in_array($file['error'], array(1, 2)))
 			{
 				$this->addError(sprintf($GLOBALS['TL_LANG']['ERR']['filesize'], $maxlength_kb));
-				$this->log('File "'.$file['name'].'" exceeds the maximum file size of '.$maxlength_kb, 'FormFileUpload validate()', TL_ERROR);
 			}
 
 			if ($file['error'] == 3)
 			{
 				$this->addError(sprintf($GLOBALS['TL_LANG']['ERR']['filepartial'], $file['name']));
-				$this->log('File "'.$file['name'].'" was only partially uploaded', 'FormFileUpload validate()', TL_ERROR);
 			}
 
 			unset($_FILES['uploadcover']);
@@ -99,7 +105,6 @@ class ModuleSong extends ModulePTW implements \uploadable
 		if ($this->maxlength > 0 && $file['size'] > $this->maxlength)
 		{
 			$this->addError(sprintf($GLOBALS['TL_LANG']['ERR']['filesize'], $maxlength_kb));
-			$this->log('File "'.$file['name'].'" exceeds the maximum file size of '.$maxlength_kb, 'FormFileUpload validate()', TL_ERROR);
 
 			unset($_FILES['uploadcover']);
 			return false;
@@ -107,13 +112,12 @@ class ModuleSong extends ModulePTW implements \uploadable
 
 		$pathinfo = pathinfo($file['name']);
 		$pathinfo['extension'] = $pathinfo['extension'] ?? '';
-		$uploadTypes = trimsplit(',', $this->extensions);
+		$uploadTypes = \Contao\StringUtil::trimsplit(',', $this->extensions);
 
 		// File type is not allowed
 		if (!in_array(strtolower($pathinfo['extension']), $uploadTypes))
 		{
 			$this->addError(sprintf($GLOBALS['TL_LANG']['ERR']['filetype'], $pathinfo['extension']));
-			$this->log('File type "'.$pathinfo['extension'].'" is not allowed to be uploaded ('.$file['name'].')', 'FormFileUpload validate()', TL_ERROR);
 
 			unset($_FILES['uploadcover']);
 			return false;
@@ -130,20 +134,18 @@ class ModuleSong extends ModulePTW implements \uploadable
 		if (($arrImageSize = @getimagesize($file['tmp_name'])) != false)
 		{
 			// Image exceeds maximum image width
-			if ($arrImageSize[0] > $GLOBALS['TL_CONFIG']['imageWidth'])
+			if ((int) $GLOBALS['TL_CONFIG']['imageWidth'] > 0 && $arrImageSize[0] > $GLOBALS['TL_CONFIG']['imageWidth'])
 			{
 				$this->addError(sprintf($GLOBALS['TL_LANG']['ERR']['filewidth'], $file['name'], $GLOBALS['TL_CONFIG']['imageWidth']));
-				$this->log('File "'.$file['name'].'" exceeds the maximum image width of '.$GLOBALS['TL_CONFIG']['imageWidth'].' pixels', 'FormFileUpload validate()', TL_ERROR);
 
 				unset($_FILES['uploadcover']);
 				return false;
 			}
 
 			// Image exceeds maximum image height
-			if ($arrImageSize[1] > $GLOBALS['TL_CONFIG']['imageHeight'])
+			if ((int) $GLOBALS['TL_CONFIG']['imageHeight'] > 0 && $arrImageSize[1] > $GLOBALS['TL_CONFIG']['imageHeight'])
 			{
 				$this->addError(sprintf($GLOBALS['TL_LANG']['ERR']['fileheight'], $file['name'], $GLOBALS['TL_CONFIG']['imageHeight']));
-				$this->log('File "'.$file['name'].'" exceeds the maximum image height of '.$GLOBALS['TL_CONFIG']['imageHeight'].' pixels', 'FormFileUpload validate()', TL_ERROR);
 
 				unset($_FILES['uploadcover']);
 				return false;
@@ -171,7 +173,7 @@ class ModuleSong extends ModulePTW implements \uploadable
 			$coverId = $this->createNewCover($songId, $data);
 			if (!$coverId) throw new \RuntimeException('Cover mapping already exists');
 			$info = $this->distributedPathInfo($coverId);
-			$directory = TL_ROOT . '/' . trim($GLOBALS['TL_CONFIG']['auriga']['coverpath'], '/') . '/' . $info['fullpath'];
+			$directory = self::projectDir() . '/' . trim($GLOBALS['TL_CONFIG']['auriga']['coverpath'], '/') . '/' . $info['fullpath'];
 			if (!is_dir($directory) && !@mkdir($directory, 0755, true) && !is_dir($directory)) throw new \RuntimeException('Cannot create cover directory');
 			$path = $directory . '/' . $coverId . '.' . $extension;
 			if (file_exists($path)) throw new \RuntimeException('Cover file already exists');
@@ -199,7 +201,7 @@ class ModuleSong extends ModulePTW implements \uploadable
 		if (is_array($foundCover))
 		{
 			$existing = !empty($foundCover['cover']) ? $this->getCovername($foundCover['cover']) : '';
-			if ($existing !== '' && @getimagesize($existing) !== false) return false;
+			if ($existing !== '' && @getimagesize(self::projectDir().'/'.$existing) !== false) return false;
 			$this->Database->prepare("DELETE FROM tl_song_cover WHERE song = ?")->execute($song_id);
 			$foundCover = null;
 		}
@@ -269,7 +271,7 @@ class ModuleSong extends ModulePTW implements \uploadable
 		{
 			$this->Template->$field = '';
 		}
-		$songid = $this->Input->get('song');
+		$songid = \Contao\Input::get('song');
 		if ($songid === null || $songid === '') return;
 		$songid = $this->requireRecordId($songid);
 		$objPageSong = ModulePTW::resolvePage($this->jumpTo_song);
@@ -295,8 +297,8 @@ class ModuleSong extends ModulePTW implements \uploadable
 		}
 		$data['special'] = $special;
 		$foundgenres = array();
-		$admingroups = deserialize($this->admingroups, true);
-		$song_genres = deserialize($objSong->genres, true);
+		$admingroups = \Contao\StringUtil::deserialize($this->admingroups, true);
+		$song_genres = \Contao\StringUtil::deserialize($objSong->genres, true);
 		foreach ($song_genres as $key => $genre)
 		{
 			if (is_scalar($genre) && (string) $genre !== '')
@@ -308,16 +310,11 @@ class ModuleSong extends ModulePTW implements \uploadable
 			}
 		}
 		$data['genres'] = $foundgenres;
-		$this->import('FrontendUser', 'User');
-		$is_admin = false;
-		foreach ($admingroups as $group)
-		{
-			if ($this->User->isMemberOf($group)) $is_admin = true;
-		}
+		$is_admin = $this->canEditCovers($admingroups);
 		if ($is_admin) $this->uploadCoverFile($objSong->id, $data);
 
-		$foundimages = $this->Session->get('auriga_cover_candidates_' . $objSong->id);
-		$usecover = filter_var($this->Input->post('usecover'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
+		$foundimages = $this->session()->get('auriga_cover_candidates_' . $objSong->id);
+		$usecover = filter_var(\Contao\Input::post('usecover'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
 		if ($is_admin && $usecover !== false && is_array($foundimages) && isset($foundimages[$usecover]))
 		{
 			$selected = $foundimages[$usecover];
@@ -328,7 +325,7 @@ class ModuleSong extends ModulePTW implements \uploadable
 			}
 			if ($image !== null && $this->storeCover($objSong->id, $data, $image['bytes'], $image['extension']))
 			{
-				$this->Session->set('auriga_cover_candidates_' . $objSong->id, null);
+				$this->session()->set('auriga_cover_candidates_' . $objSong->id, null);
 				$this->redirect($objPageSong->getFrontendUrl('/song/' . $objSong->id));
 			}
 			$this->addError('Das Cover konnte nicht geladen oder gespeichert werden.');
@@ -338,31 +335,31 @@ class ModuleSong extends ModulePTW implements \uploadable
 			->execute($objSong->id)
 			->fetchAssoc();
 		$imagename = !empty($arrCover['cover']) ? $this->getCovername($arrCover['cover']) : '';
-		if ($imagename !== '' && @getimagesize($imagename) !== false)
+		if ($imagename !== '' && @getimagesize(self::projectDir().'/'.$imagename) !== false)
 		{
 			$this->Template->albumcover = '<img src="' . htmlspecialchars($imagename, ENT_QUOTES) . '" alt="' . htmlspecialchars((string) $objSong->artist, ENT_QUOTES) . ': ' . htmlspecialchars((string) $objSong->album, ENT_QUOTES) . '" class="img-fluid albumart" />';
 		}
 		else
 		{
-			$ownsearch = $is_admin && $this->Input->post('search') && is_string($this->Input->post('searchtext')) && trim($this->Input->post('searchtext')) !== '';
+			$ownsearch = $is_admin && \Contao\Input::post('search') && is_string(\Contao\Input::post('searchtext')) && trim(\Contao\Input::post('searchtext')) !== '';
 			$sessionKey = 'auriga_cover_search_' . $objSong->id;
-			$searchAlbum = $ownsearch ? trim($this->Input->post('searchtext')) : $this->Session->get($sessionKey);
+			$searchAlbum = $ownsearch ? trim(\Contao\Input::post('searchtext')) : $this->session()->get($sessionKey);
 			if (!is_string($searchAlbum) || $searchAlbum === '') $searchAlbum = (string) ($data['album'] ?? '');
-			if ($ownsearch) $this->Session->set($sessionKey, $searchAlbum);
+			if ($ownsearch) $this->session()->set($sessionKey, $searchAlbum);
 			$this->Template->searchValue = $searchAlbum;
 			$thumbs = $this->coverSearch()->search($searchAlbum, $searchAlbum === (string) ($data['album'] ?? '') ? (string) ($data['artist'] ?? '') : '');
 			if ($is_admin)
 			{
-				if ($ownsearch) $this->Input->setGet('imgidx', '');
+				if ($ownsearch) \Contao\Input::setGet('imgidx', '');
 				$foundimages = array();
 				foreach ($thumbs as $url)
 				{
 					$foundimages[] = array('song' => $objSong->id, 'artwork' => $url,
 						'preview' => '<img src="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" alt="Covervorschlag" class="img-fluid albumart" />');
 				}
-				$this->Session->set('auriga_cover_candidates_' . $objSong->id, $foundimages);
+				$this->session()->set('auriga_cover_candidates_' . $objSong->id, $foundimages);
 
-				$possibleIndex = filter_var($this->Input->get('imgidx'), FILTER_VALIDATE_INT, array('options' => array('min_range' => 0)));
+				$possibleIndex = filter_var(\Contao\Input::get('imgidx'), FILTER_VALIDATE_INT, array('options' => array('min_range' => 0)));
 				if ($possibleIndex === false || !isset($foundimages[$possibleIndex])) $possibleIndex = 0;
 				if (count($foundimages) > $possibleIndex+1) $this->Template->urlShowNext = $objPageSong->getFrontendUrl('/song/' . $objSong->id . '/imgidx/' . ($possibleIndex+1));
 				if ($possibleIndex > 0) $this->Template->urlShowPrev = $objPageSong->getFrontendUrl('/song/' . $objSong->id . '/imgidx/' . ($possibleIndex-1));

@@ -1,5 +1,5 @@
 <?php
-require getenv('AURIGA_VENDOR_AUTOLOAD') ?: '/var/www/html/vendor/autoload.php';
+require getenv('AURIGA_VENDOR_AUTOLOAD') ?: dirname(__DIR__).'/vendor/autoload.php';
 require __DIR__.'/../src/CoverSearch.php';
 use Hschottm\AurigaBundle\CoverSearch;
 use Symfony\Component\HttpClient\MockHttpClient;

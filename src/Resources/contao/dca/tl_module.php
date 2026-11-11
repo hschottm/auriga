@@ -15,7 +15,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['aurigaTpl'] = array
 	'inputType'               => 'select',
 	'options_callback' => static function ()
 	{
-		return Controller::getTemplateGroup('mod_auriga_');
+		return \Contao\Controller::getTemplateGroup('mod_auriga_');
 	},
 	'eval'                    => array('includeBlankOption'=>true, 'chosen'=>true, 'tl_class'=>'w50'),
 	'sql'                     => "varchar(64) NOT NULL default ''"
@@ -71,3 +71,12 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['jumpTo_song'] = array
 	'eval'                    => array('fieldType'=>'radio')
 );
 
+
+\Hschottm\AurigaBundle\DatabaseSchema::apply('tl_module');
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['list_sort'] = [
+    'inputType' => 'select',
+    'options' => ['title', 'numbering', 'firstbroadcast'],
+    'eval' => ['tl_class' => 'w50'],
+    'sql' => "varchar(32) NOT NULL default 'title'",
+];

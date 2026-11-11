@@ -12,8 +12,44 @@ use Contao\PageModel;
  * @author     Helmut Schottmüller <typolight@aurealis.de>
  * @package    Controller
  */
-class ModulePTW extends \Module
+class ModulePTW extends \Contao\Module
 {
+    protected function isBackendRequest(): bool
+    {
+        $container = \Contao\System::getContainer();
+        $request = $container->get('request_stack')->getCurrentRequest();
+        return $request !== null && $container->get('contao.routing.scope_matcher')->isBackendRequest($request);
+    }
+
+    protected function session(): \Symfony\Component\HttpFoundation\Session\SessionInterface
+    {
+        return \Contao\System::getContainer()->get('request_stack')->getSession();
+    }
+
+    protected static function projectDir(): string
+    {
+        return \Contao\System::getContainer()->getParameter('kernel.project_dir');
+    }
+
+    public static function recordingUrls($references): array
+    {
+        $urls = [];
+        foreach (\Contao\StringUtil::deserialize($references, true) as $reference) {
+            if (!is_string($reference) || $reference === '') continue;
+            if (strlen($reference) === 16 || \Contao\Validator::isUuid($reference)) {
+                $file = \Contao\FilesModel::findByUuid($reference);
+                if ($file === null) continue;
+                $reference = $file->path;
+            }
+            $prefix = $GLOBALS['TL_CONFIG']['auriga']['fileroot'];
+            if (str_starts_with($reference, $prefix)) {
+                $reference = $GLOBALS['TL_CONFIG']['auriga']['filedownloadroot'].substr($reference, strlen($prefix));
+            }
+            if (preg_match('~^(?:https?://|files/)~i', $reference)) $urls[] = $reference;
+        }
+        return array_values(array_unique($urls));
+    }
+
 	public static function resolvePage($id)
 	{
 		global $objPage;
@@ -48,13 +84,13 @@ class ModulePTW extends \Module
 	
 	public static function _getCovername($cover_id)
 	{
-		$uploadTypes = trimsplit(',', 'jpg,jpeg,png,gif');
+		$uploadTypes = \Contao\StringUtil::trimsplit(',', 'jpg,jpeg,png,gif');
 		$foundimage = false;
 		$info = ModulePTW::distributedPathInfo($cover_id);
 		foreach ($uploadTypes as $extension)
 		{
 			$imagename = rtrim($GLOBALS['TL_CONFIG']['auriga']['coverpath'], '/') . '/' . $info['fullpath'] . '/' . $cover_id . '.' . $extension;
-			if (is_file($imagename) && is_readable($imagename))
+			if (is_file(self::projectDir().'/'.$imagename) && is_readable(self::projectDir().'/'.$imagename))
 			{
 				$foundimage = true;
 				break;

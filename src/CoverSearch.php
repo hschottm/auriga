@@ -15,9 +15,9 @@ final class CoverSearch
     public function __construct(?HttpClientInterface $client = null, ?\Psr\Cache\CacheItemPoolInterface $cache = null)
     {
         $this->cache = $cache;
-        if ($cache === null && defined('TL_ROOT')) {
+        if ($cache === null && \Contao\System::getContainer() !== null) {
             try {
-                $this->cache = new \Symfony\Component\Cache\Adapter\FilesystemAdapter('auriga_covers', 86400, TL_ROOT.'/var/cache/auriga');
+                $this->cache = new \Symfony\Component\Cache\Adapter\FilesystemAdapter('auriga_covers', 86400, \Contao\System::getContainer()->getParameter('kernel.cache_dir').'/auriga');
             } catch (\Exception $exception) {
                 // Continue without caching if the cache directory is unavailable.
             }

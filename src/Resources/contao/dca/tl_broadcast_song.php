@@ -35,7 +35,6 @@ $GLOBALS['TL_DCA']['tl_broadcast_song'] = array
 				'label'               => &$GLOBALS['TL_LANG']['MSC']['all'],
 				'href'                => 'act=select',
 				'class'               => 'header_edit_all',
-				'attributes'          => 'onclick="Backend.getScrollOffset();"'
 			)
 		),
 		'operations' => array
@@ -44,33 +43,31 @@ $GLOBALS['TL_DCA']['tl_broadcast_song'] = array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_broadcast_song']['edit'],
 				'href'                => 'act=edit',
-				'icon'                => 'edit.gif'
+				'icon'                => 'edit.svg'
 			),
 			'copy' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_broadcast_song']['copy'],
 				'href'                => 'act=copy',
-				'icon'                => 'copy.gif'
+				'icon'                => 'copy.svg'
 			),
 			'cut' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_broadcast_song']['cut'],
 				'href'                => 'act=paste&amp;mode=cut',
-				'icon'                => 'cut.gif',
-				'attributes'          => 'onclick="Backend.getScrollOffset();"'
+				'icon'                => 'cut.svg',
 			),
 			'delete' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_broadcast_song']['delete'],
 				'href'                => 'act=delete',
-				'icon'                => 'delete.gif',
-				'attributes'          => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"'
+				'icon'                => 'delete.svg',
 			),
 			'show' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_broadcast_song']['show'],
 				'href'                => 'act=show',
-				'icon'                => 'show.gif'
+				'icon'                => 'show.svg'
 			)
 		)
 	),
@@ -196,12 +193,12 @@ $GLOBALS['TL_DCA']['tl_broadcast_song'] = array
  * @author     Helmut Schottmüller <typolight@aurealis.de>
  * @package    Controller
  */
-class tl_broadcast_song extends Backend
+class tl_broadcast_song extends \Contao\Backend
 {
 	/**
 	 * Load database object
 	 */
-	protected function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 	}
@@ -212,7 +209,7 @@ class tl_broadcast_song extends Backend
 	 * @param object
 	 * @return string
 	 */
-	public function saveSongType($varValue, DataContainer $dc)
+	public function saveSongType($varValue, \Contao\DataContainer $dc)
 	{
 		// Generate alias if there is none
 		if (!strlen($varValue))
@@ -248,3 +245,5 @@ class tl_broadcast_song extends Backend
 	}
 }
 
+
+\Hschottm\AurigaBundle\DatabaseSchema::apply('tl_broadcast_song');

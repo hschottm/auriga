@@ -30,19 +30,17 @@ $GLOBALS['TL_DCA']['tl_broadcast'] = array
 		),
 		'global_operations' => array
 		(
-			'popwelt' => array
-			(
-					'label'               => &$GLOBALS['TL_LANG']['MSC']['import_popwelt'],
-					'href'                => 'key=popwelt',
-					'class'               => 'header_import',
-					'attributes'          => 'onclick="Backend.getScrollOffset();"'
-			),
+// 			'popwelt' => array
+// 			(
+// 					'label'               => &$GLOBALS['TL_LANG']['MSC']['import_popwelt'],
+// 					'href'                => 'key=popwelt',
+// 					'class'               => 'header_import',
+// 			),
 			'all' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['MSC']['all'],
 				'href'                => 'act=select',
 				'class'               => 'header_edit_all',
-				'attributes'          => 'onclick="Backend.getScrollOffset();"'
 			)
 		),
 		'operations' => array
@@ -51,7 +49,7 @@ $GLOBALS['TL_DCA']['tl_broadcast'] = array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_broadcast']['edit'],
 				'href'                => 'act=edit',
-				'icon'                => 'edit.gif'
+				'icon'                => 'edit.svg'
 			),
 			'songs' => array
 			(
@@ -63,27 +61,25 @@ $GLOBALS['TL_DCA']['tl_broadcast'] = array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_broadcast']['copy'],
 				'href'                => 'act=copy',
-				'icon'                => 'copy.gif'
+				'icon'                => 'copy.svg'
 			),
 			'cut' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_broadcast']['cut'],
 				'href'                => 'act=paste&amp;mode=cut',
-				'icon'                => 'cut.gif',
-				'attributes'          => 'onclick="Backend.getScrollOffset();"'
+				'icon'                => 'cut.svg',
 			),
 			'delete' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_broadcast']['delete'],
 				'href'                => 'act=delete',
-				'icon'                => 'delete.gif',
-				'attributes'          => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"'
+				'icon'                => 'delete.svg',
 			),
 			'show' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_broadcast']['show'],
 				'href'                => 'act=show',
-				'icon'                => 'show.gif'
+				'icon'                => 'show.svg'
 			)
 		)
 	),
@@ -115,7 +111,7 @@ $GLOBALS['TL_DCA']['tl_broadcast'] = array
 			'sorting'                 => true,
 			'flag'                    => 1,
 			'inputType'               => 'text',
-			'eval'                    => array('mandatory'=>true, 'rgxp'=>'date', 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard')
+			'eval'                    => array('mandatory'=>true, 'rgxp'=>'date', 'datepicker'=>true, 'tl_class'=>'w50 wizard')
 		),
 		'hour' => array
 		(
@@ -207,7 +203,7 @@ $GLOBALS['TL_DCA']['tl_broadcast'] = array
 			'label'                   => &$GLOBALS['TL_LANG']['tl_broadcast']['files'],
 			'exclude'                 => true,
 			'inputType'               => 'fileTree',
-			'eval'                    => array('fieldType'=>'checkbox', 'files'=>true, 'mandatory'=>false, 'extensions'=>'mp3')
+			'eval'                    => array('fieldType'=>'checkbox', 'multiple'=>true, 'files'=>true, 'mandatory'=>false, 'extensions'=>'mp3')
 		),
 	)
 );
@@ -220,12 +216,12 @@ $GLOBALS['TL_DCA']['tl_broadcast'] = array
  * @author     Helmut Schottmüller <typolight@aurealis.de>
  * @package    Controller
  */
-class tl_broadcast extends Backend
+class tl_broadcast extends \Contao\Backend
 {
 	/**
 	 * Load database object
 	 */
-	protected function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 	}
@@ -268,3 +264,5 @@ class tl_broadcast extends Backend
 	}
 }
 
+
+\Hschottm\AurigaBundle\DatabaseSchema::apply('tl_broadcast');

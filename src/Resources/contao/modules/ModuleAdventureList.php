@@ -28,15 +28,15 @@ class ModuleAdventureList extends ModulePTW
 	 */
 	public function generate()
 	{
-		if (TL_MODE == 'BE')
+		if ($this->isBackendRequest())
 		{
-			$objTemplate = new \BackendTemplate('be_wildcard');
+			$objTemplate = new \Contao\BackendTemplate('be_wildcard');
 
 			$objTemplate->wildcard = '### ADVENTURE LIST ###';
 			$objTemplate->title = $this->headline;
 			$objTemplate->id = $this->id;
 			$objTemplate->link = $this->name;
-			$objTemplate->href = 'typolight/main.php?do=modules&amp;act=edit&amp;id=' . $this->id;
+			$objTemplate->href = \Contao\System::getContainer()->get('router')->generate('contao_backend', ['do' => 'themes', 'table' => 'tl_module', 'act' => 'edit', 'id' => $this->id]);
 
 			return $objTemplate->parse();
 		}
@@ -62,8 +62,8 @@ class ModuleAdventureList extends ModulePTW
 		{
 			$arrAdventures[] = array
 			(
-				'title' => specialchars($objAdventure->title),
-				'description' => specialchars($objAdventure->description),
+				'title' => \Contao\StringUtil::specialchars($objAdventure->title),
+				'description' => \Contao\StringUtil::specialchars($objAdventure->description),
 				'alias' => $objAdventure->alias,
 				'numbering' => $objAdventure->numbering,
 				'url' => $objPageAdventure->getFrontendUrl('/adventure/' . $objAdventure->id),    

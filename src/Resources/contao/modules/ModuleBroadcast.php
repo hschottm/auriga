@@ -27,15 +27,15 @@ class ModuleBroadcast extends ModulePTW
 	 */
 	public function generate()
 	{
-		if (TL_MODE == 'BE')
+		if ($this->isBackendRequest())
 		{
-			$objTemplate = new \BackendTemplate('be_wildcard');
+			$objTemplate = new \Contao\BackendTemplate('be_wildcard');
 
 			$objTemplate->wildcard = '### BROADCAST ###';
 			$objTemplate->title = $this->headline;
 			$objTemplate->id = $this->id;
 			$objTemplate->link = $this->name;
-			$objTemplate->href = 'typolight/main.php?do=modules&amp;act=edit&amp;id=' . $this->id;
+			$objTemplate->href = \Contao\System::getContainer()->get('router')->generate('contao_backend', ['do' => 'themes', 'table' => 'tl_module', 'act' => 'edit', 'id' => $this->id]);
 
 			return $objTemplate->parse();
 		}
@@ -57,13 +57,13 @@ class ModuleBroadcast extends ModulePTW
 		$objPageSearch = ModulePTW::resolvePage($this->jumpTo_search);
 		$objPageSong = ModulePTW::resolvePage($this->jumpTo_song);
 		$this->loadLanguageFile('tl_broadcast_song');
-		$broadcastdate = $this->Input->get('broadcast');
+		$broadcastdate = \Contao\Input::get('broadcast');
 		$objAdventure = null;
 		if ($broadcastdate === null || $broadcastdate === '') return;
 		$broadcastdate = filter_var($broadcastdate, FILTER_VALIDATE_INT);
 		if ($broadcastdate === false) throw new \Contao\CoreBundle\Exception\PageNotFoundException('Invalid Auriga broadcast date');
 		$this->Template->titlesong = null;
-		$this->Session->set('foundimages', '');
+		$this->session()->set('foundimages', '');
 		$arrProviders = $this->Database->prepare("SELECT * FROM tl_broadcast_provider")
 			->execute()
 			->fetchAllAssoc();
@@ -94,7 +94,7 @@ class ModuleBroadcast extends ModulePTW
 					->execute($objBroadcast->pid);
 				if (!$objAdventure->numRows) throw new \Contao\CoreBundle\Exception\PageNotFoundException('Auriga adventure not found');
 			}
-			$broadcast_providers = deserialize($objBroadcast->providers, true);
+			$broadcast_providers = \Contao\StringUtil::deserialize($objBroadcast->providers, true);
 			$foundproviders = array();
 			foreach ($broadcast_providers as $key => $provider)
 			{
@@ -103,12 +103,13 @@ class ModuleBroadcast extends ModulePTW
 			$arrFiles = $this->Database->prepare("SELECT filename FROM tl_broadcast_file WHERE pid = ? ORDER BY sorting ASC")
 				->execute($objBroadcast->id)
 				->fetchEach('filename');
+			$arrFiles = self::recordingUrls(array_merge($arrFiles, \Contao\StringUtil::deserialize($objBroadcast->files, true)));
 			$arrSongs = array();
 			$objSong = $this->Database->prepare("SELECT tl_broadcast_song.*, tl_song_cover.cover FROM tl_broadcast_song LEFT JOIN tl_song_cover ON tl_broadcast_song.id = tl_song_cover.song WHERE tl_broadcast_song.pid = ? AND tl_broadcast_song.songtype <> ? ORDER BY sorting ASC")
 				->execute($objBroadcast->id, 3);
 			while ($objSong->next())
 			{
-				$song_genres = deserialize($objSong->genres, true);
+				$song_genres = \Contao\StringUtil::deserialize($objSong->genres, true);
 				$foundgenres = array();
 				foreach ($song_genres as $key => $genre)
 				{
@@ -138,30 +139,30 @@ class ModuleBroadcast extends ModulePTW
 				}
 				$arrSongs[] = array
 				(
-					'title' => specialchars($objSong->title),
-					'artist' => specialchars($objSong->artist),
-					'album' => specialchars($objSong->album),
-					'year' => specialchars($objSong->year),
+					'title' => \Contao\StringUtil::specialchars($objSong->title),
+					'artist' => \Contao\StringUtil::specialchars($objSong->artist),
+					'album' => \Contao\StringUtil::specialchars($objSong->album),
+					'year' => \Contao\StringUtil::specialchars($objSong->year),
 					'special' => $special,
 					'cover' => $cover,
 					'idurl' => $objPageSong->getFrontendUrl('/song/' . $objSong->id),
-					'titleurl' => $objPageSearch->getFrontendUrl('/search/' . specialchars($objSong->title) . '/field/title'),
-					'labelurl' => $objPageSearch->getFrontendUrl('/search/' . specialchars($objSong->labelcode) . '/field/labelcode'),
-					'albumurl' => $objPageSearch->getFrontendUrl('/search/' . specialchars($objSong->album) . '/field/album'),
-					'artisturl' => $objPageSearch->getFrontendUrl('/search/' . specialchars($objSong->artist) . '/field/artist'),
-					'labelcode' => specialchars($objSong->labelcode),
-					'length' => specialchars($objSong->length),
-					'composer' => specialchars($objSong->composer),
-					'sequence' => specialchars($objSong->sequence),
+					'titleurl' => $objPageSearch->getFrontendUrl('/search/' . \Contao\StringUtil::specialchars($objSong->title) . '/field/title'),
+					'labelurl' => $objPageSearch->getFrontendUrl('/search/' . \Contao\StringUtil::specialchars($objSong->labelcode) . '/field/labelcode'),
+					'albumurl' => $objPageSearch->getFrontendUrl('/search/' . \Contao\StringUtil::specialchars($objSong->album) . '/field/album'),
+					'artisturl' => $objPageSearch->getFrontendUrl('/search/' . \Contao\StringUtil::specialchars($objSong->artist) . '/field/artist'),
+					'labelcode' => \Contao\StringUtil::specialchars($objSong->labelcode),
+					'length' => \Contao\StringUtil::specialchars($objSong->length),
+					'composer' => \Contao\StringUtil::specialchars($objSong->composer),
+					'sequence' => \Contao\StringUtil::specialchars($objSong->sequence),
 					'genres' => $foundgenres,
-					'sorting' => specialchars($objSong->sorting),
+					'sorting' => \Contao\StringUtil::specialchars($objSong->sorting),
 				);
 			}
 			$arrBroadcasts[] = array
 			(
-				'title' => specialchars($objBroadcast->title),
-				'sorting' => specialchars($objBroadcast->sorting),
-				'date' => $this->parseDate($GLOBALS['TL_CONFIG']['dateFormat'], $objBroadcast->date),
+				'title' => \Contao\StringUtil::specialchars($objBroadcast->title),
+				'sorting' => \Contao\StringUtil::specialchars($objBroadcast->sorting),
+				'date' => \Contao\Date::parse($GLOBALS['TL_CONFIG']['dateFormat'], $objBroadcast->date),
 				'hour' => $objBroadcast->hour,
 				'chapter' => $objBroadcast->chapter,
 				'isStory' => ($objBroadcast->story) ? true : false,
@@ -189,7 +190,7 @@ class ModuleBroadcast extends ModulePTW
 				if ($titlesong['date'] <= $objBroadcast->date)
 				{
 					$foundgenres = array();
-					$song_genres = deserialize($titlesong['genres'], true);
+					$song_genres = \Contao\StringUtil::deserialize($titlesong['genres'], true);
 					foreach ($song_genres as $key => $genre)
 					{
 						if (is_scalar($genre) && (string) $genre !== '')

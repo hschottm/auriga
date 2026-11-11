@@ -1,0 +1,36 @@
+# Auriga for Contao 5.7
+
+This branch (`contao57`) targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+The `master` branch and tag `1.2.1` remain the Contao 4.13 version.
+
+## Installation / update
+
+In a Contao 5.7 project:
+
+```sh
+composer require hschottm/auriga:dev-contao57 --with-all-dependencies
+php vendor/bin/contao-console contao:migrate --env=prod
+php vendor/bin/contao-console cache:clear --env=prod
+```
+
+Finish the upgrade to Contao 4.13 before migrating an existing Contao 4 database to Contao 5. Test the upgrade with a copy of the database and files first. Review the proposed schema changes; do not use `--with-deletes` blindly on an imported database. This package now declares the Auriga table and module-field schemas which were missing from the legacy package.
+
+Existing module types and table names are retained. The `.html5` templates remain supported on Contao 5.7; migration to Contao 6 is outside this branch's scope.
+
+Reconcile local overrides of the Auriga templates, especially `mod_auriga_song.html5` and `mod_auriga_dpi.html5`. Forms now use `$this->requestToken` instead of the removed `REQUEST_TOKEN` constant. Keep the existing recording and cover files under `files/auriga/` and mark the relevant directories public in Contao's file manager.
+
+Cover search results are cached beneath the environment's Symfony cache directory (`var/cache/<environment>/auriga`). Cover storage must be writable by the PHP process. Cover changes require membership in one of the module's configured administrator groups.
+
+Old database and Popwelt imports remain disabled. No legacy import is run during migration.
+
+## Validation
+
+Tested in an isolated Contao **5.7.15** installation on **PHP 8.3.36** with MariaDB **10.11**:
+
+- Composer installation, Contao setup, container warmup and database schema creation.
+- Complete HTTP requests for all five frontend modules, the special-music content element, backend callbacks and module previews.
+- Invalid/missing records, deleted target pages, search validation and recording UUIDs/legacy paths.
+- Cover selection/download with mocked HTTP responses, real file storage, repair of missing covers and transaction rollback.
+- Cover search cache and template escaping.
+
+See `tests/README.md`. The production data and customized NAS templates are not part of these fixtures.

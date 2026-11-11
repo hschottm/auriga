@@ -1,5 +1,8 @@
 <?php
-require __DIR__.'/php-compatibility.php';
+error_reporting(E_ALL);
+set_error_handler(static function ($severity, $message, $file, $line) {
+    if (error_reporting() & $severity) throw new ErrorException($message, 0, $severity, $file, $line);
+});
 define('REQUEST_TOKEN', 'test-token');
 class TemplateView extends stdClass {
     public function __get($key) { return null; }

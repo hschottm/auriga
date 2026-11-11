@@ -38,7 +38,6 @@ $GLOBALS['TL_DCA']['tl_adventure'] = array
 				'label'               => &$GLOBALS['TL_LANG']['MSC']['all'],
 				'href'                => 'act=select',
 				'class'               => 'header_edit_all',
-				'attributes'          => 'onclick="Backend.getScrollOffset();"'
 			)
 		),
 		'operations' => array
@@ -47,26 +46,25 @@ $GLOBALS['TL_DCA']['tl_adventure'] = array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_adventure']['edit'],
 				'href'                => 'table=tl_broadcast',
-				'icon'                => 'edit.gif'
+				'icon'                => 'edit.svg'
 			),
 			'copy' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_adventure']['copy'],
 				'href'                => 'act=copy',
-				'icon'                => 'copy.gif'
+				'icon'                => 'copy.svg'
 			),
 			'delete' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_adventure']['delete'],
 				'href'                => 'act=delete',
-				'icon'                => 'delete.gif',
-				'attributes'          => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"'
+				'icon'                => 'delete.svg',
 			),
 			'show' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_adventure']['show'],
 				'href'                => 'act=show',
-				'icon'                => 'show.gif'
+				'icon'                => 'show.svg'
 			)
 		)
 	),
@@ -123,7 +121,7 @@ $GLOBALS['TL_DCA']['tl_adventure'] = array
 			'sorting'                 => true,
 			'flag'                    => 10,
 			'inputType'               => 'text',
-			'eval'                    => array('mandatory'=>false, 'rgxp'=>'date', 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard')
+			'eval'                    => array('mandatory'=>false, 'rgxp'=>'date', 'datepicker'=>true, 'tl_class'=>'w50 wizard')
 		),
 		'lastbroadcast' => array
 		(
@@ -131,7 +129,7 @@ $GLOBALS['TL_DCA']['tl_adventure'] = array
 			'exclude'                 => true,
 			'search'                  => true,
 			'inputType'               => 'text',
-			'eval'                    => array('mandatory'=>false, 'rgxp'=>'date', 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard')
+			'eval'                    => array('mandatory'=>false, 'rgxp'=>'date', 'datepicker'=>true, 'tl_class'=>'w50 wizard')
 		),
 	)
 );
@@ -144,12 +142,12 @@ $GLOBALS['TL_DCA']['tl_adventure'] = array
  * @author     Helmut Schottmüller <typolight@aurealis.de>
  * @package    Controller
  */
-class tl_adventure extends Backend
+class tl_adventure extends \Contao\Backend
 {
 	/**
 	 * Load database object
 	 */
-	protected function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 	}
@@ -160,7 +158,7 @@ class tl_adventure extends Backend
 	 * @param object
 	 * @return string
 	 */
-	public function generateAlias($varValue, DataContainer $dc)
+	public function generateAlias($varValue, \Contao\DataContainer $dc)
 	{
 		$autoAlias = false;
 
@@ -172,7 +170,7 @@ class tl_adventure extends Backend
 									   ->execute($dc->id);
 
 			$autoAlias = true;
-			$varValue = standardize($objTitle->title);
+			$varValue = \Contao\StringUtil::standardize($objTitle->title);
 		}
 
 		$objAlias = $this->Database->prepare("SELECT id FROM tl_adventure WHERE id=? OR alias=?")
@@ -204,3 +202,5 @@ class tl_adventure extends Backend
 	}
 	
 }
+
+\Hschottm\AurigaBundle\DatabaseSchema::apply('tl_adventure');

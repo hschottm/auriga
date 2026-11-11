@@ -39,3 +39,9 @@ $GLOBALS['TL_LANG']['tl_module']['searchbutton'] = 'Search';
 $GLOBALS['TL_LANG']['tl_module']['search_result'] = 'Found result'; 
 $GLOBALS['TL_LANG']['tl_module']['resultsperpage'] = 'Results per Page'; 
 
+
+$GLOBALS['TL_LANG']['tl_module']['providers'] = 'Sources';
+$GLOBALS['TL_LANG']['tl_module']['goto_first_broadcast'] = 'First broadcast';
+$GLOBALS['TL_LANG']['tl_module']['goto_last_broadcast'] = 'Last broadcast';
+$GLOBALS['TL_LANG']['tl_module']['goto_next_broadcast'] = 'Next broadcast';
+$GLOBALS['TL_LANG']['tl_module']['goto_previous_broadcast'] = 'Previous broadcast';

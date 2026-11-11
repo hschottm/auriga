@@ -32,7 +32,7 @@ $GLOBALS['TL_CTE']['texts']['speciallist'] = ContentSpecialMusic::class;
 /**
  * BACK END FORM FIELDS
  */
-array_insert($GLOBALS['BE_MOD'], 3, array
+\Contao\ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 3, array
 (
 	"auriga" => array(
 			"adventure" => array(
@@ -65,12 +65,4 @@ array_insert($GLOBALS['BE_MOD'], 3, array
  * Register hook functions
  */
 $GLOBALS['TL_HOOKS']['addCustomRegexp'][] = array('auriga.listener.addcustomregexp', 'addCustomRegexp');
-
-/**
- * Set the member URL parameter as url keyword
- */
-$urlKeywords = trimsplit(',',$GLOBALS['TL_CONFIG']['urlKeywords']);
-if (!in_array('adventure', $urlKeywords)) $this->update("\$GLOBALS['TL_CONFIG']['urlKeywords']", $GLOBALS['TL_CONFIG']['urlKeywords'] . (\strlen(trim($GLOBALS['TL_CONFIG']['urlKeywords'])) ? ',' : '') . 'adventure');
-if (!in_array('broadcast', $urlKeywords)) $this->update("\$GLOBALS['TL_CONFIG']['urlKeywords']", $GLOBALS['TL_CONFIG']['urlKeywords'] . (\strlen(trim($GLOBALS['TL_CONFIG']['urlKeywords'])) ? ',' : '') . 'broadcast');
-if (!in_array('song', $urlKeywords)) $this->update("\$GLOBALS['TL_CONFIG']['urlKeywords']", $GLOBALS['TL_CONFIG']['urlKeywords'] . (\strlen(trim($GLOBALS['TL_CONFIG']['urlKeywords'])) ? ',' : '') . 'song');
 

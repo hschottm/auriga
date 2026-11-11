@@ -1,36 +1,43 @@
 {
-  "name":"hschottm/auriga",
-  "description":"auriga is a Contao extension that provides information about the secret Auriga society",
-  "keywords":["contao", "bundle", "extension", "auriga"],
-  "type":"contao-bundle",
-  "license":["LGPL-3.0-or-later", "CC-BY-NC-SA-4.0"],
-  "authors":[
+  "name": "hschottm/auriga",
+  "description": "auriga is a Contao extension that provides information about the secret Auriga society",
+  "keywords": [
+    "contao",
+    "bundle",
+    "extension",
+    "auriga"
+  ],
+  "type": "contao-bundle",
+  "license": [
+    "LGPL-3.0-or-later",
+    "CC-BY-NC-SA-4.0"
+  ],
+  "authors": [
     {
-      "name":"Helmut Schottmüller",
-      "homepage":"https://github.com/hschottm"
+      "name": "Helmut Schottmüller",
+      "homepage": "https://github.com/hschottm"
     }
   ],
-  "require":{
-    "php": "^7.4 || ^8.0",
-    "contao/core-bundle": "~4.13",
-    "patchwork/utf8": "^1.3",
-    "symfony/http-client": "~5.4",
-    "symfony/cache": "~5.4",
-    "contao-community-alliance/composer-plugin":"~3.2"
+  "require": {
+    "php": "^8.3",
+    "contao/core-bundle": "~5.7.0",
+    "contao/manager-plugin": "^2.0",
+    "symfony/http-client": "^7.4",
+    "symfony/cache": "^7.4"
   },
   "autoload": {
-		"psr-4": {
-			"Hschottm\\AurigaBundle\\": "src/"
-		},
+    "psr-4": {
+      "Hschottm\\AurigaBundle\\": "src/"
+    },
     "classmap": [
-          "src/Resources/contao/"
-  	    ],
-  	"exclude-from-classmap": [
+      "src/Resources/contao/"
+    ],
+    "exclude-from-classmap": [
       "src/Resources/contao/config/",
       "src/Resources/contao/languages/"
-  	    ]
-    },
-    "extra":{
-      "contao-manager-plugin": "Hschottm\\AurigaBundle\\ContaoManager\\Plugin"
-    }
+    ]
+  },
+  "extra": {
+    "contao-manager-plugin": "Hschottm\\AurigaBundle\\ContaoManager\\Plugin"
+  }
 }

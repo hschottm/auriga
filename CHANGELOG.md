@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased — Contao 5.7 branch
+
+- Target PHP `^8.3`, Contao `~5.7.0` and Symfony `^7.4`; remove obsolete Composer plugin and UTF-8 helper dependencies.
+- Replace removed global classes/functions, mode/root constants and legacy session handling with Contao/Symfony APIs.
+- Update bundle signatures, service configuration, CSRF tokens, backend links, date pickers and DCA callbacks.
+- Declare all Auriga table schemas and module/content fields for clean installation and migration.
+- Support file UUIDs alongside historic recording paths; keep historic signed broadcast timestamps.
+- Use the Contao member-group permission for cover administration and honor unlimited image dimensions.
+- Keep obsolete import actions disabled, including the Popwelt backend button.
+- Replace legacy stub tests with isolated Contao 5.7 integration tests.
+
 ## 1.2.1 — 2026-11-11
 
 - PHP compatibility fixes in modules and templates, including corrected `join()` arguments and handling of nullable values.

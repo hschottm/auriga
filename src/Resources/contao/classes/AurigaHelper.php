@@ -21,7 +21,7 @@ namespace Hschottm\AurigaBundle;
  * @author     Helmut Schottmüller <typolight@aurealis.de>
  * @package    Controller
  */
-class AurigaHelper extends \Backend
+class AurigaHelper extends \Contao\Backend
 {
     public function __construct()
     {

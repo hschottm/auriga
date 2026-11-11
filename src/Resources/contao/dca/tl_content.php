@@ -56,8 +56,10 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['aurigaTpl'] = array
 	'inputType'               => 'select',
 	'options_callback' => static function ()
 	{
-		return Controller::getTemplateGroup('ce_');
+		return \Contao\Controller::getTemplateGroup('ce_');
 	},
 	'eval'                    => array('includeBlankOption'=>true, 'chosen'=>true, 'tl_class'=>'w50'),
 	'sql'                     => "varchar(64) NOT NULL default ''"
 );
+
+\Hschottm\AurigaBundle\DatabaseSchema::apply('tl_content');

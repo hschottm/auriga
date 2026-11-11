@@ -27,15 +27,15 @@ class ModuleBroadcastList extends ModulePTW
 	 */
 	public function generate()
 	{
-		if (TL_MODE == 'BE')
+		if ($this->isBackendRequest())
 		{
-			$objTemplate = new \BackendTemplate('be_wildcard');
+			$objTemplate = new \Contao\BackendTemplate('be_wildcard');
 
 			$objTemplate->wildcard = '### BROADCAST LIST ###';
 			$objTemplate->title = $this->headline;
 			$objTemplate->id = $this->id;
 			$objTemplate->link = $this->name;
-			$objTemplate->href = 'typolight/main.php?do=modules&amp;act=edit&amp;id=' . $this->id;
+			$objTemplate->href = \Contao\System::getContainer()->get('router')->generate('contao_backend', ['do' => 'themes', 'table' => 'tl_module', 'act' => 'edit', 'id' => $this->id]);
 
 			return $objTemplate->parse();
 		}
@@ -53,7 +53,7 @@ class ModuleBroadcastList extends ModulePTW
 		
 		// Redirect to jumpTo page
 		$objPageBroadcast = ModulePTW::resolvePage($this->jumpTo_broadcast);
-		$adventure = ($this->adventure_source > 0) ? $this->adventure_source : $this->Input->get('adventure');
+		$adventure = ($this->adventure_source > 0) ? $this->adventure_source : \Contao\Input::get('adventure');
 		if ($adventure === null || $adventure === '') return;
 		$adventure = $this->requireRecordId($adventure);
 		$objAdventure = $this->Database->prepare("SELECT * FROM tl_adventure WHERE id = ?")
@@ -73,7 +73,7 @@ class ModuleBroadcastList extends ModulePTW
 		$allproviders = array();
 		while ($objBroadcast->next())
 		{
-			$broadcast_providers = deserialize($objBroadcast->providers, true);
+			$broadcast_providers = \Contao\StringUtil::deserialize($objBroadcast->providers, true);
 			$foundproviders = array();
 			foreach ($broadcast_providers as $key => $provider)
 			{
@@ -83,16 +83,12 @@ class ModuleBroadcastList extends ModulePTW
 					$allproviders[$providers[$provider]['initials']] = $providers[$provider];
 				}
 			}
-			$files = deserialize($objBroadcast->files, true);
-			foreach ($files as $idx => $file)
-			{
-				$files[$idx] = str_replace($GLOBALS['TL_CONFIG']['auriga']['fileroot'], $GLOBALS['TL_CONFIG']['auriga']['filedownloadroot'], $file);
-			}
+			$files = self::recordingUrls($objBroadcast->files);
 			$arrBroadcasts[] = array
 			(
-				'title' => specialchars($objBroadcast->title),
-				'sorting' => specialchars($objBroadcast->sorting),
-				'date' => $this->parseDate($GLOBALS['TL_CONFIG']['dateFormat'], $objBroadcast->date),
+				'title' => \Contao\StringUtil::specialchars($objBroadcast->title),
+				'sorting' => \Contao\StringUtil::specialchars($objBroadcast->sorting),
+				'date' => \Contao\Date::parse($GLOBALS['TL_CONFIG']['dateFormat'], $objBroadcast->date),
 				'hour' => $objBroadcast->hour,
 				'chapter' => $objBroadcast->chapter,
 				'isStory' => ($objBroadcast->story) ? true : false,
