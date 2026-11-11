@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — Contao 5.7 branch
+## 1.3.0 — 2026-11-11
 
 - Target PHP `^8.3`, Contao `~5.7.0` and Symfony `^7.4`; remove obsolete Composer plugin and UTF-8 helper dependencies.
 - Replace removed global classes/functions, mode/root constants and legacy session handling with Contao/Symfony APIs.

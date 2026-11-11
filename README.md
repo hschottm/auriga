@@ -1,14 +1,14 @@
 # Auriga for Contao 5.7
 
-This branch (`contao57`) targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
-The `master` branch and tag `1.2.1` remain the Contao 4.13 version.
+Version **1.3.0**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
 
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:dev-contao57 --with-all-dependencies
+composer require hschottm/auriga:^1.3 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
