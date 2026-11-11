@@ -8,13 +8,17 @@
 	<div class="col-12 order-1 col-md-6 order-md-0">
 		<h2><a href="{{ urlUp }}">{{ adventure.numbering }}. {{ adventure.title }}</a></h2>
 	</div>
-	<div class="col-12 order-0 col-md-6 order-md-1">
+	<div{% block navigation_column_attributes %} class="col-12 order-0 col-md-6 order-md-1"{% endblock %}>
+		{% block navigation_wrapper %}
 		<div class="auriganav">
+            {% block navigation_controls %}
 			{% if nav_first_url|default is not empty %}<a href="{{ nav_first_url }}">{% endif %}<img src="files/auriga/images/control_start{{ nav_first_url|default is not empty ? '_blue' : '' }}.png" alt="{{ nav_first_title }}" title="{{ nav_first_title }}" />{% if nav_first_url|default is not empty %}</a>{% endif %}
 			{% if nav_prev_url|default is not empty %}<a href="{{ nav_prev_url }}">{% endif %}<img src="files/auriga/images/control_rewind{{ nav_prev_url|default is not empty ? '_blue' : '' }}.png" alt="{{ nav_prev_title }}" title="{{ nav_prev_title }}" />{% if nav_prev_url|default is not empty %}</a>{% endif %}
 			{% if nav_next_url|default is not empty %}<a href="{{ nav_next_url }}">{% endif %}<img src="files/auriga/images/control_fastforward{{ nav_next_url|default is not empty ? '_blue' : '' }}.png" alt="{{ nav_next_title }}" title="{{ nav_next_title }}" />{% if nav_next_url|default is not empty %}</a>{% endif %}
 			{% if nav_last_url|default is not empty %}<a href="{{ nav_last_url }}">{% endif %}<img src="files/auriga/images/control_end{{ nav_last_url|default is not empty ? '_blue' : '' }}.png" alt="{{ nav_last_title }}" title="{{ nav_last_title }}"/>{% if nav_last_url|default is not empty %}</a>{% endif %}
+            {% endblock %}
 		</div>
+        {% endblock %}
 	</div>
 </div>
 <p class="shortstory">{{ adventure.description|raw }}</p>
@@ -22,8 +26,9 @@
 {% for broadcast in broadcasts %}
 <h4>{{ broadcast.hour }}. Stunde{% if broadcast.title|default is not empty %}: {% endif %}{{ broadcast.title }}{% if broadcast.isStory %} ({{ adventure.numbering }}. Abenteuer, {{ broadcast.chapter }}.Kapitel){% endif %}</h4>
 {% if broadcast.songs|length > 0 %}
-<table>
-	<thead>
+{% block table_wrapper %}
+<table{% block table_attributes %}{% endblock %}>
+	<thead{% block table_head_attributes %}{% endblock %}>
 	<tr>
 		<th colspan="3">{{ lngTitle }}</th>
 		<th>{{ lngArtist }}</th>
@@ -49,13 +54,15 @@
 {% endfor %}
 	</tbody>
 </table>
+{% endblock %}
 {% endif %}
 {% endfor %}
 
 {% if titlesong|default is iterable %}
 <h4>{{ lngBackgroundMusic }}</h4>
-<table>
-	<thead>
+{% block titlesong_table_wrapper %}
+<table{{ block('table_attributes') }}>
+	<thead{{ block('table_head_attributes') }}>
 	<tr>
 		<th colspan="2">{{ lngTitle }}</th>
 		<th>{{ lngArtist }}</th>
@@ -78,6 +85,7 @@
 	</tr>
 	</tbody>
 </table>
+{% endblock %}
 {% endif %}
 
 </div>

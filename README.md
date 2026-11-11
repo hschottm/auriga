@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.3.2**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.3.3**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:^1.3.2 --with-all-dependencies
+composer require hschottm/auriga:^1.3.3 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -54,3 +54,16 @@ without duplicating the song rows:
 
 {% block table_head_attributes %} class="border-top-0 border-start-0 border-end-0 border-dark border-3"{% endblock %}
 ```
+
+## Broadcast template customization in 1.3.3
+
+`mod_auriga_broadcast.html.twig` exposes `navigation_column_attributes`,
+`navigation_wrapper`, `navigation_controls`, `table_wrapper`,
+`titlesong_table_wrapper`, `table_attributes` and `table_head_attributes`.
+The table attribute blocks apply to both broadcast and background-music tables.
+The default output remains unchanged.
+
+See `examples/templates/mod_auriga_broadcast_bootstrap.html.twig` for a Bootstrap
+variant that inherits all song rows and navigation controls. Copy it to the
+project's `templates/` directory and select `mod_auriga_broadcast_bootstrap` in the
+Auriga broadcast module. Existing PHP overrides must be reconciled separately.
