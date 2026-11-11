@@ -52,18 +52,13 @@ class ModuleBroadcastList extends ModulePTW
 		global $objPage;
 		
 		// Redirect to jumpTo page
-		if (strlen($this->jumpTo_broadcast))
-		{
-			$objPageBroadcast = PageModel::findById($this->jumpTo_broadcast);
-		}
-		else
-		{
-			$objPageBroadcast = $objPage;
-		}
+		$objPageBroadcast = ModulePTW::resolvePage($this->jumpTo_broadcast);
 		$adventure = ($this->adventure_source > 0) ? $this->adventure_source : $this->Input->get('adventure');
-		if ($adventure < 1) return;
+		if ($adventure === null || $adventure === '') return;
+		$adventure = $this->requireRecordId($adventure);
 		$objAdventure = $this->Database->prepare("SELECT * FROM tl_adventure WHERE id = ?")
 			->execute($adventure);
+		if (!$objAdventure->numRows) throw new \Contao\CoreBundle\Exception\PageNotFoundException('Auriga adventure not found');
 		$arrProviders = $this->Database->prepare("SELECT * FROM tl_broadcast_provider")
 			->execute()
 			->fetchAllAssoc();
@@ -82,7 +77,7 @@ class ModuleBroadcastList extends ModulePTW
 			$foundproviders = array();
 			foreach ($broadcast_providers as $key => $provider)
 			{
-				if (strlen($provider))
+				if (is_scalar($provider) && isset($providers[$provider]['initials']))
 				{
 					$foundproviders[$providers[$provider]['initials']] = $providers[$provider];
 					$allproviders[$providers[$provider]['initials']] = $providers[$provider];

@@ -1,0 +1,54 @@
+<?php
+require getenv('AURIGA_VENDOR_AUTOLOAD') ?: '/var/www/html/vendor/autoload.php';
+require __DIR__.'/../src/CoverSearch.php';
+use Hschottm\AurigaBundle\CoverSearch;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Exception\TransportException;
+error_reporting(E_ALL);
+set_error_handler(static function ($severity, $message, $file, $line) {
+    if (error_reporting() & $severity) throw new ErrorException($message, 0, $severity, $file, $line);
+});
+function check($condition) { if (!$condition) throw new RuntimeException('Assertion failed'); }
+$id = '12345678-1234-1234-1234-123456789abc';
+foreach (['{}', 'null', 'invalid json', '{"releases":false}', '{"releases":[null,"bad",{}]}'] as $body) {
+    check((new CoverSearch(new MockHttpClient(new MockResponse($body))))->search('Album','Artist') === []);
+}
+check((new CoverSearch(new MockHttpClient(static function () { throw new TransportException('timeout'); })))->search('Album','Artist') === []);
+$releases = json_encode(['releases' => [['id'=>$id]]]);
+foreach ([new MockResponse('', ['http_code'=>404]), new MockResponse('{"images":false}'), new MockResponse('bad json')] as $response) {
+    check((new CoverSearch(new MockHttpClient([new MockResponse($releases), $response])))->search('Album','Artist') === []);
+}
+$images = json_encode(['images'=>[null, ['front'=>true], ['front'=>true,'thumbnails'=>['large'=>'http://example.org/a.png']], ['front'=>true,'thumbnails'=>['large'=>'https://example.org/a.png']], ['front'=>false,'thumbnails'=>['large'=>'https://example.org/back.png']]]]);
+check((new CoverSearch(new MockHttpClient([new MockResponse($releases),new MockResponse($images)])))->search('Album','Artist') === ['https://example.org/a.png']);
+$gif=base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
+check(CoverSearch::imageExtension($gif) === 'gif');
+check(CoverSearch::imageExtension('not an image') === null);
+check((new CoverSearch(new MockHttpClient(new MockResponse($gif))))->download('https://example.org/image?x=1')['extension'] === 'gif');
+check((new CoverSearch(new MockHttpClient(new MockResponse($gif))))->download('https://example.org/image', 5) === null);
+check((new CoverSearch(new MockHttpClient(new MockResponse('<html>error</html>'))))->download('https://example.org/image') === null);
+check((new CoverSearch(new MockHttpClient()))->download('file:///etc/passwd') === null);
+echo "OK: cover lookup and image validation (E_ALL, offline).\n";
+check((new CoverSearch(new MockHttpClient([new MockResponse('{"releases":[]}'), new MockResponse($releases), new MockResponse($images)])))->search('Album (Remaster)','Artist') === ['https://example.org/a.png']);
+echo "OK: album-only fallback.\n";
+$cache = new Symfony\Component\Cache\Adapter\ArrayAdapter();
+$calls = 0;
+$client = new MockHttpClient(static function ($method, $url) use (&$calls, $releases, $images) {
+    ++$calls;
+    return new MockResponse(strpos($url, 'musicbrainz.org') !== false ? $releases : $images);
+});
+$search = new CoverSearch($client, $cache);
+check($search->search('Cached album', 'Artist') === ['https://example.org/a.png']);
+check((new CoverSearch($client, $cache))->search('Cached album', 'Artist') === ['https://example.org/a.png']);
+check($calls === 2);
+$search->search('Different album', 'Artist');
+check($calls === 4);
+$failures = 0;
+$search = new CoverSearch(new MockHttpClient(static function () use (&$failures) {
+    ++$failures;
+    throw new TransportException('unavailable');
+}), $cache);
+check($search->search('Unavailable album', 'Artist') === []);
+check($search->search('Unavailable album', 'Artist') === []);
+check($failures === 1);
+echo "OK: shared positive/negative cache and separate query keys.\n";

@@ -52,42 +52,17 @@ class ModuleBroadcast extends ModulePTW
 		global $objPage;
 		
 		// Redirect to jumpTo page
-		if (strlen($this->jumpTo_adventure))
-		{
-			$objPageAdventure = PageModel::findById($this->jumpTo_adventure);
-		}
-		else
-		{
-			$objPageAdventure = $objPage;
-		}
-		if (strlen($this->jumpTo_broadcast))
-		{
-			$objPageBroadcast = PageModel::findById($this->jumpTo_broadcast);
-		}
-		else
-		{
-			$objPageBroadcast = $objPage;
-		}
-		if (strlen($this->jumpTo_search))
-		{
-			$objPageSearch = PageModel::findById($this->jumpTo_search);
-		}
-		else
-		{
-			$objPageSearch = $objPage;
-		}
-		if (strlen($this->jumpTo_song))
-		{
-			$objPageSong = PageModel::findById($this->jumpTo_song);
-		}
-		else
-		{
-			$objPageSong = $objPage;
-		}
+		$objPageAdventure = ModulePTW::resolvePage($this->jumpTo_adventure);
+		$objPageBroadcast = ModulePTW::resolvePage($this->jumpTo_broadcast);
+		$objPageSearch = ModulePTW::resolvePage($this->jumpTo_search);
+		$objPageSong = ModulePTW::resolvePage($this->jumpTo_song);
 		$this->loadLanguageFile('tl_broadcast_song');
 		$broadcastdate = $this->Input->get('broadcast');
 		$objAdventure = null;
-		if ($broadcastdate < 1) return;
+		if ($broadcastdate === null || $broadcastdate === '') return;
+		$broadcastdate = filter_var($broadcastdate, FILTER_VALIDATE_INT);
+		if ($broadcastdate === false) throw new \Contao\CoreBundle\Exception\PageNotFoundException('Invalid Auriga broadcast date');
+		$this->Template->titlesong = null;
 		$this->Session->set('foundimages', '');
 		$arrProviders = $this->Database->prepare("SELECT * FROM tl_broadcast_provider")
 			->execute()
@@ -110,18 +85,20 @@ class ModuleBroadcast extends ModulePTW
 		$arrBroadcasts = array();
 		$objBroadcast = $this->Database->prepare("SELECT * FROM tl_broadcast WHERE `date` = ? ORDER BY sorting ASC")
 			->execute($broadcastdate);
+		if (!$objBroadcast->numRows) throw new \Contao\CoreBundle\Exception\PageNotFoundException('Auriga broadcast not found');
 		while ($objBroadcast->next())
 		{
 			if (is_null($objAdventure))
 			{
 				$objAdventure = $this->Database->prepare("SELECT * FROM tl_adventure WHERE id = ?")
 					->execute($objBroadcast->pid);
+				if (!$objAdventure->numRows) throw new \Contao\CoreBundle\Exception\PageNotFoundException('Auriga adventure not found');
 			}
 			$broadcast_providers = deserialize($objBroadcast->providers, true);
 			$foundproviders = array();
 			foreach ($broadcast_providers as $key => $provider)
 			{
-				if (strlen($provider)) $foundproviders[$providers[$provider]['initials']] = $providers[$provider];
+				if (is_scalar($provider) && isset($providers[$provider]['initials'])) $foundproviders[$providers[$provider]['initials']] = $providers[$provider];
 			}
 			$arrFiles = $this->Database->prepare("SELECT filename FROM tl_broadcast_file WHERE pid = ? ORDER BY sorting ASC")
 				->execute($objBroadcast->id)
@@ -135,7 +112,7 @@ class ModuleBroadcast extends ModulePTW
 				$foundgenres = array();
 				foreach ($song_genres as $key => $genre)
 				{
-					if (strlen($genre)) $foundgenres[] = $genres[$genre]['name'];
+					if (is_scalar($genre) && isset($genres[$genre]['name'])) $foundgenres[] = $genres[$genre]['name'];
 				}
 				switch ($objSong->songtype)
 				{
@@ -153,7 +130,7 @@ class ModuleBroadcast extends ModulePTW
 				if ($objSong->cover > 0)
 				{
 					$imagename = $this->getCovername($objSong->cover);
-					$cover = '<img src="' . $imagename . '" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" width="22" height="22" />';
+					$cover = '<img src="' . htmlspecialchars((string) $imagename, ENT_QUOTES, 'UTF-8') . '" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" width="22" height="22" />';
 				}
 				else
 				{
@@ -215,19 +192,19 @@ class ModuleBroadcast extends ModulePTW
 					$song_genres = deserialize($titlesong['genres'], true);
 					foreach ($song_genres as $key => $genre)
 					{
-						if (strlen($genre))
+						if (is_scalar($genre) && (string) $genre !== '')
 						{
 							$arrGenre = $this->Database->prepare("SELECT * FROM tl_genre WHERE id = ?")
 								->execute($genre)
 								->fetchAssoc();
-							$foundgenres[] = $arrGenre['name'];
+							if (isset($arrGenre['name'])) $foundgenres[] = $arrGenre['name'];
 						}
 					}
 					$titlesong['genres'] = $foundgenres;
 					if ($titlesong['cover'] > 0)
 					{
 						$imagename = $this->getCovername($titlesong['cover']);
-						$cover = '<img src="' . $imagename . '" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" width="22" height="22" />';
+						$cover = '<img src="' . htmlspecialchars((string) $imagename, ENT_QUOTES, 'UTF-8') . '" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" width="22" height="22" />';
 					}
 					else
 					{
@@ -266,7 +243,7 @@ class ModuleBroadcast extends ModulePTW
 		$this->Template->lngArtist = $GLOBALS['TL_LANG']['tl_module']['song_artist'];
 		$this->Template->lngAlbum = $GLOBALS['TL_LANG']['tl_module']['song_album'];
 		$this->Template->lngYear = $GLOBALS['TL_LANG']['tl_module']['song_year'];
-		$this->Template->lngLablecode = $GLOBALS['TL_LANG']['tl_module']['song_labelcode'];
+		$this->Template->lngLabelcode = $GLOBALS['TL_LANG']['tl_module']['song_labelcode'];
 		$this->Template->lngGenres = $GLOBALS['TL_LANG']['tl_module']['song_genres'];
 		$this->Template->nav_first_url = '';
 		$this->Template->nav_prev_url = '';
@@ -275,7 +252,7 @@ class ModuleBroadcast extends ModulePTW
 		$firstBroadcast = $this->Database->prepare("SELECT * FROM tl_broadcast WHERE pid = ? ORDER BY sorting ASC")
 			->execute($objBroadcast->pid)
 			->fetchAssoc();
-		if ($firstBroadcast['date'] == $objBroadcast->date)
+		if (!isset($firstBroadcast['date']) || $firstBroadcast['date'] == $objBroadcast->date)
 		{
 			$this->Template->nav_first_url = '';
 		}
@@ -286,7 +263,7 @@ class ModuleBroadcast extends ModulePTW
 		$lastBroadcast = $this->Database->prepare("SELECT * FROM tl_broadcast WHERE pid = ? ORDER BY sorting DESC")
 			->execute($objBroadcast->pid)
 			->fetchAssoc();
-		if ($lastBroadcast['date'] == $objBroadcast->date)
+		if (!isset($lastBroadcast['date']) || $lastBroadcast['date'] == $objBroadcast->date)
 		{
 			$this->Template->nav_last_url = '';
 		}
@@ -297,7 +274,7 @@ class ModuleBroadcast extends ModulePTW
 		$nextBroadcast = $this->Database->prepare("SELECT * FROM tl_broadcast WHERE pid = ? AND `date` > ? ORDER BY sorting ASC")
 			->execute($objBroadcast->pid, $objBroadcast->date)
 			->fetchAssoc();
-		if (!is_array($nextBroadcast) || $objBroadcast->date == $lastBroadcast['date'])
+		if (!isset($nextBroadcast['date']) || $objBroadcast->date == ($lastBroadcast['date'] ?? null))
 		{
 			$this->Template->nav_next_url = '';
 		}
@@ -308,7 +285,7 @@ class ModuleBroadcast extends ModulePTW
 		$prevBroadcast = $this->Database->prepare("SELECT * FROM tl_broadcast WHERE pid = ? AND `date` < ? ORDER BY sorting DESC")
 			->execute($objBroadcast->pid, $objBroadcast->date)
 			->fetchAssoc();
-		if (!is_array($prevBroadcast) || $objBroadcast->date == $firstBroadcast['date'])
+		if (!isset($prevBroadcast['date']) || $objBroadcast->date == ($firstBroadcast['date'] ?? null))
 		{
 			$this->Template->nav_prev_url = '';
 		}

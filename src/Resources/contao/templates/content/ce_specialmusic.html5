@@ -1,8 +1,9 @@
+<?php $escape = static function ($value) { return htmlspecialchars((string) ($value ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false); }; ?>
 
-<div class="<?php echo $this->class; ?> block ptw_broadcast"<?php echo $this->cssID; ?><?php if ($this->style): ?> style="<?php echo $this->style; ?>"<?php endif; ?>>
+<div class="<?php echo $escape($this->class); ?> block ptw_broadcast"<?php echo $this->cssID; ?><?php if ($this->style): ?> style="<?php echo $escape($this->style); ?>"<?php endif; ?>>
 <?php if ($this->headline): ?>
 
-<<?php echo $this->hl; ?>><?php echo $this->headline; ?></<?php echo $this->hl; ?>>
+<<?php echo $this->hl; ?>><?php echo $escape($this->headline); ?></<?php echo $this->hl; ?>>
 <?php endif; ?>
 
 <table>
@@ -20,15 +21,15 @@
 	<tbody>
 <?php foreach ($this->songs as $song): ?>
 	<tr>
-		<td><?php echo $song['adventure']; ?></td>
+		<td><?php echo $escape($song['adventure']); ?></td>
 		<td><?php echo $song['special']; ?></td>
-		<td><?php echo $song['title']; ?></td>
-		<td><?php echo $song['artist']; ?></td>
-		<td class="cover"><a href="<?php echo $song['titleurl']; ?>"><?php echo $song['cover']; ?></a></td>
-		<td><?php echo $song['album']; ?></td>
-		<td><?php echo $song['year']; ?></td>
-		<td><?php echo $song['labelcode']; ?></td>
-		<td><?php echo join(array_values($song['genres']), '/') ; ?></td>
+		<td><?php echo $escape($song['title']); ?></td>
+		<td><?php echo $escape($song['artist']); ?></td>
+		<td class="cover"><a href="<?php echo $escape($song['titleurl']); ?>"><?php echo $song['cover']; ?></a></td>
+		<td><?php echo $escape($song['album']); ?></td>
+		<td><?php echo $escape($song['year']); ?></td>
+		<td><?php echo $escape($song['labelcode']); ?></td>
+		<td><?php echo $escape(join('/', array_values($song['genres']))); ?></td>
 	</tr>
 <?php endforeach; ?>
 	</tbody>

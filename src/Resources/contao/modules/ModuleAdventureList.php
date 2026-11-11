@@ -57,14 +57,7 @@ class ModuleAdventureList extends ModulePTW
 			->execute();
 
 		// Redirect to jumpTo page
-		if (strlen($this->jumpTo_adventure))
-		{
-			$objPageAdventure = PageModel::findById($this->jumpTo_adventure);
-		}
-		else
-		{
-			$objPageAdventure = $objPage;
-		}
+		$objPageAdventure = ModulePTW::resolvePage($this->jumpTo_adventure);
 		while ($objAdventure->next())
 		{
 			$arrAdventures[] = array

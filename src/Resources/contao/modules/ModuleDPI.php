@@ -52,30 +52,9 @@ class ModuleDPI extends ModulePTW
 		global $objPage;
 		
 		// Redirect to jumpTo page
-		if (strlen($this->jumpTo_adventure))
-		{
-			$objPageAdventure = PageModel::findById($this->jumpTo_adventure);
-		}
-		else
-		{
-			$objPageAdventure = $objPage;
-		}
-		if (strlen($this->jumpTo_broadcast))
-		{
-			$objPageBroadcast = PageModel::findById($this->jumpTo_broadcast);
-		}
-		else
-		{
-			$objPageBroadcast = $objPage;
-		}
-		if (strlen($this->jumpTo_song))
-		{
-			$objPageSong = PageModel::findById($this->jumpTo_song);
-		}
-		else
-		{
-			$objPageSong = $objPage;
-		}
+		$objPageAdventure = ModulePTW::resolvePage($this->jumpTo_adventure);
+		$objPageBroadcast = ModulePTW::resolvePage($this->jumpTo_broadcast);
+		$objPageSong = ModulePTW::resolvePage($this->jumpTo_song);
 		$objPageSearch = $objPage;
 		$arrGenres = $this->Database->prepare("SELECT * FROM tl_genre")
 			->execute()
@@ -86,22 +65,36 @@ class ModuleDPI extends ModulePTW
 			$genres[$genre['id']] = $genre;
 		}
 		
-		$savedField = strlen($this->Session->get('dpi_field')) ? $this->Session->get('dpi_field') : '';
-		$savedSearch = strlen($this->Session->get('dpi_search')) ? $this->Session->get('dpi_search') : '';
-		if (!strlen($this->Input->get('page'))) $savedSearch = '';
-		$savedResults = strlen($this->Session->get('dpi_results')) ? $this->Session->get('dpi_results') : '';
-		$field = strlen($this->Input->post('field')) ? $this->Input->post('field') : ((strlen($this->Input->get('field'))) ? $this->Input->get('field') : $savedField);
-		$search = strlen($this->Input->post('search')) ? $this->Input->post('search') : ((strlen($this->Input->get('search'))) ? $this->Input->get('search') : $savedSearch);
-		$results = strlen($this->Input->post('results')) ? $this->Input->post('results') : $savedResults;
-		$start = 0;
-		
+		// Request/session values may be null or arrays; pagination requires integers.
+		$options = array('title', 'artist', 'album', 'year', 'labelcode');
+		$arrResults = array(10, 20, 50, 100, 1000);
+		$scalar = static function ($value) { return is_scalar($value) ? (string) $value : ''; };
+		$savedField = $scalar($this->Session->get('dpi_field'));
+		$savedSearch = $scalar($this->Session->get('dpi_search'));
+		if ($scalar($this->Input->get('page')) === '') $savedSearch = '';
+		$field = $scalar($this->Input->post('field'));
+		if ($field === '') $field = $scalar($this->Input->get('field'));
+		if ($field === '') $field = $savedField;
+		if (!in_array($field, $options, true)) $field = 'title';
+		$search = $scalar($this->Input->post('search'));
+		if ($search === '') $search = $scalar($this->Input->get('search'));
+		if ($search === '') $search = $savedSearch;
+		$results = $scalar($this->Input->post('results'));
+		if ($results === '') $results = $scalar($this->Session->get('dpi_results'));
+		$results = (int) $results;
+		if (!in_array($results, $arrResults, true)) $results = 10;
+		$page = filter_var($this->Input->get('page'), FILTER_VALIDATE_INT, array(
+			'options' => array('min_range' => 1, 'max_range' => intdiv(PHP_INT_MAX, $results) - 1)
+		));
+		if ($page === false) $page = 1;
+
 		$this->Session->set('dpi_field', $field);
 		$this->Session->set('dpi_search', $search);
 		$this->Session->set('dpi_results', $results);
 		$arrFoundSongs = array();
 		$foundResults = false;
 		$totalcount = 0;
-		$page = (strlen($this->Input->get('page'))) ? $this->Input->get('page') : 1;
+
 		
 		if (strlen($search))
 		{
@@ -119,7 +112,7 @@ class ModuleDPI extends ModulePTW
 				$foundgenres = array();
 				foreach ($song_genres as $key => $genre)
 				{
-					if (strlen($genre)) $foundgenres[] = $genres[$genre]['name'];
+					if (is_scalar($genre) && isset($genres[$genre]['name'])) $foundgenres[] = $genres[$genre]['name'];
 				}
 				switch ($objSong->songtype)
 				{
@@ -137,7 +130,7 @@ class ModuleDPI extends ModulePTW
 				if ($objSong->cover > 0)
 				{
 					$imagename = $this->getCovername($objSong->cover);
-					$cover = '<img src="' . $imagename . '" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" width="22" height="22" />';
+					$cover = '<img src="' . htmlspecialchars((string) $imagename, ENT_QUOTES, 'UTF-8') . '" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" width="22" height="22" />';
 				}
 				else
 				{
@@ -168,21 +161,6 @@ class ModuleDPI extends ModulePTW
 			}
 		}
 		
-		$options = array(
-			'title',
-			'artist',
-			'album',
-			'year',
-			'labelcode'
-		);
-		$arrResults = array(
-			10,
-			20,
-			50,
-			100,
-			1000
-		);
-
 		// Pagination
 		$objPagination = new \Pagination($totalcount, $results);
 		$this->Template->pagination = $objPagination->generate("\n  ");

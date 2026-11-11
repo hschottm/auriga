@@ -14,6 +14,21 @@ use Contao\PageModel;
  */
 class ModulePTW extends \Module
 {
+	public static function resolvePage($id)
+	{
+		global $objPage;
+
+		$id = filter_var($id, FILTER_VALIDATE_INT, array('options' => array('min_range' => 1)));
+		return ($id !== false ? PageModel::findById($id) : null) ?? $objPage;
+	}
+
+	protected function requireRecordId($value)
+	{
+		$id = filter_var($value, FILTER_VALIDATE_INT, array('options' => array('min_range' => 1)));
+		if ($id === false) throw new \Contao\CoreBundle\Exception\PageNotFoundException('Invalid Auriga record ID');
+		return $id;
+	}
+
 	public function generate()
 	{
 		if ($this->aurigaTpl)
@@ -38,8 +53,8 @@ class ModulePTW extends \Module
 		$info = ModulePTW::distributedPathInfo($cover_id);
 		foreach ($uploadTypes as $extension)
 		{
-			$imagename = $GLOBALS['TL_CONFIG']['auriga']['coverpath'] . $info['fullpath'] . '/' . $cover_id . '.' . $extension;
-			if (@file_exists($imagename))
+			$imagename = rtrim($GLOBALS['TL_CONFIG']['auriga']['coverpath'], '/') . '/' . $info['fullpath'] . '/' . $cover_id . '.' . $extension;
+			if (is_file($imagename) && is_readable($imagename))
 			{
 				$foundimage = true;
 				break;
@@ -72,7 +87,7 @@ class ModulePTW extends \Module
 		$arrAdventure = $this->Database->prepare("SELECT tl_adventure.id FROM tl_adventure, tl_broadcast, tl_broadcast_song WHERE tl_broadcast_song.pid = tl_broadcast.id AND tl_broadcast.pid = tl_adventure.id AND tl_broadcast_song.id = ?")
 			->execute($song_id)
 			->fetchAssoc();
-		return $arrAdventure['id'];
+		return $arrAdventure['id'] ?? null;
 	}
 	
 	protected function getPathForSong($song_id)
@@ -80,41 +95,24 @@ class ModulePTW extends \Module
 		global $objPage;
 		
 		// Redirect to jumpTo page
-		if (strlen($this->jumpTo_adventure))
-		{
-			$objPageAdventure = PageModel::findById($this->jumpTo_adventure);
-		}
-		else
-		{
-			$objPageAdventure = $objPage;
-		}
-		if (strlen($this->jumpTo_broadcast))
-		{
-			$objPageBroadcast = PageModel::findById($this->jumpTo_broadcast);
-		}
-		else
-		{
-			$objPageBroadcast = $objPage;
-		}
-		if (strlen($this->jumpTo_song))
-		{
-			$objPageSong = PageModel::findById($this->jumpTo_song);
-		}
-		else
-		{
-			$objPageSong = $objPage;
-		}
+		$objPageAdventure = ModulePTW::resolvePage($this->jumpTo_adventure);
+		$objPageBroadcast = ModulePTW::resolvePage($this->jumpTo_broadcast);
+		$objPageSong = ModulePTW::resolvePage($this->jumpTo_song);
 		
 		$arrBroadcast = $this->Database->prepare("SELECT tl_broadcast.* FROM tl_broadcast, tl_broadcast_song WHERE tl_broadcast.id = tl_broadcast_song.pid AND tl_broadcast_song.id = ?")
 			->execute($song_id)
 			->fetchAssoc();
+		if (empty($arrBroadcast['id'])) return array();
 		$arrAdventure = $this->Database->prepare("SELECT tl_adventure.* FROM tl_adventure, tl_broadcast WHERE tl_adventure.id = tl_broadcast.pid AND tl_broadcast.id = ?")
 			->execute($arrBroadcast['id'])
 			->fetchAssoc();
-		return array(
-			array('title' => $arrAdventure['numbering'] . '. ' . $arrAdventure['title'], 'url' => $objPageAdventure->getFrontendUrl('/adventure/' . $arrAdventure['id'])),
-			array('title' => $arrBroadcast['chapter'] . '. ' . $arrBroadcast['title'], 'url' => $objPageBroadcast->getFrontendUrl('/broadcast/' . $arrBroadcast['date']))
-		);
+		$path = array();
+		if (!empty($arrAdventure['id']))
+		{
+			$path[] = array('title' => $arrAdventure['numbering'] . '. ' . $arrAdventure['title'], 'url' => $objPageAdventure->getFrontendUrl('/adventure/' . $arrAdventure['id']));
+		}
+		$path[] = array('title' => $arrBroadcast['chapter'] . '. ' . $arrBroadcast['title'], 'url' => $objPageBroadcast->getFrontendUrl('/broadcast/' . $arrBroadcast['date']));
+		return $path;
 	}
 
 	protected function createPaths($path, $array)
@@ -142,7 +140,7 @@ class ModulePTW extends \Module
 	if (is_array($arrSong) && $objCover->numRows == 0)
 		{
 			// change identical entries and add the cover too
-			if (strlen($arrSong['labelcode']))
+			if (strlen((string) ($arrSong['labelcode'] ?? '')))
 			{
 				$sameLC = $this->Database->prepare("SELECT id FROM tl_broadcast_song WHERE labelcode = ?")
 					->execute($arrSong['labelcode'])
@@ -152,7 +150,7 @@ class ModulePTW extends \Module
 			{
 				$sameLC = array();
 			}
-			if (strlen($arrSong['album'].$arrSong['artist']))
+			if (strlen((string) ($arrSong['album'] ?? '').(string) ($arrSong['artist'] ?? '')))
 			{
 				$sameAlbum = $this->Database->prepare("SELECT id FROM tl_broadcast_song WHERE album = ? and artist = ?")
 					->execute($arrSong['album'], $arrSong['artist'])
@@ -165,7 +163,7 @@ class ModulePTW extends \Module
 			$samefound = array_unique(array_merge($sameLC, $sameAlbum));
 			if (count($samefound))
 			{
-				$arrCover = $this->Database->prepare("SELECT * FROM tl_song_cover WHERE song IN (" . join($samefound, ',') . ")")
+				$arrCover = $this->Database->prepare("SELECT * FROM tl_song_cover WHERE song IN (" . join(',', $samefound) . ")")
 					->execute()
 					->fetchAssoc();
 				if (is_array($arrCover))

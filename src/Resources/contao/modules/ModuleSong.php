@@ -2,7 +2,6 @@
 
 namespace Hschottm\AurigaBundle;
 
-use Symfony\Component\HttpClient\HttpClient;
 use Contao\PageModel;
 
 
@@ -58,6 +57,11 @@ class ModuleSong extends ModulePTW implements \uploadable
 		return count($this->errors) > 0;
 	}
 	
+	protected function coverSearch(): CoverSearch
+	{
+		return new CoverSearch();
+	}
+
 	protected function uploadCoverFile($song_id, $data)
 	{
 		// No file specified
@@ -102,6 +106,7 @@ class ModuleSong extends ModulePTW implements \uploadable
 		}
 
 		$pathinfo = pathinfo($file['name']);
+		$pathinfo['extension'] = $pathinfo['extension'] ?? '';
 		$uploadTypes = trimsplit(',', $this->extensions);
 
 		// File type is not allowed
@@ -114,6 +119,14 @@ class ModuleSong extends ModulePTW implements \uploadable
 			return false;
 		}
 
+		$bytes = @file_get_contents($file['tmp_name']);
+		$extension = is_string($bytes) ? CoverSearch::imageExtension($bytes) : null;
+		if ($extension === null)
+		{
+			$this->addError('Die Datei ist kein unterstütztes Coverbild.');
+			unset($_FILES['uploadcover']);
+			return false;
+		}
 		if (($arrImageSize = @getimagesize($file['tmp_name'])) != false)
 		{
 			// Image exceeds maximum image width
@@ -137,46 +150,44 @@ class ModuleSong extends ModulePTW implements \uploadable
 			}
 		}
 
-		// Store file in the session and optionally on the server
-		if (!$this->hasErrors())
+		if (!$this->hasErrors() && !$this->storeCover($song_id, $data, $bytes, $extension))
 		{
-			$_SESSION['FILES']['uploadcover'] = $_FILES['uploadcover'];
-			$this->log('File "'.$file['name'].'" uploaded successfully', 'FormFileUpload validate()', TL_FILES);
-
-			$strUploadFolder = $GLOBALS['TL_CONFIG']['auriga']['coverpath'];
-
-			// Store the file if the upload folder exists
-			if (strlen($strUploadFolder) && is_dir(TL_ROOT . '/' . $strUploadFolder))
-			{
-				$coverid = $this->createNewCover($song_id, $data);
-				if ($coverid)
-				{
-					$this->import('Files');
-					$info = $this->distributedPathInfo($coverid);
-					$this->createPaths($strUploadFolder, $info['path']);
-					$this->Files->move_uploaded_file($file['tmp_name'], $strUploadFolder . '/' . $info['fullpath'] . '/' . $coverid . '.' . $pathinfo['extension']);
-					$this->Files->chmod($strUploadFolder . '/' . $info['fullpath'] . '/' . $coverid . '.' . $pathinfo['extension'], 0644);
-
-					$_SESSION['FILES']['uploadcover'] = array
-					(
-						'name' => $file['name'],
-						'type' => $file['type'],
-						'tmp_name' => TL_ROOT . '/' . $strUploadFolder . '/' . $file['name'],
-						'error' => $file['error'],
-						'size' => $file['size'],
-						'uploaded' => true
-					);
-
-					$this->log('File "'.$file['name'].'" has been moved to "'.$strUploadFolder.'"', 'FormFileUpload validate()', TL_FILES);
-				}
-				else
-				{
-					$this->addError($GLOBALS['TL_LANG']['ERR']['could_not_create_cover_id']);
-				}
-			}
+			$this->addError('Das Cover konnte nicht gespeichert werden.');
 		}
 
 		unset($_FILES['uploadcover']);
+	}
+
+	/** Roll back new mappings if the image cannot be persisted. */
+	protected function storeCover($songId, array $data, string $bytes, string $extension): bool
+	{
+		if (strlen($bytes) > $this->maxlength || CoverSearch::imageExtension($bytes) !== $extension) return false;
+		$path = null;
+		$temp = null;
+		$created = false;
+		$this->Database->beginTransaction();
+		try
+		{
+			$coverId = $this->createNewCover($songId, $data);
+			if (!$coverId) throw new \RuntimeException('Cover mapping already exists');
+			$info = $this->distributedPathInfo($coverId);
+			$directory = TL_ROOT . '/' . trim($GLOBALS['TL_CONFIG']['auriga']['coverpath'], '/') . '/' . $info['fullpath'];
+			if (!is_dir($directory) && !@mkdir($directory, 0755, true) && !is_dir($directory)) throw new \RuntimeException('Cannot create cover directory');
+			$path = $directory . '/' . $coverId . '.' . $extension;
+			if (file_exists($path)) throw new \RuntimeException('Cover file already exists');
+			$temp = @tempnam($directory, '.cover-');
+			if ($temp === false || @file_put_contents($temp, $bytes) !== strlen($bytes) || !@chmod($temp, 0644) || !@rename($temp, $path)) throw new \RuntimeException('Cannot store cover');
+			$created = true;
+			$this->Database->commitTransaction();
+			return true;
+		}
+		catch (\Exception $exception)
+		{
+			$this->Database->rollbackTransaction();
+			if ($temp && is_file($temp)) @unlink($temp);
+			if ($created && $path && is_file($path)) @unlink($path);
+			return false;
+		}
 	}
 
 	protected function createNewCover($song_id, $data)
@@ -185,6 +196,13 @@ class ModuleSong extends ModulePTW implements \uploadable
 		$foundCover = $this->Database->prepare("SELECT * FROM tl_song_cover WHERE song = ?")
 			->execute($song_id)
 			->fetchAssoc();
+		if (is_array($foundCover))
+		{
+			$existing = !empty($foundCover['cover']) ? $this->getCovername($foundCover['cover']) : '';
+			if ($existing !== '' && @getimagesize($existing) !== false) return false;
+			$this->Database->prepare("DELETE FROM tl_song_cover WHERE song = ?")->execute($song_id);
+			$foundCover = null;
+		}
 		if (!is_array($foundCover))
 		{
 			$objResult = $this->Database->prepare("INSERT INTO tl_cover (tstamp) VALUES (?)")
@@ -199,7 +217,7 @@ class ModuleSong extends ModulePTW implements \uploadable
 					$coverid
 					);
 			// change identical entries and add the cover too
-			if (strlen($data['labelcode']))
+			if (strlen((string) ($data['labelcode'] ?? '')))
 			{
 				$sameLC = $this->Database->prepare("SELECT id FROM tl_broadcast_song WHERE labelcode = ?")
 					->execute($data['labelcode'])
@@ -209,7 +227,7 @@ class ModuleSong extends ModulePTW implements \uploadable
 			{
 				$sameLC = array();
 			}
-			if (strlen($data['album'].$data['artist']))
+			if (strlen((string) ($data['album'] ?? '').(string) ($data['artist'] ?? '')))
 			{
 				$sameAlbum = $this->Database->prepare("SELECT id FROM tl_broadcast_song WHERE album = ? and artist = ?")
 					->execute($data['album'], $data['artist'])
@@ -222,7 +240,7 @@ class ModuleSong extends ModulePTW implements \uploadable
 			$samefound = array_unique(array_merge($sameLC, $sameAlbum));
 			foreach ($samefound as $foundid)
 			{
-				if ($foundid != $song_id)
+				if ($foundid != $song_id && !$this->Database->prepare("SELECT id FROM tl_song_cover WHERE song = ?")->execute($foundid)->numRows)
 				{
 					$objResult = $this->Database->prepare("INSERT INTO tl_song_cover (tstamp, song, cover) VALUES (?, ?, ?)")
 						->execute(
@@ -247,21 +265,20 @@ class ModuleSong extends ModulePTW implements \uploadable
 		//require_once(TL_ROOT . '/plugins/cloudfusion/pas.class.php');
 		//require_once(TL_ROOT . '/plugins/cloudfusion/_utilities.class.php');
 		//require_once(TL_ROOT . '/plugins/cloudfusion/lib/requestcore/requestcore.class.php');
+		foreach (array('albumcover', 'possibleImage', 'urlShowNext', 'urlShowPrev', 'imagePosition', 'searchValue') as $field)
+		{
+			$this->Template->$field = '';
+		}
 		$songid = $this->Input->get('song');
-		if (!$songid) return;
-		if (strlen($this->jumpTo_song))
-		{
-			$objPageSong = PageModel::findById($this->jumpTo_song);
-		}
-		else
-		{
-			$objPageSong = $objPage;
-		}
-		$this->checkCoverForSong($songid);
+		if ($songid === null || $songid === '') return;
+		$songid = $this->requireRecordId($songid);
+		$objPageSong = ModulePTW::resolvePage($this->jumpTo_song);
 		$thumbs = array();
-		$adventure = $this->getAdventureForSong($song_id);
 		$objSong = $this->Database->prepare("SELECT * FROM tl_broadcast_song WHERE `id` = ?")
 			->execute($songid);
+		if (!$objSong->numRows) throw new \Contao\CoreBundle\Exception\PageNotFoundException('Auriga song not found');
+		$this->checkCoverForSong($songid);
+		$this->loadLanguageFile('tl_broadcast_song');
 		$this->loadLanguageFile('tl_module');
 		$data = $objSong->row();
 		switch ($objSong->songtype)
@@ -282,217 +299,80 @@ class ModuleSong extends ModulePTW implements \uploadable
 		$song_genres = deserialize($objSong->genres, true);
 		foreach ($song_genres as $key => $genre)
 		{
-			if (strlen($genre))
+			if (is_scalar($genre) && (string) $genre !== '')
 			{
 				$arrGenre = $this->Database->prepare("SELECT * FROM tl_genre WHERE id = ?")
 					->execute($genre)
 					->fetchAssoc();
-				$foundgenres[] = $arrGenre['name'];
+				if (isset($arrGenre['name'])) $foundgenres[] = $arrGenre['name'];
 			}
 		}
 		$data['genres'] = $foundgenres;
-		$this->uploadCoverFile($objSong->id, $data);
-
-		$foundimages = $this->Session->get('foundimages');
-		if (strlen($this->Input->post('usecover')))
-		{
-			if (is_array($foundimages) && array_key_exists($this->Input->post('usecover'), $foundimages))
-			{
-				$coverid = $this->createNewCover($objSong->id, $data);
-
-				if ($coverid)
-				{
-					// download the cover image
-					$image = file_get_contents($foundimages[$this->Input->post('usecover')]['artwork']);
-					$pathinfo = pathinfo($foundimages[$this->Input->post('usecover')]['artwork']);
-					$info = $this->distributedPathInfo($coverid);
-					$this->createPaths($GLOBALS['TL_CONFIG']['auriga']['coverpath'], $info['path']);
-					$written = file_put_contents($GLOBALS['TL_CONFIG']['auriga']['coverpath'] . '/' . $info['fullpath'] . '/' . $coverid . '.' . $pathinfo['extension'], $image);
-					if ($written > 0)
-					{
-						$foundimages = array();
-						$this->Session->set('foundimages', null);
-					}
-				}
-			}
-			$this->redirect($objPageSong->getFrontendUrl('/song/' . $objSong->id));
-		}
-
-		$arrCover = $this->Database->prepare("SELECT cover FROM tl_song_cover WHERE song = ?")
-			->execute($objSong->id)
-			->fetchAssoc();
-		if (!is_array($arrCover))
-		{
-			$use_existing_cover = false;
-			// check for duplicates first
-			$arrCover = $this->Database->prepare("SELECT tl_song_cover.* FROM tl_broadcast_song LEFT JOIN tl_song_cover ON tl_broadcast_song.id = tl_song_cover.song WHERE tl_broadcast_song.id <> ? AND labelcode = ?")
-				->execute($objSong->id, $objSong->labelcode)
-				->fetchAssoc();
-			if (is_array($arrCover) && $arrCover['id'] > 0)
-			{
-				$use_existing_cover = true;
-			}
-			else
-			{
-				$arrCover = null;
-				$arrCover = $this->Database->prepare("SELECT tl_song_cover.* FROM tl_broadcast_song LEFT JOIN tl_song_cover ON tl_broadcast_song.id = tl_song_cover.song WHERE tl_broadcast_song.id <> ? AND tl_broadcast_song.artist = ? AND tl_broadcast_song.album = ?")
-					->execute($objSong->id, $objSong->artist, $objSong->album)
-					->fetchAssoc();
-				if (is_array($arrCover) && $arrCover['id'] > 0)
-				{
-					$use_existing_cover = true;
-				}
-				else
-				{
-					$arrCover = null;
-				}
-			}
-			if ($use_existing_cover)
-			{
-				$objDupResult = $this->Database->prepare("INSERT INTO tl_song_cover (tstamp, song, cover) VALUES (?, ?, ?)")
-					->execute(
-						time(),
-						$objSong->id,
-						$arrCover['cover']
-						);
-			}
-		}
 		$this->import('FrontendUser', 'User');
 		$is_admin = false;
 		foreach ($admingroups as $group)
 		{
 			if ($this->User->isMemberOf($group)) $is_admin = true;
 		}
-		if (is_array($arrCover))
+		if ($is_admin) $this->uploadCoverFile($objSong->id, $data);
+
+		$foundimages = $this->Session->get('auriga_cover_candidates_' . $objSong->id);
+		$usecover = filter_var($this->Input->post('usecover'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
+		if ($is_admin && $usecover !== false && is_array($foundimages) && isset($foundimages[$usecover]))
 		{
-			$imagename = $this->getCovername($arrCover['cover']);
-			if (!strlen($imagename))
+			$selected = $foundimages[$usecover];
+			$image = null;
+			if (is_array($selected) && ($selected['song'] ?? null) == $objSong->id && is_string($selected['artwork'] ?? null))
 			{
-				$objResult = $this->Database->prepare("DELETE FROM tl_cover WHERE id = ?")
-					->execute($arrCover['cover']);
-				$objResult = $this->Database->prepare("DELETE FROM tl_song_cover WHERE cover = ?")
-					->execute($arrCover['cover']);
+				$image = $this->coverSearch()->download($selected['artwork'], $this->maxlength);
+			}
+			if ($image !== null && $this->storeCover($objSong->id, $data, $image['bytes'], $image['extension']))
+			{
+				$this->Session->set('auriga_cover_candidates_' . $objSong->id, null);
 				$this->redirect($objPageSong->getFrontendUrl('/song/' . $objSong->id));
 			}
-			else
-			{
-				$arrImageSize = getimagesize($imagename);
+			$this->addError('Das Cover konnte nicht geladen oder gespeichert werden.');
+		}
 
-				$size[0] = 300;
-				$size[1] = floor(300 * $arrImageSize[1] / $arrImageSize[0]);
-
-				$this->Template->albumcover = '<img src="' . $imagename . '" alt="' . htmlspecialchars($objSong->artist) . ': ' . htmlspecialchars($objSong->album) . '" class="img-fluid albumart" />';
-			}
+		$arrCover = $this->Database->prepare("SELECT cover FROM tl_song_cover WHERE song = ?")
+			->execute($objSong->id)
+			->fetchAssoc();
+		$imagename = !empty($arrCover['cover']) ? $this->getCovername($arrCover['cover']) : '';
+		if ($imagename !== '' && @getimagesize($imagename) !== false)
+		{
+			$this->Template->albumcover = '<img src="' . htmlspecialchars($imagename, ENT_QUOTES) . '" alt="' . htmlspecialchars((string) $objSong->artist, ENT_QUOTES) . ': ' . htmlspecialchars((string) $objSong->album, ENT_QUOTES) . '" class="img-fluid albumart" />';
 		}
 		else
 		{
-			$client = HttpClient::create([
-				'headers' => [
-						'User-Agent' => 'Auriga Secret Society Pop Index',
-				],
-			]);
-			$response = $client->request('GET', 'https://musicbrainz.org/ws/2/release?query=' . "release:" . \System::urlEncode($data['album']) . \System::urlEncode(" AND artist") . ":" . \System::urlEncode($data["artist"]));// . "&limit=10");
-			$content = $response->getContent();
-			$xml = simplexml_load_string($content);
-			$json = json_encode($xml);
-			$array = json_decode($json,TRUE);
-
-			if ($array['release-list']["@attributes"]['count'] == 0) {
-				$album = $data["album"];
-				if (strpos($album, "(") > 0) {
-					$album = substr($album, 0, strpos($album, "("));
-				}
-				$response = $client->request('GET', 'https://musicbrainz.org/ws/2/release?query=' . "release:" . \System::urlEncode(trim($album)));// . "&limit=10");
-				$content = $response->getContent();
-				$xml = simplexml_load_string($content);
-				$json = json_encode($xml);
-				$array = json_decode($json,TRUE);
-			}
-
-			$coverclient = HttpClient::create([
-				'headers' => [
-						'User-Agent' => 'Auriga Secret Society Pop Index',
-				],
-			]);
-			$mbids = array();
-			if ($array['release-list']["@attributes"]['count'] > 1) {
-				foreach ($array['release-list']['release'] as $release) {
-					$mbid = $release["@attributes"]['id'];
-					if (!in_array($mbid, $mbids)) $mbids[] = $mbid;
-				}
-			} else if ($array['release-list']["@attributes"]['count'] == 1) {
-				$mbid = $array['release-list']['release']["@attributes"]['id'];
-				if (!in_array($mbid, $mbids)) $mbids[] = $mbid;
-			}
-			foreach ($mbids as $mbid) {
-				$coverresponse = $coverclient->request('GET', 'https://coverartarchive.org/release/' . $mbid);
-				if ($coverresponse->getStatusCode() < 400) {
-					$covercontent = $coverresponse->getContent();
-					$coverjson = json_decode($covercontent, TRUE);
-					foreach ($coverjson['images'] as $imagedata) {
-						if ($imagedata['front']) {
-							if (!in_array($imagedata['thumbnails']['large'], $thumbs))
-							{
-								$thumbs[] = $imagedata['thumbnails']['large'];
-							}
-						}
-					}
-				}
-			}
-
+			$ownsearch = $is_admin && $this->Input->post('search') && is_string($this->Input->post('searchtext')) && trim($this->Input->post('searchtext')) !== '';
+			$sessionKey = 'auriga_cover_search_' . $objSong->id;
+			$searchAlbum = $ownsearch ? trim($this->Input->post('searchtext')) : $this->Session->get($sessionKey);
+			if (!is_string($searchAlbum) || $searchAlbum === '') $searchAlbum = (string) ($data['album'] ?? '');
+			if ($ownsearch) $this->Session->set($sessionKey, $searchAlbum);
+			$this->Template->searchValue = $searchAlbum;
+			$thumbs = $this->coverSearch()->search($searchAlbum, $searchAlbum === (string) ($data['album'] ?? '') ? (string) ($data['artist'] ?? '') : '');
 			if ($is_admin)
 			{
-				$ownsearch = strlen($this->Input->post('search')) & strlen($this->Input->post('searchtext'));
-				if ($ownsearch)
+				if ($ownsearch) $this->Input->setGet('imgidx', '');
+				$foundimages = array();
+				foreach ($thumbs as $url)
 				{
-					$this->Input->setGet('imgidx', '');
+					$foundimages[] = array('song' => $objSong->id, 'artwork' => $url,
+						'preview' => '<img src="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" alt="Covervorschlag" class="img-fluid albumart" />');
 				}
-				if ((is_array($foundimages) && $foundimages[0]['song'] != $objSong->id) || $ownsearch)
-				{
-					$foundimages = array();
-				}
-				if (!is_array($foundimages)) $foundimages = array();
-				if (count($foundimages) == 0)
-				{
-					//$pas = new AmazonPAS('0KTJZ8FG7FSTFQ2S9EG2', 'g58MVTP8MuXdKmSGEQg1uO4XgyoNDMmJz/C9txB2', '8102-4954-1410');
-					//$album = preg_replace("/\\(.*?\\)/", "", $objSong->album);
-					//$album = preg_replace("/-\\s*?CD.*/", "", $album);
-					//$album = preg_replace("/-\\s*?Single.*/", "", $album);
-					//$searchtext = ($ownsearch) ? $this->Input->post('searchtext') : $objSong->artist . " " . $album;
-				 	//$items = $pas->item_search($searchtext, array('ResponseGroup' => 'Medium'), 'de');
-					//if (count($items->body->Items->Item) == 0 && $ownsearch)
-					//{
-					//	$items = $pas->item_search($album, array('ResponseGroup' => 'Medium'), 'de');
-					//	if (count($items->body->Items->Item) == 0)
-					//	{
-					//		$items = $pas->item_search($objSong->labelcode, array('ResponseGroup' => 'Medium'), 'de');
-					//	}
-					//}
-					//foreach ($items->body->Items->Item as $item)
-					//{
-					//	$url = $item->DetailPageURL;
-					//	$title = $item->ItemAttributes->Title;
-					//	$ItemId = $item->ASIN;
-					//	$artist = $pas->util->try_these(array('Artist', 'Creator'), $item->ItemAttributes);
-					//	$artwork = $pas->util->try_these(array('LargeImage','MediumImage','SmallImage'), $item, null);
-					//	$preview = $artwork;
-					//	if ($artwork)
-					//	{
-					//		$artwork = $artwork->URL;
-					//		$foundimages[] = array("song" => $objSong->id, "id" => (string)$ItemId, "title" => (string)$title, "artist" => (string)$artist, "artwork" => (string)$artwork, "preview" => '<img src="' . $preview->URL . '" alt="' . htmlspecialchars($artist) . ': ' . htmlspecialchars($title) . '" title="' . htmlentities($artist) . ': ' . htmlentities($title) . '" />');
-					//	}
-					//}
-					//$this->Session->set('foundimages', $foundimages);
-				}
-				$possibleIndex = strlen($this->Input->get('imgidx')) ? $this->Input->get('imgidx') : 0;
+				$this->Session->set('auriga_cover_candidates_' . $objSong->id, $foundimages);
+
+				$possibleIndex = filter_var($this->Input->get('imgidx'), FILTER_VALIDATE_INT, array('options' => array('min_range' => 0)));
+				if ($possibleIndex === false || !isset($foundimages[$possibleIndex])) $possibleIndex = 0;
 				if (count($foundimages) > $possibleIndex+1) $this->Template->urlShowNext = $objPageSong->getFrontendUrl('/song/' . $objSong->id . '/imgidx/' . ($possibleIndex+1));
 				if ($possibleIndex > 0) $this->Template->urlShowPrev = $objPageSong->getFrontendUrl('/song/' . $objSong->id . '/imgidx/' . ($possibleIndex-1));
-				$this->Template->possibleImage = $foundimages[$possibleIndex]['preview'];
-				$this->Template->imagePosition = ($possibleIndex+1) . '/' . count($foundimages);
+				$this->Template->possibleImage = $foundimages[$possibleIndex]['preview'] ?? '';
+				$this->Template->imagePosition = (count($foundimages) ? $possibleIndex+1 : 0) . '/' . count($foundimages);
 				$this->Template->formaction = $objPageSong->getFrontendUrl('/song/' . $objSong->id);
 				$this->Template->usecover = $possibleIndex;
 			}
 		}
+		$this->Template->coverErrors = $this->errors;
 		$this->Template->song = $data;
 		$this->Template->coverSearch = $thumbs;
 		$this->Template->coverSearchCount = count($thumbs);

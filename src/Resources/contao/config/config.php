@@ -1,6 +1,6 @@
 <?php
 
-use Hschottm\AurigaBundle\AurigaHelper;
+// use Hschottm\AurigaBundle\AurigaHelper;
 use Hschottm\AurigaBundle\FieldValidator;
 use Hschottm\AurigaBundle\ContentSpecialMusic;
 use Hschottm\AurigaBundle\ModulePTW;
@@ -41,9 +41,9 @@ array_insert($GLOBALS['BE_MOD'], 3, array
 						),
 					'icon' => 'bundles/hschottmauriga/images/adventure.png',
 					'stylesheet' => 'bundles/hschottmauriga/css/auriga.css',
-					'popwelt' => array(AurigaHelper::class, 'importFromPopwelt'),
-					'importbg' => array(AurigaHelper::class, 'importBackgroundMusic'),
-					'import' => array(AurigaHelper::class, 'importOldDatabase')
+// 					'popwelt' => array(AurigaHelper::class, 'importFromPopwelt'),
+// 					'importbg' => array(AurigaHelper::class, 'importBackgroundMusic'),
+// 					'import' => array(AurigaHelper::class, 'importOldDatabase')
 				),
 			"provider" => array(
 				'tables' => array(

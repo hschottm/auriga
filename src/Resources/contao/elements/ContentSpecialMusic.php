@@ -75,24 +75,18 @@ class ContentSpecialMusic extends \ContentElement
 			$genres[$genre['id']] = $genre;
 		}
 
-		if (strlen($this->jumpTo_song))
-		{
-			$objPageSong = PageModel::findById($this->jumpTo_song);
-		}
-		else
-		{
-			$objPageSong = $objPage;
-		}
+		$objPageSong = ModulePTW::resolvePage($this->jumpTo_song);
 
 		$objSong = $this->Database->prepare("SELECT tl_broadcast_song.*, tl_song_cover.cover, tl_adventure.title adventuretitle, tl_adventure.numbering FROM tl_adventure, tl_broadcast, tl_broadcast_song LEFT JOIN tl_song_cover ON tl_broadcast_song.id = tl_song_cover.song WHERE tl_broadcast.id = tl_broadcast_song.pid AND tl_adventure.id = tl_broadcast.pid AND tl_broadcast_song.songtype = ? ORDER BY cast(tl_broadcast.date AS UNSIGNED) DESC")
 			->execute($this->special_type);
+		$arrSongs = array();
 		while ($objSong->next())
 		{
 			$song_genres = deserialize($objSong->genres, true);
 			$foundgenres = array();
 			foreach ($song_genres as $key => $genre)
 			{
-				if (strlen($genre)) $foundgenres[] = $genres[$genre]['name'];
+				if (is_scalar($genre) && isset($genres[$genre]['name'])) $foundgenres[] = $genres[$genre]['name'];
 			}
 			switch ($objSong->songtype)
 			{
@@ -110,7 +104,7 @@ class ContentSpecialMusic extends \ContentElement
 			if ($objSong->cover > 0)
 			{
 				$imagename = ModulePTW::_getCovername($objSong->cover);
-				$cover = '<img src="' . $imagename . '" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" width="22" height="22" />';
+				$cover = '<img src="' . htmlspecialchars((string) $imagename, ENT_QUOTES, 'UTF-8') . '" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" width="22" height="22" />';
 			}
 			else
 			{

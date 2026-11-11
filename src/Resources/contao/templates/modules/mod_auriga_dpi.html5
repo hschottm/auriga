@@ -1,15 +1,16 @@
+<?php $escape = static function ($value) { return htmlspecialchars((string) ($value ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false); }; ?>
 
-<div class="<?php echo $this->class; ?> ptw_broadcast"<?php echo $this->cssID; ?><?php if ($this->style): ?> style="<?php echo $this->style; ?>"<?php endif; ?>>
+<div class="<?php echo $escape($this->class); ?> ptw_broadcast"<?php echo $this->cssID; ?><?php if ($this->style): ?> style="<?php echo $escape($this->style); ?>"<?php endif; ?>>
 <?php if ($this->headline): ?>
 
-<<?php echo $this->hl; ?>><?php echo $this->headline; ?></<?php echo $this->hl; ?>>
+<<?php echo $this->hl; ?>><?php echo $escape($this->headline); ?></<?php echo $this->hl; ?>>
 <?php endif; ?>
 
-<form method="POST" action="<?php echo $this->formaction; ?>">
+<form method="POST" action="<?php echo $escape($this->formaction); ?>">
 <input type="hidden" name="FORM_SUBMIT" value="dpi" />
 <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>" />
 <div>
-<?php echo $this->lngSearch; ?> <input type="text" name="search" <?php if (strlen($this->savedSearch)) echo 'value="' . $this->savedSearch . '" ' ?>/> <?php echo $this->lngIn; ?> 
+<?php echo $this->lngSearch; ?> <input type="text" name="search" <?php if (strlen((string) ($this->savedSearch ?? ''))) echo 'value="' . $escape($this->savedSearch) . '" ' ?>/> <?php echo $this->lngIn; ?>
 <select name="field"><?php foreach ($this->options as $option): ?><option value="<?php echo $option; ?>" <?php if (strcmp($option, $this->savedField) == 0) echo ' selected="selected"' ?>><?php echo $this->$option; ?></option><?php endforeach; ?></select>
 <input type="submit" class="submit" name="submit" value="<?php echo $this->lngSearchButton; ?>" />
 </div>
@@ -35,15 +36,15 @@
 	<tbody>
 <?php foreach ($this->foundsongs as $song): ?>
 	<tr>
-		<td><a href="<?php echo $song['advurl']; ?>"><?php echo $song['adventure']; ?></a></td>
+		<td><a href="<?php echo $escape($song['advurl']); ?>"><?php echo $escape($song['adventure']); ?></a></td>
 		<td><?php echo $song['special']; ?></td>
-		<td><a href="<?php echo $song['titleurl']; ?>"><?php echo $song['title']; ?></a></td>
-		<td><a href="<?php echo $song['artisturl']; ?>"><?php echo $song['artist']; ?></a></td>
-		<td class="cover"><a href="<?php echo $song['idurl']; ?>"><?php echo $song['cover']; ?></a></td>
-		<td><a href="<?php echo $song['albumurl']; ?>"><?php echo $song['album']; ?></a></td>
-		<td><?php echo $song['year']; ?></td>
-		<td><a href="<?php echo $song['labelurl']; ?>"><?php echo $song['labelcode']; ?></a></td>
-		<td><?php echo join(array_values($song['genres']), '/') ; ?></td>
+		<td><a href="<?php echo $escape($song['titleurl']); ?>"><?php echo $escape($song['title']); ?></a></td>
+		<td><a href="<?php echo $escape($song['artisturl']); ?>"><?php echo $escape($song['artist']); ?></a></td>
+		<td class="cover"><a href="<?php echo $escape($song['idurl']); ?>"><?php echo $song['cover']; ?></a></td>
+		<td><a href="<?php echo $escape($song['albumurl']); ?>"><?php echo $escape($song['album']); ?></a></td>
+		<td><?php echo $escape($song['year']); ?></td>
+		<td><a href="<?php echo $escape($song['labelurl']); ?>"><?php echo $escape($song['labelcode']); ?></a></td>
+		<td><?php echo $escape(join('/', array_values($song['genres']))); ?></td>
 	</tr>
 <?php endforeach; ?>
 	</tbody>
