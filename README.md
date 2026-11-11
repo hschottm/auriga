@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.3.6**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.3.7**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:^1.3.6 --with-all-dependencies
+composer require hschottm/auriga:^1.3.7 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -115,3 +115,22 @@ page again before submitting. CSRF protection remains enabled.
 
 Regression tests now render without injected token values and validate the
 emitted tokens using Contao's real CSRF token manager.
+
+## Improved cover lookup in 1.3.7
+
+The existing MusicBrainz/Cover Art Archive lookup now examines up to ten releases
+per query, ordered by MusicBrainz relevance, and returns at most eight distinct
+front-cover URLs. If no usable front cover is found, it tries a conservatively
+cleaned edition title with the artist, then the cleaned album title alone.
+Fallbacks also run when releases exist but have no covers. Meaningful parenthetical
+title parts are retained; remaster/deluxe/expanded/anniversary edition labels are
+removed. Duplicate release IDs are queried only once per search.
+
+Numeric 500px thumbnails are preferred, with legacy large, 1200px and original
+image URLs as fallbacks. A search is bounded to three distinct MusicBrainz queries,
+20 cover metadata requests and a 15-second remote-lookup budget. MusicBrainz
+requests within the search instance are spaced at least 1.1 seconds apart.
+Service errors do not trigger broader MusicBrainz searches. Existing positive
+(24 hours) and empty-result (10 minutes) caching remains; the cache key version
+was changed so old limited results are not reused. The URL-list return format
+and manual cover selection/storage are unchanged.

@@ -11,6 +11,8 @@ final class CoverSearch
 {
     private $client;
     private $cache;
+    private ?float $deadline = null;
+    private float $lastMusicBrainzRequest = 0.0;
 
     public function __construct(?HttpClientInterface $client = null, ?\Psr\Cache\CacheItemPoolInterface $cache = null)
     {
@@ -31,7 +33,9 @@ final class CoverSearch
     {
         $response = null;
         try {
-            $response = $this->client->request('GET', $url, ['timeout' => 3, 'max_duration' => 5]);
+            $remaining = $this->deadline === null ? 5.0 : min(5.0, $this->deadline - microtime(true));
+            if ($remaining <= 0) return null;
+            $response = $this->client->request('GET', $url, ['timeout' => min(3.0, $remaining), 'max_duration' => $remaining]);
             if ($response->getStatusCode() !== 200) return null;
             $content = '';
             foreach ($this->client->stream($response) as $chunk) {
@@ -56,7 +60,7 @@ final class CoverSearch
 
     public function search(string $album, string $artist): array
     {
-        $key = hash('sha256', serialize([trim($album), trim($artist)]));
+        $key = hash('sha256', serialize(['v2', trim($album), trim($artist)]));
         $item = null;
         try {
             if ($this->cache !== null) {
@@ -74,46 +78,92 @@ final class CoverSearch
         return $images;
     }
 
+    /** Strip edition labels only; meaningful parenthetical album titles stay intact. */
+    private function cleanAlbum(string $album): string
+    {
+        $edition = '(?:remaster(?:ed)?|deluxe|expanded|anniversary|special edition|bonus tracks?)';
+        $clean = preg_replace('~\s*[([][^)\]]*\b'.$edition.'\b[^)\]]*[)\]]~iu', '', $album);
+        $clean = preg_replace('~\s+[-–—:]\s*(?:(?:19|20)\d{2}\s+)?'.$edition.'\b.*$~iu', '', $clean);
+        return trim(preg_replace('/\s+/u', ' ', $clean)) ?: $album;
+    }
+
+    private function musicBrainz(string $query): array
+    {
+        $delay = 1.1 - (microtime(true) - $this->lastMusicBrainzRequest);
+        if ($delay > 0) {
+            if (microtime(true) + $delay >= $this->deadline) return [];
+            usleep((int) ($delay * 1000000));
+        }
+        $this->lastMusicBrainzRequest = microtime(true);
+        return $this->json('https://musicbrainz.org/ws/2/release?'.http_build_query([
+            'query' => $query, 'fmt' => 'json', 'limit' => 10,
+        ]));
+    }
+
+    private function frontImages(array $cover): array
+    {
+        $urls = [];
+        foreach (is_array($cover['images'] ?? null) ? $cover['images'] : [] as $image) {
+            if (!is_array($image) || ($image['front'] ?? false) !== true) continue;
+            $thumbnails = is_array($image['thumbnails'] ?? null) ? $image['thumbnails'] : [];
+            foreach ([$thumbnails['500'] ?? null, $thumbnails['large'] ?? null,
+                $thumbnails['1200'] ?? null, $image['image'] ?? null] as $url) {
+                if (!is_string($url)) continue;
+                $url = preg_replace('~^http://~i', 'https://', $url);
+                if (filter_var($url, FILTER_VALIDATE_URL) && strtolower((string) parse_url($url, PHP_URL_SCHEME)) === 'https') {
+                    $urls[] = $url;
+                    break;
+                }
+            }
+        }
+        return array_values(array_unique($urls));
+    }
+
     private function searchRemote(string $album, string $artist): array
     {
         $album = trim($album);
+        $artist = trim($artist);
         if ($album === '') return [];
-        $quote = static function ($value) { return '"'.addcslashes($value, '\\"').'"'; };
-        $query = 'release:'.$quote($album);
-        if (trim($artist) !== '') $query .= ' AND artist:'.$quote(trim($artist));
-        $started = microtime(true);
-        $data = $this->json('https://musicbrainz.org/ws/2/release?'.http_build_query([
-            'query' => $query, 'fmt' => 'json', 'limit' => 3,
-        ]));
-        if (!isset($data['releases']) || !is_array($data['releases'])) return [];
-        if ($data['releases'] === []) {
-            // Preserve the broader album-only fallback; space MusicBrainz requests.
-            $delay = 1.1 - (microtime(true) - $started);
-            if ($delay > 0) usleep((int) ($delay * 1000000));
-            $fallback = trim(explode('(', $album, 2)[0]);
-            if ($fallback === '') return [];
-            $data = $this->json('https://musicbrainz.org/ws/2/release?'.http_build_query([
-                'query' => 'release:'.$quote($fallback), 'fmt' => 'json', 'limit' => 3,
-            ]));
-            if (!isset($data['releases']) || !is_array($data['releases'])) return [];
-        }
-        $images = [];
+        $quote = static fn ($value) => '"'.addcslashes($value, '\\"').'"';
+        $clean = $this->cleanAlbum($album);
+        $artistQuery = $artist !== '' ? ' AND artist:'.$quote($artist) : '';
+        $queries = array_unique([
+            'release:'.$quote($album).$artistQuery,
+            'release:'.$quote($clean).$artistQuery,
+            'release:'.$quote($clean),
+        ]);
         $seen = [];
-        foreach (array_slice($data['releases'], 0, 3) as $release) {
-            $id = is_array($release) ? ($release['id'] ?? null) : null;
-            if (!is_string($id) || !preg_match('/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i', $id) || isset($seen[$id])) continue;
-            $seen[$id] = true;
-            $cover = $this->json('https://coverartarchive.org/release/'.$id);
-            if (!isset($cover['images']) || !is_array($cover['images'])) continue;
-            foreach ($cover['images'] as $image) {
-                if (!is_array($image) || ($image['front'] ?? false) !== true) continue;
-                $url = $image['thumbnails']['large'] ?? null;
-                if (!is_string($url)) continue;
-                $url = preg_replace('~^http://~i', 'https://', $url);
-                if (filter_var($url, FILTER_VALIDATE_URL) && strtolower((string) parse_url($url, PHP_URL_SCHEME)) === 'https') $images[] = $url;
+        $images = [];
+        $requests = 0;
+        $this->deadline = microtime(true) + 15;
+        try {
+            foreach ($queries as $query) {
+                if (microtime(true) >= $this->deadline || $requests >= 20) break;
+                $data = $this->musicBrainz($query);
+                // Do not broaden the query on service errors or malformed responses.
+                if (!is_array($data['releases'] ?? null)) break;
+                $releases = array_values(array_filter($data['releases'], 'is_array'));
+                // Keep MusicBrainz relevance order, preferring higher scores when supplied.
+                usort($releases, static fn ($a, $b) => (int) ($b['score'] ?? 0) <=> (int) ($a['score'] ?? 0));
+                foreach (array_slice($releases, 0, 10) as $release) {
+                    $id = $release['id'] ?? null;
+                    if (!is_string($id) || !preg_match('/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i', $id)) continue;
+                    $id = strtolower($id);
+                    if (isset($seen[$id])) continue;
+                    if (microtime(true) >= $this->deadline || $requests >= 20) break;
+                    $seen[$id] = true;
+                    ++$requests;
+                    $images = array_values(array_unique(array_merge($images,
+                        $this->frontImages($this->json('https://coverartarchive.org/release/'.$id)))));
+                    if (count($images) >= 8) return array_slice($images, 0, 8);
+                }
+                // Broaden only when this search found no usable front covers.
+                if ($images !== []) return $images;
             }
+            return $images;
+        } finally {
+            $this->deadline = null;
         }
-        return array_values(array_unique($images));
     }
 
     public static function imageExtension(string $bytes): ?string
