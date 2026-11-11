@@ -1,0 +1,9 @@
+{% extends '@Contao/mod_auriga_broadcastlist.html.twig' %}
+
+{% block table_wrapper %}
+    <div class="table-responsive">{{ parent() }}</div>
+{% endblock %}
+
+{% block table_attributes %} class="table table-borderless table-hover"{% endblock %}
+
+{% block table_head_attributes %} class="border-top-0 border-start-0 border-end-0 border-dark border-3"{% endblock %}

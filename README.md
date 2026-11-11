@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.3.3**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.3.4**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:^1.3.3 --with-all-dependencies
+composer require hschottm/auriga:^1.3.4 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -67,3 +67,19 @@ See `examples/templates/mod_auriga_broadcast_bootstrap.html.twig` for a Bootstra
 variant that inherits all song rows and navigation controls. Copy it to the
 project's `templates/` directory and select `mod_auriga_broadcast_bootstrap` in the
 Auriga broadcast module. Existing PHP overrides must be reconciled separately.
+
+## List template customization in 1.3.4
+
+`mod_auriga_broadcastlist.html.twig` now exposes `table_wrapper`,
+`table_attributes` and `table_head_attributes`.
+`mod_auriga_adventurelist.html.twig` exposes `headline`, `table_wrapper`,
+`table_attributes`, `table_body`, `row_attributes`, `numbering_attributes`
+and `title_attributes`. Default output is unchanged.
+
+Bootstrap examples for both lists are provided in `examples/templates/`.
+Copy the desired example into the project's `templates/` directory and select
+its name in the corresponding Auriga module. The adventure list example adds
+an initially expanded Bootstrap collapse panel with a generated ID, avoiding
+one fixed target shared by different lists. Without a headline, the list remains
+visible. Both examples inherit the data rows and preserve escaping and provider
+URL validation. Clear the production cache after updating templates.

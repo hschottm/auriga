@@ -1,18 +1,24 @@
 {% block content %}
 <div{{ attrs(cssID|default).addClass([class|default, 'ptw_adventurelist']).addStyle(style|default) }}>
+{% block headline %}
 {% if headline %}
 
 <{{ hl }}>{{ headline }}</{{ hl }}>
 {% endif %}
+{% endblock %}
 
-<table>
+{% block table_wrapper %}
+<table{% block table_attributes %}{% endblock %}>
+{% block table_body %}
 {% for adventure in adventures %}
-  <tr>
-		<td>{{ adventure.numbering }}.</td>
-		<td><a href="{{ adventure.url }}" title="{{ adventure.title }}">{{ adventure.title }}</a></td>
+  <tr{% block row_attributes %}{% endblock %}>
+		<td{% block numbering_attributes %}{% endblock %}>{{ adventure.numbering }}.</td>
+		<td{% block title_attributes %}{% endblock %}><a href="{{ adventure.url }}" title="{{ adventure.title }}">{{ adventure.title }}</a></td>
 	</tr>
 {% endfor %}
+{% endblock %}
 </table>
+{% endblock %}
 
 </div>
 {% endblock %}

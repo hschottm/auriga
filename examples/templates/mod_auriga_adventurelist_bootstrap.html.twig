@@ -1,0 +1,24 @@
+{% extends '@Contao/mod_auriga_adventurelist.html.twig' %}
+
+{% block content %}
+    {% set collapseId = 'auriga-adventures-' ~ random() %}
+    {{ parent() }}
+{% endblock %}
+
+{% block headline %}
+    {% if headline %}
+        <a href="#{{ collapseId }}" role="button"
+           data-bs-toggle="collapse" data-bs-target="#{{ collapseId }}"
+           aria-expanded="true" aria-controls="{{ collapseId }}">{{ headline }}</a>
+    {% endif %}
+{% endblock %}
+
+{% block table_wrapper %}
+    <div class="table-responsive collapse show" id="{{ collapseId }}">{{ parent() }}</div>
+{% endblock %}
+
+{% block table_attributes %} class="table table-borderless"{% endblock %}
+{% block table_body %}<tbody>{{ parent() }}</tbody>{% endblock %}
+{% block row_attributes %} class="m-0 p-0"{% endblock %}
+{% block numbering_attributes %} class="m-0 p-0 pe-2"{% endblock %}
+{% block title_attributes %} class="m-0 p-0"{% endblock %}

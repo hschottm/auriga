@@ -7,8 +7,9 @@
 {% endif %}
 <h2>{{ adventure.numbering }}. {{ adventure.title }}</h2>
 <p class="shortstory">{{ adventure.description|raw }}</p>
-<table>
-	<thead>
+{% block table_wrapper %}
+<table{% block table_attributes %}{% endblock %}>
+	<thead{% block table_head_attributes %}{% endblock %}>
 	<tr>
 		<th colspan="2">{{ lngBroadcast }}</th>
 		<th>{{ lngDate }}</th>
@@ -34,6 +35,7 @@
 {% endfor %}
 	</tbody>
 </table>
+{% endblock %}
 <h3>{{ lngProviders }}</h3>
 <ul class="providers">
 {% for provider in providers %}
