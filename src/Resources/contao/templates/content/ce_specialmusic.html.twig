@@ -1,38 +1,46 @@
 {% block content %}
-<div{{ attrs(cssID|default).addClass([class|default, 'block ptw_broadcast']).addStyle(style|default) }}>
-{% if headline %}
+    <div{{ attrs(cssID|default).addClass([class|default, 'block ptw_broadcast']).addStyle(style|default) }}>
+        {% block headline %}
+            {% if headline %}
+                <{{ hl }}>{{ headline }}</{{ hl }}>
+            {% endif %}
+        {% endblock %}
 
-<{{ hl }}>{{ headline }}</{{ hl }}>
-{% endif %}
-
-<table>
-	<thead>
-	<tr>
-		<th>{{ lngAdventure }}</th>
-		<th colspan="2">{{ lngTitle }}</th>
-		<th>{{ lngArtist }}</th>
-		<th colspan="2">{{ lngAlbum }}</th>
-		<th>{{ lngYear }}</th>
-		<th>{{ lngLabelcode }}</th>
-		<th>{{ lngGenres }}</th>
-	</tr>
-	</thead>
-	<tbody>
-{% for song in songs %}
-	<tr>
-		<td>{{ song.adventure }}</td>
-		<td>{{ song.special|raw }}</td>
-		<td>{{ song.title }}</td>
-		<td>{{ song.artist }}</td>
-		<td class="cover"><a href="{{ song.titleurl }}">{{ song.cover|raw }}</a></td>
-		<td>{{ song.album }}</td>
-		<td>{{ song.year }}</td>
-		<td>{{ song.labelcode }}</td>
-		<td>{{ song.genres|join('/') }}</td>
-	</tr>
-{% endfor %}
-	</tbody>
-</table>
-
-</div>
+        {% block table_wrapper %}
+            <table{% block table_attributes %}{% endblock %}>
+                {% block table_head %}
+                    <thead{% block table_head_attributes %}{% endblock %}>
+                        <tr>
+                            <th>{{ lngAdventure }}</th>
+                            <th colspan="2">{{ lngTitle }}</th>
+                            <th>{{ lngArtist }}</th>
+                            <th colspan="2">{{ lngAlbum }}</th>
+                            <th>{{ lngYear }}</th>
+                            <th>{{ lngLabelcode }}</th>
+                            <th>{{ lngGenres }}</th>
+                        </tr>
+                    </thead>
+                {% endblock %}
+                {% block table_body %}
+                    <tbody>
+                        {% for song in songs %}
+                            {% block table_row %}
+                                <tr>
+                                    <td>{{ song.adventure }}</td>
+                                    <td>{{ song.special|raw }}</td>
+                                    <td>{{ song.title }}</td>
+                                    <td>{{ song.artist }}</td>
+                                    <td class="cover"><a href="{{ song.titleurl }}">{{ song.cover|raw }}</a></td>
+                                    <td>{{ song.album }}</td>
+                                    <td>{{ song.year }}</td>
+                                    <td>{{ song.labelcode }}</td>
+                                    <td>{{ song.genres|join('/') }}</td>
+                                </tr>
+                            {% endblock %}
+                        {% endfor %}
+                    </tbody>
+                {% endblock %}
+            </table>
+        {% endblock %}
+    </div>
 {% endblock %}
