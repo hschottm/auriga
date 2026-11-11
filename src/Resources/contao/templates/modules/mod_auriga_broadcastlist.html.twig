@@ -1,0 +1,47 @@
+{% block content %}
+{% if broadcasts|default is iterable %}
+<div{{ attrs(cssID|default).addClass([class|default, 'ptw_broadcastlist']).addStyle(style|default) }}>
+{% if headline %}
+
+<{{ hl }}>{{ headline }}</{{ hl }}>
+{% endif %}
+<h2>{{ adventure.numbering }}. {{ adventure.title }}</h2>
+<p class="shortstory">{{ adventure.description|raw }}</p>
+<table>
+	<thead>
+	<tr>
+		<th colspan="2">{{ lngBroadcast }}</th>
+		<th>{{ lngDate }}</th>
+		<th>{{ lngLength }}</th>
+		<th>{{ lngFrequency }}</th>
+		<th>{{ lngSamplerate }}</th>
+		<th>{{ lngProvider }}</th>
+		<th></th>
+	</tr>
+	</thead>
+	<tbody>
+{% for broadcast in broadcasts %}
+	<tr>
+		<td>{{ broadcast.chapter }}.</td>
+		<td>{% if broadcast.isStory or broadcast.isSpecial %}<span class="{{ broadcast.isSpecial ? 'special ' : '' }}{{ broadcast.isStory ? 'story' : '' }}">{% endif %}<a href="{{ broadcast.url }}">{{ broadcast.title }}</a>{% if broadcast.isStory or broadcast.isSpecial %}</span>{% endif %}</td>
+		<td>{{ broadcast.date }}</td>
+		<td>{{ broadcast.length }}</td>
+		<td>{{ broadcast.frequency }}</td>
+		<td>{{ broadcast.samplerate }}</td>
+		<td>{{ broadcast.providers|keys|join(',') }}</td>
+		<td>{% for file in broadcast.files %}<a href="{{ file }}"><img src="bundles/hschottmauriga/images/song.gif" title="{{ file }}" alt="" /></a>{% endfor %}</td>
+	</tr>
+{% endfor %}
+	</tbody>
+</table>
+<h3>{{ lngProviders }}</h3>
+<ul class="providers">
+{% for provider in providers %}
+	{% set homepage = provider.homepage|default('') %}
+    {% set hasHomepage = homepage matches '~^https?://~i' %}
+	<li>{{ provider.initials }} = {% if hasHomepage %}<a href="{{ homepage }}" target="_blank" rel="noopener noreferrer">{% endif %}{{ provider.name }}{% if hasHomepage %}</a>{% endif %}</li>
+{% endfor %}
+</ul>
+</div>
+{% endif %}
+{% endblock %}

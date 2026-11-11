@@ -1,0 +1,112 @@
+{% block content %}
+{% if song|default is iterable %}
+<div{{ attrs(cssID|default).addClass([class|default, 'ptw_song']).addStyle(style|default) }}>
+{% if headline %}
+
+<{{ hl }}>{{ headline }}</{{ hl }}>
+{% endif %}
+<div class="ptwpath">
+{% for part in currentpath %}
+	<a href="{{ part.url }}">{{ part.title }}</a> {% if not loop.last %}&gt;{% endif %}
+{% endfor %}
+</div>
+{% for error in coverErrors|default([]) %}
+<p class="error">{{ error }}</p>
+{% endfor %}
+<table>
+	<tbody>
+	<tr>
+		<td class="key">{{ lngCover }}</td>
+		<td class="value">
+{% if albumcover|default is empty and possibleImage|default is empty %}
+	<div class="coverplaceholder">{{ song.album }}</div>
+{% endif %}
+{% if albumcover|default is not empty %}
+			{{ albumcover|raw }}
+{% endif %}
+{% if possibleImage|default is not empty %}
+			<div class="coverquestion"><form method="POST" action="{{ formaction }}">
+<input type="hidden" name="FORM_SUBMIT" value="image" />
+<input type="hidden" name="REQUEST_TOKEN" value="{{ requestToken }}" />
+{% if urlShowPrev|default is not empty %}<a href="{{ urlShowPrev }}">{% endif %}<img src="files/auriga/images/control_rewind{{ urlShowPrev|default is not empty ? '_blue' : '' }}.png" alt="{{ lngShowPrevCover }}" title="{{ lngShowPrevCover }}" />{% if urlShowPrev|default is not empty %}</a>{% endif %}
+{% if imagePosition|default is not empty %} ({{ imagePosition }}) {% endif %}
+{% if urlShowNext|default is not empty %}<a href="{{ urlShowNext }}">{% endif %}<img src="files/auriga/images/control_fastforward{{ urlShowNext|default is not empty ? '_blue' : '' }}.png" alt="{{ lngShowNextCover }}" title="{{ lngShowNextCover }}" />{% if urlShowNext|default is not empty %}</a>{% endif %}
+{{ lngCorrectCover }} <input type="hidden" name="usecover" value="{{ usecover }}" /><input type="submit" name="submit" value="{{ lngYes }}" /></form></div>
+{{ possibleImage|raw }}
+{% endif %}
+{% if isAdmin %}
+{% if not albumcover|default and not possibleImage|default %}
+<p>Keine Covervorschläge verfügbar. Du kannst einen anderen Albumtitel suchen oder ein Bild hochladen.</p>
+{% endif %}
+{% if albumcover|default is empty %}
+<div>
+		<form method="POST" action="{{ formaction }}">
+			<input type="hidden" name="FORM_SUBMIT" value="searchform" />
+			<input type="hidden" name="REQUEST_TOKEN" value="{{ requestToken }}" />
+			<label for="search_own">{{ lngSearchOwn }}</label>
+			<input type="text" id="search_own" name="searchtext" {% if searchValue|default is not empty %}value="{{ searchValue }}" {% endif %}/>
+			<input type="submit" name="search" value="{{ lngSearch }}" />
+		</form>
+</div>
+<div>
+		<form method="POST" action="{{ formaction }}" enctype="multipart/form-data">
+			<input type="hidden" name="FORM_SUBMIT" value="uploadform" />
+			<input type="hidden" name="REQUEST_TOKEN" value="{{ requestToken }}" />
+			<label for="upload">{{ lngUploadCover }}</label>
+			<input type="file" id="upload" name="uploadcover" />
+			<input type="submit" name="upload" value="{{ lngUpload }}" />
+		</form>
+</div>
+{% endif %}
+{% endif %}
+		</td>
+	</tr>
+	<tr>
+		<td class="key">{{ lngTitle }}</td>
+		<td class="value">{{ song.title }}</td>
+	</tr>
+	<tr>
+		<td class="key">{{ lngArtist }}</td>
+		<td class="value">{{ song.artist }}</td>
+	</tr>
+	<tr>
+		<td class="key">{{ lngAlbum }}</td>
+		<td class="value">{{ song.album }}</td>
+	</tr>
+	<tr>
+		<td class="key">{{ lngYear }}</td>
+		<td class="value">{{ song.year }}</td>
+	</tr>
+	<tr>
+		<td class="key">{{ lngLabelcode }}</td>
+		<td class="value">{{ song.labelcode }}</td>
+	</tr>
+{% if song.special|default is not empty %}
+	<tr>
+		<td class="key">{{ lngSongtype }}</td>
+		<td class="value">{{ song.special|raw }}</td>
+	</tr>
+{% endif %}
+{% if song.length|default is not empty %}
+	<tr>
+		<td class="key">{{ lngLength }}</td>
+		<td class="value">{{ song.length }}</td>
+	</tr>
+{% endif %}
+{% if song.composer|default is not empty %}
+	<tr>
+		<td class="key">{{ lngComposer }}</td>
+		<td class="value">{{ song.composer }}</td>
+	</tr>
+{% endif %}
+{% if song.genres|length %}
+	<tr>
+		<td class="key">{{ lngGenres }}</td>
+		<td class="value">{{ song.genres|join(', ') }}</td>
+	</tr>
+{% endif %}
+	</tbody>
+</table>
+</div>
+{% endif %}
+{% endblock %}

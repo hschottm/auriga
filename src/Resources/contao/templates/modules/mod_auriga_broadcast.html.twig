@@ -1,0 +1,85 @@
+{% block content %}
+{% if broadcasts|default is iterable %}
+<div{{ attrs(cssID|default).addClass([class|default, 'ptw_broadcast']).addStyle(style|default) }}>
+{% if headline %}
+<{{ hl }}>{{ headline }}</{{ hl }}>
+{% endif %}
+<div class="row">
+	<div class="col-12 order-1 col-md-6 order-md-0">
+		<h2><a href="{{ urlUp }}">{{ adventure.numbering }}. {{ adventure.title }}</a></h2>
+	</div>
+	<div class="col-12 order-0 col-md-6 order-md-1">
+		<div class="auriganav">
+			{% if nav_first_url|default is not empty %}<a href="{{ nav_first_url }}">{% endif %}<img src="files/auriga/images/control_start{{ nav_first_url|default is not empty ? '_blue' : '' }}.png" alt="{{ nav_first_title }}" title="{{ nav_first_title }}" />{% if nav_first_url|default is not empty %}</a>{% endif %}
+			{% if nav_prev_url|default is not empty %}<a href="{{ nav_prev_url }}">{% endif %}<img src="files/auriga/images/control_rewind{{ nav_prev_url|default is not empty ? '_blue' : '' }}.png" alt="{{ nav_prev_title }}" title="{{ nav_prev_title }}" />{% if nav_prev_url|default is not empty %}</a>{% endif %}
+			{% if nav_next_url|default is not empty %}<a href="{{ nav_next_url }}">{% endif %}<img src="files/auriga/images/control_fastforward{{ nav_next_url|default is not empty ? '_blue' : '' }}.png" alt="{{ nav_next_title }}" title="{{ nav_next_title }}" />{% if nav_next_url|default is not empty %}</a>{% endif %}
+			{% if nav_last_url|default is not empty %}<a href="{{ nav_last_url }}">{% endif %}<img src="files/auriga/images/control_end{{ nav_last_url|default is not empty ? '_blue' : '' }}.png" alt="{{ nav_last_title }}" title="{{ nav_last_title }}"/>{% if nav_last_url|default is not empty %}</a>{% endif %}
+		</div>
+	</div>
+</div>
+<p class="shortstory">{{ adventure.description|raw }}</p>
+<h3>{{ broadcasts[0].chapter }}. Kapitel, gesendet am {{ broadcasts[0].date }}</h3>
+{% for broadcast in broadcasts %}
+<h4>{{ broadcast.hour }}. Stunde{% if broadcast.title|default is not empty %}: {% endif %}{{ broadcast.title }}{% if broadcast.isStory %} ({{ adventure.numbering }}. Abenteuer, {{ broadcast.chapter }}.Kapitel){% endif %}</h4>
+{% if broadcast.songs|length > 0 %}
+<table>
+	<thead>
+	<tr>
+		<th colspan="3">{{ lngTitle }}</th>
+		<th>{{ lngArtist }}</th>
+		<th colspan="2">{{ lngAlbum }}</th>
+		<th>{{ lngYear }}</th>
+		<th>{{ lngLabelcode }}</th>
+		<th>{{ lngGenres }}</th>
+	</tr>
+	</thead>
+	<tbody>
+{% for song in broadcast.songs %}
+	<tr>
+		<td>{{ song.sequence }}.</td>
+		<td>{{ song.special|raw }}</td>
+		<td><a href="{{ song.titleurl }}">{{ song.title }}</a></td>
+		<td><a href="{{ song.artisturl }}">{{ song.artist }}</a></td>
+		<td class="cover"><a href="{{ song.idurl }}">{{ song.cover|raw }}</a></td>
+		<td><a href="{{ song.albumurl }}">{{ song.album }}</a></td>
+		<td>{{ song.year }}</td>
+		<td><a href="{{ song.labelurl }}">{{ song.labelcode }}</a></td>
+		<td>{{ song.genres|join('/') }}</td>
+	</tr>
+{% endfor %}
+	</tbody>
+</table>
+{% endif %}
+{% endfor %}
+
+{% if titlesong|default is iterable %}
+<h4>{{ lngBackgroundMusic }}</h4>
+<table>
+	<thead>
+	<tr>
+		<th colspan="2">{{ lngTitle }}</th>
+		<th>{{ lngArtist }}</th>
+		<th colspan="2">{{ lngAlbum }}</th>
+		<th>{{ lngYear }}</th>
+		<th>{{ lngLabelcode }}</th>
+		<th>{{ lngGenres }}</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr>
+		<td>{{ titlesong.special|raw }}</td>
+		<td>{{ titlesong.title }}</td>
+		<td>{{ titlesong.artist }}</td>
+		<td class="cover"><a href="{{ titlesong.titleurl }}">{{ titlesong.cover|raw }}</a></td>
+		<td>{{ titlesong.album }}</td>
+		<td>{{ titlesong.year }}</td>
+		<td>{{ titlesong.labelcode }}</td>
+		<td>{{ titlesong.genres|join('/') }}</td>
+	</tr>
+	</tbody>
+</table>
+{% endif %}
+
+</div>
+{% endif %}
+{% endblock %}

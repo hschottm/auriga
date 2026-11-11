@@ -61,9 +61,9 @@ foreach (['tl_adventure','tl_broadcast','tl_broadcast_song','tl_broadcast_provid
     if (method_exists($callback, 'addIcon')) check(str_contains($callback->addIcon([], 'Test'), 'Test'), 'Backend callback '.$table);
 }
 Contao\Controller::loadDataContainer('tl_module');
-check(is_array(($GLOBALS['TL_DCA']['tl_module']['fields']['aurigaTpl']['options_callback'])()), 'Module template callback failed');
+check(in_array('mod_auriga_song', ($GLOBALS['TL_DCA']['tl_module']['fields']['aurigaTpl']['options_callback'])(), true), 'Twig module template not selectable');
 Contao\Controller::loadDataContainer('tl_content');
-check(is_array(($GLOBALS['TL_DCA']['tl_content']['fields']['aurigaTpl']['options_callback'])()), 'Content template callback failed');
+check(in_array('ce_specialmusic', ($GLOBALS['TL_DCA']['tl_content']['fields']['aurigaTpl']['options_callback'])(), true), 'Twig content template not selectable');
 echo "OK: special music element, backend callbacks and template selectors\n";
 $uuid = Symfony\Component\Uid\Uuid::v4()->toBinary();
 $db->insert('tl_files', ['uuid'=>$uuid,'type'=>'file','path'=>'files/auriga/recordings/test.mp3','name'=>'test.mp3','extension'=>'mp3','hash'=>'']);

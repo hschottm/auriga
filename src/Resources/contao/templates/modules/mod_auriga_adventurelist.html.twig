@@ -1,0 +1,18 @@
+{% block content %}
+<div{{ attrs(cssID|default).addClass([class|default, 'ptw_adventurelist']).addStyle(style|default) }}>
+{% if headline %}
+
+<{{ hl }}>{{ headline }}</{{ hl }}>
+{% endif %}
+
+<table>
+{% for adventure in adventures %}
+  <tr>
+		<td>{{ adventure.numbering }}.</td>
+		<td><a href="{{ adventure.url }}" title="{{ adventure.title }}">{{ adventure.title }}</a></td>
+	</tr>
+{% endfor %}
+</table>
+
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% block content %}
+<div{{ attrs(cssID|default).addClass([class|default, 'block ptw_broadcast']).addStyle(style|default) }}>
+{% if headline %}
+
+<{{ hl }}>{{ headline }}</{{ hl }}>
+{% endif %}
+
+<table>
+	<thead>
+	<tr>
+		<th>{{ lngAdventure }}</th>
+		<th colspan="2">{{ lngTitle }}</th>
+		<th>{{ lngArtist }}</th>
+		<th colspan="2">{{ lngAlbum }}</th>
+		<th>{{ lngYear }}</th>
+		<th>{{ lngLabelcode }}</th>
+		<th>{{ lngGenres }}</th>
+	</tr>
+	</thead>
+	<tbody>
+{% for song in songs %}
+	<tr>
+		<td>{{ song.adventure }}</td>
+		<td>{{ song.special|raw }}</td>
+		<td>{{ song.title }}</td>
+		<td>{{ song.artist }}</td>
+		<td class="cover"><a href="{{ song.titleurl }}">{{ song.cover|raw }}</a></td>
+		<td>{{ song.album }}</td>
+		<td>{{ song.year }}</td>
+		<td>{{ song.labelcode }}</td>
+		<td>{{ song.genres|join('/') }}</td>
+	</tr>
+{% endfor %}
+	</tbody>
+</table>
+
+</div>
+{% endblock %}

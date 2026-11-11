@@ -1,0 +1,54 @@
+{% block content %}
+<div{{ attrs(cssID|default).addClass([class|default, 'ptw_broadcast']).addStyle(style|default) }}>
+{% if headline %}
+
+<{{ hl }}>{{ headline }}</{{ hl }}>
+{% endif %}
+
+<form method="POST" action="{{ formaction }}">
+<input type="hidden" name="FORM_SUBMIT" value="dpi" />
+<input type="hidden" name="REQUEST_TOKEN" value="{{ requestToken }}" />
+<div>
+{{ lngSearch }} <input type="text" name="search" value="{{ savedSearch|default }}"/> {{ lngIn }}
+<select name="field">{% for option in options %}<option value="{{ option }}" {% if option == savedField %} selected{% endif %}>{{ attribute(_context, option) }}</option>{% endfor %}</select>
+<input type="submit" class="submit" name="submit" value="{{ lngSearchButton }}" />
+</div>
+<div>
+	{{ resultsperpage }} <select name="results">{% for result in results %}<option value="{{ result }}" {% if result == savedResults %} selected{% endif %}>{{ result }}</option>{% endfor %}</select>
+</div>
+</form>
+
+{% if foundResults %}
+<div class="resultinfo">{{ searchResult }} {{ resFrom }} - {{ resTo }} {{ of }} {{ resTotal }}</div>
+<table>
+	<thead>
+	<tr>
+		<th>{{ adventure }}</th>
+		<th colspan="2">{{ title }}</th>
+		<th>{{ artist }}</th>
+		<th colspan="2">{{ album }}</th>
+		<th>{{ year }}</th>
+		<th>{{ labelcode }}</th>
+		<th>{{ genres }}</th>
+	</tr>
+	</thead>
+	<tbody>
+{% for song in foundsongs %}
+	<tr>
+		<td><a href="{{ song.advurl }}">{{ song.adventure }}</a></td>
+		<td>{{ song.special|raw }}</td>
+		<td><a href="{{ song.titleurl }}">{{ song.title }}</a></td>
+		<td><a href="{{ song.artisturl }}">{{ song.artist }}</a></td>
+		<td class="cover"><a href="{{ song.idurl }}">{{ song.cover|raw }}</a></td>
+		<td><a href="{{ song.albumurl }}">{{ song.album }}</a></td>
+		<td>{{ song.year }}</td>
+		<td><a href="{{ song.labelurl }}">{{ song.labelcode }}</a></td>
+		<td>{{ song.genres|join('/') }}</td>
+	</tr>
+{% endfor %}
+	</tbody>
+</table>
+{{ pagination|raw }}
+{% endif %}
+</div>
+{% endblock %}

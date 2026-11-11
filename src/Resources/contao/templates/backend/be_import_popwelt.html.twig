@@ -1,0 +1,34 @@
+{% block content %}
+<div id="tl_buttons">
+<a href="{{ hrefBack }}" class="header_back" title="{{ goBack }}" accesskey="b" onclick="Backend.getScrollOffset();">{{ goBack }}</a>
+</div>
+
+<h2 class="sub_headline">{{ headline }}</h2>
+
+<form action="{{ request }}" id="tl_import_popwelt" class="tl_form" method="post">
+<div class="tl_formbody_edit">
+<input type="hidden" name="FORM_SUBMIT" value="tl_import_popwelt" />
+<input type="hidden" name="REQUEST_TOKEN" value="{{ requestToken }}">
+
+{% for broadcast in broadcasts %}
+<div class="tl_tbox">
+<div><input type="checkbox" name="cb[]" value="{{ broadcast.ausgabe }}" id="cb_{{ broadcast.ausgabe }}" /> <label for="cb_{{ broadcast.ausgabe }}">{{ broadcast.datum }}</label></div>
+<table>
+	<tr><td>{{ lngDate }}:</td><td><input type="text" name="date_{{ broadcast.ausgabe }}" size="10" /></td></tr>
+	<tr><td>{{ lngChapter }}:</td><td><input type="text" name="chapter_{{ broadcast.ausgabe }}" size="3" /></td></tr>
+	<tr><td>{{ lngTitle1 }}:</td><td><input type="text" name="title1_{{ broadcast.ausgabe }}" size="35" /></td></tr>
+	<tr><td>{{ lngTitle2 }}:</td><td><input type="text" name="title2_{{ broadcast.ausgabe }}" size="35" /></td></tr>
+</table>
+</div>
+{% endfor %}
+</div>
+
+<div class="tl_formbody_submit">
+
+<div class="tl_submit_container">
+<input type="submit" name="import" id="save" class="tl_submit" alt="{{ submit }}" accesskey="s" value="{{ submit }}" />
+</div>
+
+</div>
+</form>
+{% endblock %}
