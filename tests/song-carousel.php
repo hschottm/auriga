@@ -5,7 +5,7 @@ $twig = $container->get('twig');
 $template = $twig->createTemplate(file_get_contents(__DIR__.'/../examples/templates/mod_auriga_song_bootstrap.html.twig'));
 $data = ['song'=>['album'=>'Album','title'=>'Song','artist'=>'Artist','genres'=>[]],
     'currentpath'=>[], 'headline'=>'', 'isAdmin'=>true, 'formaction'=>'/song.html',
-    'requestToken'=>'carousel-token', 'coverSearch'=>['https://example.org/first.jpg','https://example.org/second.jpg'],
+    'coverSearch'=>['https://example.org/first.jpg','https://example.org/second.jpg'],
     'possibleImage'=>'<img src="preview.jpg">', 'usecover'=>1,
     'lngShowPrevCover'=>'Previous', 'lngShowNextCover'=>'Next'];
 $html = $template->render($data);
@@ -16,7 +16,7 @@ $slides = $xpath->query('//div[contains(concat(" ", normalize-space(@class), " "
 assertOutput($slides->length === 2, 'Expected two carousel slides');
 foreach ($slides as $index=>$slide) {
     assertOutput($xpath->evaluate('string(.//input[@name="usecover"]/@value)', $slide) === (string)$index, 'Slide submits the wrong cover index');
-    assertOutput($xpath->evaluate('string(.//input[@name="REQUEST_TOKEN"]/@value)', $slide) === 'carousel-token', 'Slide CSRF token missing');
+    assertFormTokens($dom->saveHTML($slide));
     assertOutput($xpath->evaluate('string(.//input[@name="FORM_SUBMIT"]/@value)', $slide) === 'image', 'Wrong cover form type');
     assertOutput(str_contains($slide->getAttribute('class'), ' active') === ($index===1), 'Selected slide not retained');
 }

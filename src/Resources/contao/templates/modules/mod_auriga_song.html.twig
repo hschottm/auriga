@@ -28,7 +28,7 @@
 {% if possibleImage|default is not empty %}
 			<div class="coverquestion"><form method="POST" action="{{ formaction }}">
 <input type="hidden" name="FORM_SUBMIT" value="image" />
-<input type="hidden" name="REQUEST_TOKEN" value="{{ requestToken }}" />
+<input type="hidden" name="REQUEST_TOKEN" value="{{ contao.request_token }}" />
 {% if urlShowPrev|default is not empty %}<a href="{{ urlShowPrev }}">{% endif %}<img src="files/auriga/images/control_rewind{{ urlShowPrev|default is not empty ? '_blue' : '' }}.png" alt="{{ lngShowPrevCover }}" title="{{ lngShowPrevCover }}" />{% if urlShowPrev|default is not empty %}</a>{% endif %}
 {% if imagePosition|default is not empty %} ({{ imagePosition }}) {% endif %}
 {% if urlShowNext|default is not empty %}<a href="{{ urlShowNext }}">{% endif %}<img src="files/auriga/images/control_fastforward{{ urlShowNext|default is not empty ? '_blue' : '' }}.png" alt="{{ lngShowNextCover }}" title="{{ lngShowNextCover }}" />{% if urlShowNext|default is not empty %}</a>{% endif %}
@@ -45,7 +45,7 @@
 <div>
 		<form method="POST" action="{{ formaction }}">
 			<input type="hidden" name="FORM_SUBMIT" value="searchform" />
-			<input type="hidden" name="REQUEST_TOKEN" value="{{ requestToken }}" />
+			<input type="hidden" name="REQUEST_TOKEN" value="{{ contao.request_token }}" />
 			<label for="search_own">{{ lngSearchOwn }}</label>
 			<input type="text" id="search_own" name="searchtext" {% if searchValue|default is not empty %}value="{{ searchValue }}" {% endif %}/>
 			<input type="submit" name="search" value="{{ lngSearch }}" />
@@ -54,7 +54,7 @@
 <div>
 		<form method="POST" action="{{ formaction }}" enctype="multipart/form-data">
 			<input type="hidden" name="FORM_SUBMIT" value="uploadform" />
-			<input type="hidden" name="REQUEST_TOKEN" value="{{ requestToken }}" />
+			<input type="hidden" name="REQUEST_TOKEN" value="{{ contao.request_token }}" />
 			<label for="upload">{{ lngUploadCover }}</label>
 			<input type="file" id="upload" name="uploadcover" />
 			<input type="submit" name="upload" value="{{ lngUpload }}" />

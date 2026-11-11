@@ -19,7 +19,7 @@
                             {% if isAdmin %}
                                 <form method="post" action="{{ formaction }}">
                                     <input type="hidden" name="FORM_SUBMIT" value="image">
-                                    <input type="hidden" name="REQUEST_TOKEN" value="{{ requestToken }}">
+                                    <input type="hidden" name="REQUEST_TOKEN" value="{{ contao.request_token }}">
                                     <input type="hidden" name="usecover" value="{{ loop.index0 }}">
                                     <button type="submit" class="btn btn-primary">Dieses Cover speichern</button>
                                 </form>

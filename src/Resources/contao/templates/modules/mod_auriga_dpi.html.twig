@@ -7,7 +7,7 @@
 
 <form method="POST" action="{{ formaction }}">
 <input type="hidden" name="FORM_SUBMIT" value="dpi" />
-<input type="hidden" name="REQUEST_TOKEN" value="{{ requestToken }}" />
+<input type="hidden" name="REQUEST_TOKEN" value="{{ contao.request_token }}" />
 <div>
 {{ lngSearch }} <input type="text" name="search" value="{{ savedSearch|default }}"/> {{ lngIn }}
 <select name="field">{% for option in options %}<option value="{{ option }}" {% if option == savedField %} selected{% endif %}>{{ attribute(_context, option) }}</option>{% endfor %}</select>

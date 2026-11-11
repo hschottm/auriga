@@ -8,7 +8,7 @@
 <form action="{{ request }}" id="tl_import_popwelt" class="tl_form" method="post">
 <div class="tl_formbody_edit">
 <input type="hidden" name="FORM_SUBMIT" value="tl_import_popwelt" />
-<input type="hidden" name="REQUEST_TOKEN" value="{{ requestToken }}">
+<input type="hidden" name="REQUEST_TOKEN" value="{{ contao.request_token }}">
 
 {% for broadcast in broadcasts %}
 <div class="tl_tbox">
