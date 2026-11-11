@@ -346,8 +346,9 @@ class ModuleSong extends ModulePTW
 			$searchAlbum = $ownsearch ? trim(\Contao\Input::post('searchtext')) : $this->session()->get($sessionKey);
 			if (!is_string($searchAlbum) || $searchAlbum === '') $searchAlbum = (string) ($data['album'] ?? '');
 			if ($ownsearch) $this->session()->set($sessionKey, $searchAlbum);
+			$manualSearch = $ownsearch || (is_string($this->session()->get($sessionKey)) && $this->session()->get($sessionKey) !== '');
 			$this->Template->searchValue = $searchAlbum;
-			$thumbs = $this->coverSearch()->search($searchAlbum, $searchAlbum === (string) ($data['album'] ?? '') ? (string) ($data['artist'] ?? '') : '');
+			$thumbs = $this->coverSearch()->search($searchAlbum, $searchAlbum === (string) ($data['album'] ?? '') ? (string) ($data['artist'] ?? '') : '', $manualSearch);
 			if ($is_admin)
 			{
 				if ($ownsearch) \Contao\Input::setGet('imgidx', '');

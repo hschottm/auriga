@@ -58,9 +58,9 @@ final class CoverSearch
         return is_array($data) ? $data : [];
     }
 
-    public function search(string $album, string $artist): array
+    public function search(string $album, string $artist, bool $manual = false): array
     {
-        $key = hash('sha256', serialize(['v3', $this->provider, hash('sha256', $this->discogsToken), trim($album), trim($artist)]));
+        $key = hash('sha256', serialize(['v4', $manual, $this->provider, hash('sha256', $this->discogsToken), trim($album), trim($artist)]));
         $item = null;
         try {
             if ($this->cache !== null) {
@@ -70,7 +70,7 @@ final class CoverSearch
         } catch (\Exception $exception) {
             // A cache failure must not break the song page.
         }
-        $images = $this->provider === 'discogs' ? $this->searchDiscogs($album, $artist) : $this->searchRemote($album, $artist);
+        $images = $this->provider === 'discogs' ? $this->searchDiscogs($album, $artist, $manual) : $this->searchRemote($album, $artist);
         try {
             if ($item !== null) $this->cache->save($item->set($images)->expiresAfter($images ? 86400 : 600));
         } catch (\Exception $exception) {
@@ -166,7 +166,7 @@ final class CoverSearch
         }
     }
 
-    private function searchDiscogs(string $album, string $artist): array
+    private function searchDiscogs(string $album, string $artist, bool $manual): array
     {
         $album = trim($album);
         $artist = trim($artist);
@@ -178,6 +178,13 @@ final class CoverSearch
             http_build_query(['release_title' => $clean, 'artist' => $artist]),
             http_build_query(['release_title' => $clean, 'artist' => '']),
         ]);
+        if ($manual) {
+            // Discogs has no dedicated label-code filter. General search includes
+            // indexed identifiers; catno would mean catalogue number, not LC code.
+            $queries = array_map(static fn ($field) => http_build_query([$field => $album]),
+                ['artist', 'release_title', 'q', 'label', 'track']);
+        }
+        $groups = [];
         $this->deadline = microtime(true) + 15;
         try {
             foreach ($queries as $query) {
@@ -189,7 +196,7 @@ final class CoverSearch
                     'max_redirects' => 0,
                 ]);
                 // Stop on authorization failures, rate limits and malformed responses.
-                if (!is_array($data['results'] ?? null)) return [];
+                if (!is_array($data['results'] ?? null)) break;
                 $images = [];
                 foreach (array_slice($data['results'], 0, 10) as $result) {
                     if (!is_array($result)) continue;
@@ -202,9 +209,18 @@ final class CoverSearch
                     $images[] = $url;
                 }
                 $images = array_values(array_unique($images));
-                if ($images) return array_slice($images, 0, 8);
+                if ($images && !$manual) return array_slice($images, 0, 8);
+                $groups[] = $images;
             }
-            return [];
+            // Interleave fields so early artist matches do not hide track matches.
+            $merged = [];
+            for ($i = 0; $i < 10; ++$i) {
+                foreach ($groups as $group) {
+                    if (isset($group[$i]) && !in_array($group[$i], $merged, true)) $merged[] = $group[$i];
+                    if (count($merged) >= 8) return $merged;
+                }
+            }
+            return $merged;
         } finally {
             $this->deadline = null;
         }

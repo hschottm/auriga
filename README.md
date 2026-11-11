@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.3.8**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.3.9**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:^1.3.8 --with-all-dependencies
+composer require hschottm/auriga:^1.3.9 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -157,3 +157,15 @@ authorization errors and rate limits leave the page usable with no suggestions;
 they do not silently switch providers. Results are cached separately per provider
 and token (24 hours for matches, 10 minutes for empty results). Existing saved
 covers are unchanged. Search uses the Discogs API's `cover_image` URLs.
+
+## Manual Discogs search in 1.3.9
+
+Manual Discogs searches use the entered text in separate `artist`,
+`release_title`, `q`, `label` and `track` queries. Results from all five searches
+are interleaved and deduplicated, with an eight-cover cap and the same 15-second
+budget. Discogs does not expose a dedicated LC label-code filter: label codes
+are attempted through general search (`q`); matching depends on Discogs indexing.
+Catalogue numbers (`catno`) are not the same as label codes. Manual searches remain
+manual when navigating between cover candidates, even if the entered text equals
+the original album title. Automatic lookup retains its album/artist fallbacks;
+MusicBrainz behavior is unchanged. Manual and automatic results use separate caches.

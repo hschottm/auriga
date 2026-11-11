@@ -46,3 +46,19 @@ $other = new MockHttpClient(function () use (&$count) { ++$count; return new Moc
 (new CoverSearch($other, $cache))->search('Album (Deluxe)', 'Artist');
 verify($count === 2);
 echo "OK: Discogs fallback, limits, auth isolation, caching, missing token and API failures.\n";
+$fields = [];
+$client = new MockHttpClient(function ($method, $url) use (&$fields) {
+    parse_str(parse_url($url, PHP_URL_QUERY), $query);
+    $field = array_values(array_diff(array_keys($query), ['type', 'per_page', 'page']))[0];
+    $fields[] = $field;
+    verify($query[$field] === 'LC 00199');
+    return new MockResponse(json_encode(['results'=>[
+        ['cover_image'=>'https://i.discogs.com/'.$field.'.jpg'],
+        ['cover_image'=>'https://i.discogs.com/shared.jpg'],
+    ]]));
+});
+$results = (new CoverSearch($client, new ArrayAdapter(), 'discogs', 'test-token'))->search('LC 00199', '', true);
+verify($fields === ['artist','release_title','q','label','track']);
+verify(count($results) === 6 && count(array_unique($results)) === 6);
+verify(in_array('https://i.discogs.com/track.jpg', $results, true));
+echo "OK: manual multi-field search collects and deduplicates all five fields.\n";
