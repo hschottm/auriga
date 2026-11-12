@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.4.1.1**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.4.1.2**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:1.4.1.1 --with-all-dependencies
+composer require hschottm/auriga:1.4.1.2 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -294,3 +294,27 @@ is required for this release.
 - Seek past large picture frames and padding, keeping memory usage bounded.
 - Added regression tests for titles before and after large picture frames in ID3v2.3 and ID3v2.4.
 - No database migration required.
+
+### MediafileBrowser layout
+
+The browser loads `bundles/hschottmauriga/css/mediafile-browser.css` automatically.
+Desktop tables use compact text, vertically centered cells and separate date/time
+lines. Below 992px each entry becomes a card with labelled metadata and a
+full-width audio player. Folder icons remain outside the links. Long names wrap
+beside their icon without forcing horizontal scrolling.
+
+Column classes are `mediafile-browser-name`, `mediafile-browser-modified`,
+`mediafile-browser-size`, `mediafile-browser-title` and `mediafile-browser-actions`.
+Custom styles can override the defaults, for example:
+
+```css
+.mediafile-browser {
+    --media-browser-font-size: .875rem;
+    --media-browser-player-width: 17rem;
+    --media-browser-border: #dee2e6;
+}
+```
+
+Existing custom templates must adopt the new column classes and `data-label`
+attributes to use the mobile layout. The original `entry.date` remains available;
+`entry.dateOnly`, `entry.timeOnly` and `entry.datetime` are also provided.

@@ -6,31 +6,31 @@
     {% else %}
         {% block directory %}<p class="mediafile-browser-path"><strong>{{ currentDirectory }}</strong></p>{% endblock %}
         {% block listing %}
-        <div class="table-responsive" style="overflow-x:auto">
-            <table class="table table-hover mediafile-browser-table" style="width:100%">
-                <thead><tr><th scope="col">{{ labels.name }}</th><th scope="col">{{ labels.modified }}</th><th scope="col">{{ labels.size }}</th><th scope="col">{{ labels.title }}</th><th scope="col">{{ labels.actions }}</th></tr></thead>
-                <tbody>
+        <div class="mediafile-browser-listing">
+            <table class="table table-hover mediafile-browser-table" role="table">
+                <thead role="rowgroup"><tr role="row"><th scope="col" class="mediafile-browser-name">{{ labels.name }}</th><th scope="col" class="mediafile-browser-modified">{{ labels.modified }}</th><th scope="col" class="mediafile-browser-size">{{ labels.size }}</th><th scope="col" class="mediafile-browser-title">{{ labels.title }}</th><th scope="col" class="mediafile-browser-actions">{{ labels.actions }}</th></tr></thead>
+                <tbody role="rowgroup">
                 {% if parentUrl is not null %}
-                    <tr><td colspan="5" style="white-space:nowrap"><span aria-hidden="true">📁</span> <a href="{{ parentUrl }}">{{ labels.parent }}</a></td></tr>
+                    <tr class="mediafile-browser-parent" role="row"><td colspan="5" role="cell"><span class="mediafile-browser-filename"><span aria-hidden="true">📁</span><a href="{{ parentUrl }}">{{ labels.parent }}</a></span></td></tr>
                 {% endif %}
                 {% for entry in entries %}
                     {% block entry %}
-                    <tr>
-                        <td class="mediafile-browser-name" style="white-space:nowrap"><span role="img" aria-label="{{ entry.directory ? labels.folder : labels.file }}">{{ entry.directory ? '📁' : '📄' }}</span> {% if entry.directory %}<a href="{{ entry.url }}">{% endif %}{{ entry.name }}{% if entry.directory %}</a>{% endif %}</td>
-                        <td style="white-space:nowrap">{{ entry.date }}</td>
-                        <td style="white-space:nowrap">{{ entry.formattedSize }}</td>
-                        <td>{{ entry.title|default }}</td>
-                        <td>
+                    <tr class="{{ entry.directory ? 'mediafile-browser-folder' : 'mediafile-browser-file' }}" role="row">
+                        <td class="mediafile-browser-name" role="cell"><span class="mediafile-browser-filename"><span role="img" aria-label="{{ entry.directory ? labels.folder : labels.file }}">{{ entry.directory ? '📁' : '📄' }}</span> {% if entry.directory %}<a href="{{ entry.url }}">{% endif %}<span>{{ entry.name }}</span>{% if entry.directory %}</a>{% endif %}</span></td>
+                        <td class="mediafile-browser-modified" role="cell" data-label="{{ labels.modified }}"><time datetime="{{ entry.datetime }}"><span>{{ entry.dateOnly }}</span><span class="mediafile-browser-time">{{ entry.timeOnly }}</span></time></td>
+                        <td class="mediafile-browser-size" role="cell" data-label="{{ labels.size }}">{{ entry.formattedSize }}</td>
+                        <td class="mediafile-browser-title" role="cell" data-label="{{ labels.title }}">{{ entry.title|default }}</td>
+                        <td class="mediafile-browser-actions" role="cell" data-label="{{ labels.actions }}">
                             {% if not entry.directory %}
-                                {% if entry.allowed %}
+                                {% if entry.allowed %}<div class="mediafile-browser-controls">
                                     {% if entry.playUrl %}<audio controls preload="none" aria-label="{{ labels.play }}: {{ entry.name }}"><source src="{{ entry.playUrl }}" type="{{ entry.audioType }}"></audio>{% endif %}
-                                    <a href="{{ entry.url }}" download class="btn btn-sm btn-outline-primary">{{ labels.download }}</a>
+                                    <a href="{{ entry.url }}" download class="btn btn-sm btn-outline-primary">{{ labels.download }}</a></div>
                                 {% else %}<span>{{ labels.locked }}</span>{% endif %}
                             {% endif %}
                         </td>
                     </tr>
                     {% endblock %}
-                {% else %}<tr><td colspan="5">{{ labels.empty }}</td></tr>{% endfor %}
+                {% else %}<tr class="mediafile-browser-empty" role="row"><td colspan="5" role="cell">{{ labels.empty }}</td></tr>{% endfor %}
                 </tbody>
             </table>
         </div>

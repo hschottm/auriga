@@ -18,6 +18,8 @@ $GLOBALS['objPage'] = new Contao\PageModel();
 try {
     $html = (new ContentMediafileBrowser($model))->generate();
     assertOutput(str_contains($html,'example.mp3') && str_contains($html, 'sub') && str_contains($html, '13'), 'Listing metadata missing');
+    assertOutput(str_contains($html, 'class="mediafile-browser-modified" role="cell" data-label=') && str_contains($html, '<time datetime="') && str_contains($html, 'class="mediafile-browser-time"'), 'Responsive date metadata missing');
+    assertOutput(in_array('bundles/hschottmauriga/css/mediafile-browser.css|static', $GLOBALS['TL_CSS'] ?? [], true), 'Browser stylesheet not registered');
     file_put_contents($folder.'/example.mp3', 'TAG'.str_pad('<Titel & mehr>', 30, "\0").str_repeat("\0", 95));
     $html = (new ContentMediafileBrowser($model))->generate();
     assertOutput(str_contains($html, '&lt;Titel &amp; mehr&gt;') && !str_contains($html, '<Titel & mehr>'), 'ID3 title must be displayed and escaped');

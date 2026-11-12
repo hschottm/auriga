@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.1.2 — 2026-11-12
+
+- Add automatically loaded, scoped CSS for a compact MediafileBrowser table with vertically centered cells and separate date/time lines.
+- Display entries as labelled cards below 992px with full-width audio controls and wrapping filenames beside their icons.
+- Add column classes and configurable CSS variables for font size, player width and borders.
+- Preserve download authorization and existing template date data; document custom-template requirements.
+- Validate rendered metadata, stylesheet registration, navigation and protected downloads in the isolated Contao integration tests.
+
 ## 1.3.0 — 2026-11-11
 
 - Target PHP `^8.3`, Contao `~5.7.0` and Symfony `^7.4`; remove obsolete Composer plugin and UTF-8 helper dependencies.

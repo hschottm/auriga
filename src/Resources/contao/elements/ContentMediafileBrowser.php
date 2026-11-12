@@ -43,6 +43,7 @@ class ContentMediafileBrowser extends \Contao\ContentElement
             $this->Template->message = 'MediafileBrowser';
             return;
         }
+        $GLOBALS['TL_CSS'][] = 'bundles/hschottmauriga/css/mediafile-browser.css|static';
         // Lists and downloads must not be served from the public page cache.
         global $objPage;
         if ($objPage) { $objPage->cache = 0; $objPage->clientCache = 0; }
@@ -86,6 +87,9 @@ class ContentMediafileBrowser extends \Contao\ContentElement
                 $entry['audioType'] = !$entry['directory'] ? (self::AUDIO[strtolower(pathinfo($entry['name'], PATHINFO_EXTENSION))] ?? null) : null;
                 $entry['playUrl'] = $entry['allowed'] && $entry['audioType'] ? $url($entry['path'], 'play') : null;
                 $entry['date'] = \Contao\Date::parse(\Contao\Config::get('datimFormat'), $entry['modified']);
+                $entry['dateOnly'] = \Contao\Date::parse(\Contao\Config::get('dateFormat'), $entry['modified']);
+                $entry['timeOnly'] = \Contao\Date::parse(\Contao\Config::get('timeFormat'), $entry['modified']);
+                $entry['datetime'] = date('c', $entry['modified']);
                 $entry['formattedSize'] = $entry['directory'] ? '' : \Contao\System::getReadableSize($entry['size']);
             }
             unset($entry);
