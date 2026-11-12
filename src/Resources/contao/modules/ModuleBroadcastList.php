@@ -44,6 +44,15 @@ class ModuleBroadcastList extends ModulePTW
 	}
 
 
+    protected function mayPlayArchive(): bool
+    {
+        $groups = \Contao\StringUtil::deserialize($this->aurigaArchiveGroups, true);
+        $container = \Contao\System::getContainer();
+        return $groups !== [] && $container->get('contao.security.token_checker')->hasFrontendUser()
+            && $container->get('security.authorization_checker')->isGranted(
+                \Contao\CoreBundle\Security\ContaoCorePermissions::MEMBER_IN_GROUPS, $groups);
+    }
+
 	/**
 	 * Generate module
 	 */
@@ -51,6 +60,18 @@ class ModuleBroadcastList extends ModulePTW
 	{
 		global $objPage;
 		
+        $container = \Contao\System::getContainer();
+        $request = $container->get('request_stack')->getCurrentRequest();
+        $params = $request->query->all();
+        $playKey = 'auriga_archive_'.$this->id;
+        $play = $params[$playKey] ?? null;
+        $allowed = $this->mayPlayArchive();
+        $this->Template->showArchivePlayer = $allowed;
+        if ($objPage) { $objPage->cache = 0; $objPage->clientCache = 0; }
+        if ($play !== null && !$allowed) throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException('Member access required');
+        if ($play !== null && (!is_string($play) || !preg_match('/^[1-9][0-9]*:[0-9]+$/D', $play))) throw new \Contao\CoreBundle\Exception\PageNotFoundException();
+        $archive = $allowed && $this->aurigaArchiveRoot ? \Contao\FilesModel::findByUuid($this->aurigaArchiveRoot) : null;
+
 		// Redirect to jumpTo page
 		$objPageBroadcast = ModulePTW::resolvePage($this->jumpTo_broadcast);
 		$adventure = ($this->adventure_source > 0) ? $this->adventure_source : \Contao\Input::get('adventure');
@@ -83,7 +104,24 @@ class ModuleBroadcastList extends ModulePTW
 					$allproviders[$providers[$provider]['initials']] = $providers[$provider];
 				}
 			}
-			$files = self::recordingUrls($objBroadcast->files);
+            $audio = [];
+            if ($archive && $archive->type === 'folder') {
+                $files = ArchiveAudio::files(self::projectDir().'/'.$container->getParameter('contao.upload_path'), self::projectDir().'/'.$archive->path, $objAdventure->numbering, $objBroadcast->files);
+                foreach ($files as $index => $file) {
+                    $selection = $objBroadcast->id.':'.$index;
+                    if ($play === $selection) {
+                        $response = new \Symfony\Component\HttpFoundation\BinaryFileResponse($file);
+                        $response->setContentDisposition(\Symfony\Component\HttpFoundation\ResponseHeaderBag::DISPOSITION_INLINE, basename($file));
+                        $response->headers->set('Content-Type', 'audio/mpeg');
+                        $response->headers->set('Cache-Control', 'private, no-store');
+                        $response->headers->set('X-Content-Type-Options', 'nosniff');
+                        throw new \Contao\CoreBundle\Exception\ResponseException($response);
+                    }
+                    $query = $params;
+                    $query[$playKey] = $selection;
+                    $audio[] = $request->getPathInfo().'?'.http_build_query($query, '', '&', PHP_QUERY_RFC3986);
+                }
+            }
 			$arrBroadcasts[] = array
 			(
 				'title' => \Contao\StringUtil::specialchars($objBroadcast->title),
@@ -97,14 +135,17 @@ class ModuleBroadcastList extends ModulePTW
 				'length' => $objBroadcast->length,
 				'frequency' => $objBroadcast->frequency,
 				'samplerate' => $objBroadcast->samplerate,
-				'files' => $files,
+				'files' => [], // No direct archive URLs, including in old overrides.
+                'audio' => $audio,
 				'providers' => $foundproviders,
 				'url' => $objPageBroadcast->getFrontendUrl('/broadcast/' . $objBroadcast->date),
 				'id' => $objBroadcast->id
 			);
 		}
 
+        if ($play !== null) throw new \Contao\CoreBundle\Exception\PageNotFoundException('Recording not found');
 		$this->loadLanguageFile('tl_module');
+        $this->Template->lngArchivePlayer = $GLOBALS['TL_LANG']['tl_module']['aurigaArchivePlayer'];
 		ksort($allproviders);
 		$this->Template->providers = $allproviders;
 		$this->Template->adventure = $objAdventure->row();

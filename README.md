@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.4.0.1**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.4.0.2**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:1.4.0.1 --with-all-dependencies
+composer require hschottm/auriga:1.4.0.2 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -241,3 +241,31 @@ from listings and cannot be accessed through direct navigation or file requests.
 - Linked only folder names, leaving icons outside links; removed `..` from the parent-directory label.
 
 MediafileBrowser follow-up releases use a fourth version component (`1.4.0.x`).
+
+## Member-only players in broadcast lists
+
+The broadcast-list module now offers an **Archive folder** picker and **Allowed
+member groups**. Run database migrations after updating to add these module fields.
+The column after the provider/source column is rendered only for logged-in members
+of an allowed group. No selected groups means no player column and no playback.
+Each audio request rechecks this permission, including when the archive is public.
+
+Files are looked up under `<archive>/ptw/<adventure.numbering padded to 3 digits>/`
+using the filename from the existing `tl_broadcast.files` references (including
+Contao file UUIDs). This preserves filenames originally imported from the old
+recording database; filenames are not generated from the broadcast title or date.
+Only existing, readable MP3 files within the archive receive a player. Missing
+recordings leave that cell empty. Playback is streamed with byte-range support;
+old direct external download links are no longer supplied by this module.
+
+The bundled Bootstrap broadcast-list variant inherits the changed markup.
+Project-local templates that copied the full old table must be updated: wrap both
+the final header and cell in `showArchivePlayer`, and render `broadcast.audio`
+URLs through audio players. The original exposes an `archive_player` block.
+
+## Release 1.4.0.2
+
+- Added configurable archive folders and member groups to broadcast lists, with protected audio playback for existing recordings.
+- Hide the entire player column for unauthorized visitors.
+- Keep MediafileBrowser icons and filenames together on one line.
+- Database migration is required for the new module settings.

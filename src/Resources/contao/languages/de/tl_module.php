@@ -45,3 +45,8 @@ $GLOBALS['TL_LANG']['tl_module']['goto_first_broadcast'] = 'Erste Sendung';
 $GLOBALS['TL_LANG']['tl_module']['goto_last_broadcast'] = 'Letzte Sendung';
 $GLOBALS['TL_LANG']['tl_module']['goto_next_broadcast'] = 'Nächste Sendung';
 $GLOBALS['TL_LANG']['tl_module']['goto_previous_broadcast'] = 'Vorherige Sendung';
+
+$GLOBALS['TL_LANG']['tl_module']['auriga_archive_legend'] = 'Audio-Archiv';
+$GLOBALS['TL_LANG']['tl_module']['aurigaArchiveRoot'] = ['Archivordner', 'Startordner auswählen. Aufnahmen werden unter ptw/000/Dateiname gesucht.'];
+$GLOBALS['TL_LANG']['tl_module']['aurigaArchiveGroups'] = ['Erlaubte Mitgliedergruppen', 'Nur angemeldete Mitglieder dieser Gruppen sehen die Playerspalte und dürfen Aufnahmen abspielen.'];
+$GLOBALS['TL_LANG']['tl_module']['aurigaArchivePlayer'] = 'Abspielen';

@@ -17,7 +17,7 @@
 		<th>{{ lngFrequency }}</th>
 		<th>{{ lngSamplerate }}</th>
 		<th>{{ lngProvider }}</th>
-		<th></th>
+		{% if showArchivePlayer|default(false) %}<th>{{ lngArchivePlayer }}</th>{% endif %}
 	</tr>
 	</thead>
 	<tbody>
@@ -30,7 +30,9 @@
 		<td>{{ broadcast.frequency }}</td>
 		<td>{{ broadcast.samplerate }}</td>
 		<td>{{ broadcast.providers|keys|join(',') }}</td>
-		<td>{% for file in broadcast.files %}<a href="{{ file }}"><img src="bundles/hschottmauriga/images/song.gif" title="{{ file }}" alt="" /></a>{% endfor %}</td>
+		{% if showArchivePlayer|default(false) %}
+        <td>{% block archive_player %}{% for url in broadcast.audio|default([]) %}<audio controls preload="none" aria-label="{{ broadcast.title }}"><source src="{{ url }}" type="audio/mpeg"></audio>{% endfor %}{% endblock %}</td>
+        {% endif %}
 	</tr>
 {% endfor %}
 	</tbody>
