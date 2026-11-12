@@ -66,3 +66,5 @@ $GLOBALS['TL_CTE']['texts']['speciallist'] = ContentSpecialMusic::class;
  */
 $GLOBALS['TL_HOOKS']['addCustomRegexp'][] = array('auriga.listener.addcustomregexp', 'addCustomRegexp');
 
+
+$GLOBALS['TL_CTE']['files']['mediafile_browser'] = \Hschottm\AurigaBundle\ContentMediafileBrowser::class;

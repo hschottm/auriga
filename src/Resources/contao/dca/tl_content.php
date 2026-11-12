@@ -63,3 +63,24 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['aurigaTpl'] = array
 );
 
 \Hschottm\AurigaBundle\DatabaseSchema::apply('tl_content');
+
+$GLOBALS['TL_DCA']['tl_content']['palettes']['mediafile_browser'] = '{type_legend},type,headline;{auriga_browser_legend},aurigaBrowserRoot,aurigaBrowserExtensions,aurigaBrowserGroups;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['fields']['aurigaBrowserRoot'] = [
+    'label' => &$GLOBALS['TL_LANG']['tl_content']['aurigaBrowserRoot'],
+    'exclude' => true,
+    'inputType' => 'fileTree',
+    'eval' => ['fieldType' => 'radio', 'files' => false, 'mandatory' => true],
+    'sql' => 'binary(16) NULL',
+];
+
+$GLOBALS['TL_DCA']['tl_content']['fields']['aurigaBrowserExtensions'] = [
+    'label' => &$GLOBALS['TL_LANG']['tl_content']['aurigaBrowserExtensions'],
+    'exclude' => true, 'inputType' => 'text', 'default' => 'mp3',
+    'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
+    'sql' => "varchar(255) NOT NULL default 'mp3'",
+];
+$GLOBALS['TL_DCA']['tl_content']['fields']['aurigaBrowserGroups'] = [
+    'label' => &$GLOBALS['TL_LANG']['tl_content']['aurigaBrowserGroups'],
+    'exclude' => true, 'inputType' => 'checkbox', 'foreignKey' => 'tl_member_group.name',
+    'eval' => ['multiple' => true, 'tl_class' => 'clr'], 'sql' => 'blob NULL',
+];

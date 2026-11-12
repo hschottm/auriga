@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.3.9**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.4.0**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:^1.3.9 --with-all-dependencies
+composer require hschottm/auriga:^1.4.0 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -180,3 +180,46 @@ Existing files, stored file paths and UUIDs do not need to be moved or migrated.
 Old configuration overrides starting with `files/` or the configured upload path
 remain supported without adding the prefix twice. `filedownloadroot` remains the
 external download URL and is unchanged.
+
+## MediafileBrowser content element (1.4.0)
+
+After updating the package, run Contao's database migrations and clear the
+production cache. Add the **MediafileBrowser** content element in the file element
+category, then select its root folder with the file picker. The browser lists the
+current directory, with folders first, naturally sorted names, modification dates
+and file sizes. Folder links open subdirectories; the parent link stops at the
+configured root. Multiple browsers on a page have separate navigation parameters.
+
+Clicking a file downloads it through the rendered content element, including files
+in non-public folders. To restrict access to members, protect the page or content
+element and choose the allowed member groups. A non-public folder alone does not
+restrict who can use an unprotected browser element. Avoid publicly exposing the
+folder or any ancestor if direct access must be prevented. Hidden files and
+symlinks are excluded. This browser is read-only: no uploads, rename or deletion.
+
+The Twig template `ce_mediafile_browser.html.twig` provides `headline`, `directory`,
+`listing` and `entry` blocks for customization. Its table uses Bootstrap-compatible
+classes and also works without Bootstrap. The download response is private and
+not stored in caches. German and English labels are included.
+
+Tests: `tests/mediafile-browser.php` covers filesystem boundaries and listing;
+`tests/mediafile-browser-integration.php` uses the isolated Contao test installation
+for template rendering, navigation, download responses and guest access checks.
+
+### File types, playback and private files
+
+Set **Allowed file types** to a comma-separated list such as `mp3` (default) or
+`mp3,m4a,flac`. Direct file requests enforce the same filter; directories remain
+navigable. Recognized audio formats have a native HTML audio player with
+`preload="none"` and a separate download action. Playback uses a streamed inline
+response supporting byte ranges; actual codec support depends on the browser.
+
+Select **Member groups for private files** on the browser element. Non-public
+files require both a frontend member login and membership in one of those groups,
+regardless of whether the element itself is protected. No selected groups means
+private downloads and playback are denied. Public visibility is inherited from
+ancestor folders in Contao's file records. Public files may be accessed by guests
+who can view the element. Both playback and downloads recheck access on each
+request. Protect the element/page as well if filenames must be hidden from guests;
+otherwise guests can browse the list but see no player or download link for private
+files. Never expose private directories through manually created public symlinks.

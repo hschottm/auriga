@@ -1,0 +1,39 @@
+{% block content %}
+<div{{ attrs(cssID|default).addClass([class|default, 'mediafile-browser', 'block']) }}>
+    {% block headline %}{% if headline %}<{{ hl }}>{{ headline }}</{{ hl }}>{% endif %}{% endblock %}
+    {% if message %}
+        <p>{{ message }}</p>
+    {% else %}
+        {% block directory %}<p class="mediafile-browser-path"><strong>{{ currentDirectory }}</strong></p>{% endblock %}
+        {% block listing %}
+        <div class="table-responsive" style="overflow-x:auto">
+            <table class="table table-hover mediafile-browser-table" style="width:100%">
+                <thead><tr><th scope="col">{{ labels.name }}</th><th scope="col">{{ labels.modified }}</th><th scope="col">{{ labels.size }}</th><th scope="col">{{ labels.actions }}</th></tr></thead>
+                <tbody>
+                {% if parentUrl is not null %}
+                    <tr><td colspan="4"><a href="{{ parentUrl }}"><span aria-hidden="true">📁 ..</span> {{ labels.parent }}</a></td></tr>
+                {% endif %}
+                {% for entry in entries %}
+                    {% block entry %}
+                    <tr>
+                        <td>{% if entry.directory %}<a href="{{ entry.url }}">{% endif %}<span role="img" aria-label="{{ entry.directory ? labels.folder : labels.file }}">{{ entry.directory ? '📁' : '📄' }}</span> {{ entry.name }}{% if entry.directory %}</a>{% endif %}</td>
+                        <td style="white-space:nowrap">{{ entry.date }}</td>
+                        <td style="white-space:nowrap">{{ entry.formattedSize }}</td>
+                        <td>
+                            {% if not entry.directory %}
+                                {% if entry.allowed %}
+                                    {% if entry.playUrl %}<audio controls preload="none" aria-label="{{ labels.play }}: {{ entry.name }}"><source src="{{ entry.playUrl }}" type="{{ entry.audioType }}"></audio>{% endif %}
+                                    <a href="{{ entry.url }}" download class="btn btn-sm btn-outline-primary">{{ labels.download }}</a>
+                                {% else %}<span>{{ labels.locked }}</span>{% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endblock %}
+                {% else %}<tr><td colspan="4">{{ labels.empty }}</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endblock %}
+    {% endif %}
+</div>
+{% endblock %}
