@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.4.1**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.4.1.1**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:1.4.1 --with-all-dependencies
+composer require hschottm/auriga:1.4.1.1 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -227,9 +227,11 @@ files. Never expose private directories through manually created public symlinks
 The browser's **Title** column (after Size) reads embedded MP3 titles from ID3v2.2,
 ID3v2.3 or ID3v2.4, falling back to ID3v1. Latin-1, UTF-8 and UTF-16 text are
 supported. Missing titles and non-MP3 entries leave the cell empty. Titles are
-escaped by Twig. The reader loads at most 1 MiB of ID3v2 metadata plus the ID3v1
-footer, never the full recording. Oversized, compressed or encrypted metadata may
-fall back to ID3v1 or yield an empty title; audio files are not modified.
+escaped by Twig. The reader seeks over large picture frames and padding instead of loading the
+whole tag or recording. It reads at most 4096 frame headers and a 64 KiB title
+frame. For older tag-wide unsynchronisation, a bounded 1 MiB prefix is decoded.
+Unsupported compressed/encrypted titles or titles beyond these limits may fall
+back to ID3v1; audio files are not modified.
 
 Directories whose names start with `@` (including Synology `@eaDir`) are excluded
 from listings and cannot be accessed through direct navigation or file requests.
@@ -285,3 +287,10 @@ Copy `examples/templates/mod_auriga_dpi_bootstrap.html.twig` to your project's
 variant styles the form and results table without duplicating the data loops.
 Existing project overrides are not replaced automatically. No database migration
 is required for this release.
+
+## MediafileBrowser update 1.4.1.1
+
+- Read ID3v2 titles even when the tag exceeds 1 MiB, instead of falling back to truncated ID3v1 titles.
+- Seek past large picture frames and padding, keeping memory usage bounded.
+- Added regression tests for titles before and after large picture frames in ID3v2.3 and ID3v2.4.
+- No database migration required.

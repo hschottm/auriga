@@ -19,6 +19,16 @@ try {
             titleCheck('ID3'.chr($version)."\0\0".syncSize(strlen($body)).$body.$v1, 'Grüße <Titel>');
         }
     }
+    $longTitle = '1. Im frostigen Griff des Winters';
+    foreach ([3,4] as $version) {
+        $sizeBytes = $version === 4 ? static fn($n) => syncSize($n) : static fn($n) => pack('N', $n);
+        $value = "\0".$longTitle;
+        $titleFrame = 'TIT2'.$sizeBytes(strlen($value))."\0\0".$value;
+        $picture = 'APIC'.$sizeBytes(1400000)."\0\0".str_repeat('x',1400000);
+        foreach ([$titleFrame.$picture, $picture.$titleFrame] as $body) {
+            titleCheck('ID3'.chr($version)."\0\0".syncSize(strlen($body)).$body.$v1, $longTitle);
+        }
+    }
     titleCheck('no tags', '');
     titleCheck('ID3'."\x03\0\0".syncSize(100).'short', '');
     titleCheck('ID3'."\x03\0\0".syncSize(2000000).$v1, 'Grüße');

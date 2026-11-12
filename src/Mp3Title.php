@@ -14,12 +14,17 @@ final class Mp3Title
             if (strlen($header) === 10 && substr($header, 0, 3) === 'ID3') {
                 $version = ord($header[3]);
                 $size = self::sync(substr($header, 6, 4));
-                if (in_array($version, [2, 3, 4], true) && $size > 0 && $size <= 1048576) {
-                    $body = fread($stream, $size);
-                    if (strlen($body) === $size) {
-                        $title = self::frames($body, $version, ord($header[5]));
-                        if ($title !== '') return $title;
+                if (in_array($version, [2, 3, 4], true) && $size > 0) {
+                    $flags = ord($header[5]);
+                    if ($version === 4 || !($flags & 128)) {
+                        $title = self::streamFrames($stream, $size, $version, $flags);
+                    } else {
+                        // Older tag-wide unsynchronisation changes byte offsets.
+                        // Decode a bounded prefix rather than discarding a large tag.
+                        $body = stream_get_contents($stream, min($size, 1048576));
+                        $title = self::frames($body === false ? '' : $body, $version, $flags);
                     }
+                    if ($title !== '') return $title;
                 }
             }
             // ID3v1 title is a 30-byte Latin-1 field at the end of the file.
@@ -33,6 +38,37 @@ final class Mp3Title
         } finally {
             fclose($stream);
         }
+    }
+
+    /** Seek over pictures/padding; read only frame headers and a bounded title. */
+    private static function streamFrames($stream, int $size, int $version, int $flags): string
+    {
+        $stat = fstat($stream);
+        $end = 10 + $size;
+        if ($stat === false || $end > $stat['size'] || ($version === 2 && ($flags & 64))) return '';
+        if ($version >= 3 && ($flags & 64)) {
+            $bytes = stream_get_contents($stream, 4);
+            if ($bytes === false || strlen($bytes) !== 4) return '';
+            $extended = $version === 4 ? self::sync($bytes) : unpack('N', $bytes)[1] + 4;
+            if ($extended < 4 || 10 + $extended > $end || fseek($stream, 10 + $extended) !== 0) return '';
+        }
+        $headerSize = $version === 2 ? 6 : 10;
+        for ($count = 0; $count < 4096 && ftell($stream) + $headerSize <= $end; ++$count) {
+            $header = stream_get_contents($stream, $headerSize);
+            if ($header === false || strlen($header) !== $headerSize) return '';
+            $id = substr($header, 0, $version === 2 ? 3 : 4);
+            if (!preg_match('/^[A-Z0-9]+$/D', $id)) return '';
+            $length = $version === 2 ? unpack('N', "\0".substr($header, 3, 3))[1]
+                : ($version === 4 ? self::sync(substr($header, 4, 4)) : unpack('N', substr($header, 4, 4))[1]);
+            if ($length <= 0 || $length > $end - ftell($stream)) return '';
+            if (($id === 'TIT2' || $id === 'TT2') && $length <= 65536) {
+                $value = stream_get_contents($stream, $length);
+                if ($value === false || strlen($value) !== $length) return '';
+                return self::frames($header.$value, $version, $flags & 128);
+            }
+            if (fseek($stream, $length, SEEK_CUR) !== 0) return '';
+        }
+        return '';
     }
 
     private static function sync(string $bytes): int
