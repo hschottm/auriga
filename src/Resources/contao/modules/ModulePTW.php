@@ -31,6 +31,25 @@ class ModulePTW extends \Contao\Module
         return \Contao\System::getContainer()->getParameter('kernel.project_dir');
     }
 
+    protected static function filesRoot(): string
+    {
+        return trim((string) \Contao\System::getContainer()->getParameter('contao.upload_path'), '/');
+    }
+
+    /** Resolve an Auriga directory relative to Contao's configured file directory. */
+    protected static function aurigaFilePath(string $setting): string
+    {
+        $path = trim((string) $GLOBALS['TL_CONFIG']['auriga'][$setting], '/');
+        // Accept old project-relative overrides during upgrades as well.
+        foreach (array_unique([self::filesRoot(), 'files']) as $prefix) {
+            if ($path === $prefix || str_starts_with($path, $prefix.'/')) {
+                $path = ltrim(substr($path, strlen($prefix)), '/');
+                break;
+            }
+        }
+        return self::filesRoot().($path !== '' ? '/'.$path : '');
+    }
+
     public static function recordingUrls($references): array
     {
         $urls = [];
@@ -41,11 +60,11 @@ class ModulePTW extends \Contao\Module
                 if ($file === null) continue;
                 $reference = $file->path;
             }
-            $prefix = $GLOBALS['TL_CONFIG']['auriga']['fileroot'];
+            $prefix = self::aurigaFilePath('fileroot').'/';
             if (str_starts_with($reference, $prefix)) {
                 $reference = $GLOBALS['TL_CONFIG']['auriga']['filedownloadroot'].substr($reference, strlen($prefix));
             }
-            if (preg_match('~^(?:https?://|files/)~i', $reference)) $urls[] = $reference;
+            if (preg_match('~^https?://~i', $reference) || str_starts_with($reference, self::filesRoot().'/')) $urls[] = $reference;
         }
         return array_values(array_unique($urls));
     }
@@ -89,7 +108,7 @@ class ModulePTW extends \Contao\Module
 		$info = ModulePTW::distributedPathInfo($cover_id);
 		foreach ($uploadTypes as $extension)
 		{
-			$imagename = rtrim($GLOBALS['TL_CONFIG']['auriga']['coverpath'], '/') . '/' . $info['fullpath'] . '/' . $cover_id . '.' . $extension;
+			$imagename = self::aurigaFilePath('coverpath') . '/' . $info['fullpath'] . '/' . $cover_id . '.' . $extension;
 			if (is_file(self::projectDir().'/'.$imagename) && is_readable(self::projectDir().'/'.$imagename))
 			{
 				$foundimage = true;

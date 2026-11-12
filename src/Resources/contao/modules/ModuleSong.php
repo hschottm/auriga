@@ -173,7 +173,7 @@ class ModuleSong extends ModulePTW
 			$coverId = $this->createNewCover($songId, $data);
 			if (!$coverId) throw new \RuntimeException('Cover mapping already exists');
 			$info = $this->distributedPathInfo($coverId);
-			$directory = self::projectDir() . '/' . trim($GLOBALS['TL_CONFIG']['auriga']['coverpath'], '/') . '/' . $info['fullpath'];
+			$directory = self::projectDir() . '/' . self::aurigaFilePath('coverpath') . '/' . $info['fullpath'];
 			if (!is_dir($directory) && !@mkdir($directory, 0755, true) && !is_dir($directory)) throw new \RuntimeException('Cannot create cover directory');
 			$path = $directory . '/' . $coverId . '.' . $extension;
 			if (file_exists($path)) throw new \RuntimeException('Cover file already exists');

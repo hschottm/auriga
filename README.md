@@ -169,3 +169,14 @@ Catalogue numbers (`catno`) are not the same as label codes. Manual searches rem
 manual when navigating between cover candidates, even if the entered text equals
 the original album title. Automatic lookup retains its album/artist fallbacks;
 MusicBrainz behavior is unchanged. Manual and automatic results use separate caches.
+
+## File directory configuration
+
+`auriga.coverpath` (`auriga/covers/`) and `auriga.fileroot`
+(`auriga/recordings/`) are relative to Contao's file directory. Auriga prefixes
+Contao's `contao.upload_path` (normally `files`) when resolving cover files and
+recording paths. Filesystem access additionally prefixes the project directory.
+Existing files, stored file paths and UUIDs do not need to be moved or migrated.
+Old configuration overrides starting with `files/` or the configured upload path
+remain supported without adding the prefix twice. `filedownloadroot` remains the
+external download URL and is unchanged.

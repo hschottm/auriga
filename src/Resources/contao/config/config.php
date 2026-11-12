@@ -11,8 +11,8 @@ use Hschottm\AurigaBundle\ModuleDPI;
 use Hschottm\AurigaBundle\ModuleSong;
 use Hschottm\AurigaBundle\EventListener\AddCustomRegexpListener;
 
-$GLOBALS['TL_CONFIG']['auriga']['coverpath'] = 'files/auriga/covers/';
-$GLOBALS['TL_CONFIG']['auriga']['fileroot'] = 'files/auriga/recordings/';
+$GLOBALS['TL_CONFIG']['auriga']['coverpath'] = 'auriga/covers/';
+$GLOBALS['TL_CONFIG']['auriga']['fileroot'] = 'auriga/recordings/';
 $GLOBALS['TL_CONFIG']['auriga']['filedownloadroot'] = 'https://mp3.nasbrill-soft.de/';
 
 /**

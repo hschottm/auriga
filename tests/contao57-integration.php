@@ -75,7 +75,7 @@ class CoverView extends SongView {
     protected function canEditCovers(array $groups): bool { return true; }
     public function saveCover($song, $bytes) { return $this->storeCover($song, ['album'=>'','artist'=>'','labelcode'=>''], $bytes, 'gif'); }
 }
-$GLOBALS['TL_CONFIG']['auriga']['coverpath']='files/auriga-test-covers/';
+$GLOBALS['TL_CONFIG']['auriga']['coverpath']='auriga-test-covers/';
 $gif=base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
 $db->insert('tl_cover', ['tstamp'=>time()]); $oldCover=(int)$db->lastInsertId();
 $db->insert('tl_song_cover', ['song'=>$song,'cover'=>$oldCover]);
@@ -84,7 +84,11 @@ $view=new CoverView($model);
 check($view->saveCover($song,$gif), 'Repair/save failed');
 $newCover=(int)$db->fetchOne('SELECT cover FROM tl_song_cover WHERE song=?',[$song]);
 check($newCover!==$oldCover && (int)$db->fetchOne('SELECT cover FROM tl_song_cover WHERE song=999998 ORDER BY id DESC LIMIT 1')===$oldCover,'Repair changed other mappings');
-check(Hschottm\AurigaBundle\ModulePTW::_getCovername($newCover)!=='','Saved image not found');
+$savedPath = Hschottm\AurigaBundle\ModulePTW::_getCovername($newCover);
+check(str_starts_with($savedPath, 'files/auriga-test-covers/'), 'Saved image path must include file root exactly once');
+$GLOBALS['TL_CONFIG']['auriga']['coverpath']='files/auriga-test-covers/';
+check(Hschottm\AurigaBundle\ModulePTW::_getCovername($newCover) === $savedPath, 'Legacy cover configuration no longer resolves');
+$GLOBALS['TL_CONFIG']['auriga']['coverpath']='auriga-test-covers/';
 check(!$view->saveCover($song,$gif),'Healthy cover overwritten');
 $db->insert('tl_broadcast_song', ['pid'=>$broadcast,'title'=>'Cover selection','album'=>'Album','artist'=>'Artist']); $coverSong=(int)$db->lastInsertId();
 Contao\Input::setGet('song',(string)$coverSong);
@@ -99,7 +103,7 @@ try { $view->render(); throw new RuntimeException('Expected redirect after save'
 check((int)$db->fetchOne('SELECT COUNT(*) FROM tl_song_cover WHERE song=?',[$coverSong])===1, 'Cover selection not persisted');
 Contao\Input::setPost('usecover',null);
 $blocked=$project.'/files/auriga-test-blocked'; file_put_contents($blocked,'not a directory');
-$GLOBALS['TL_CONFIG']['auriga']['coverpath']='files/auriga-test-blocked/';
+$GLOBALS['TL_CONFIG']['auriga']['coverpath']='auriga-test-blocked/';
 $count=(int)$db->fetchOne('SELECT COUNT(*) FROM tl_cover');
 check(!$view->saveCover(999997,$gif),'Expected filesystem failure');
 check((int)$db->fetchOne('SELECT COUNT(*) FROM tl_cover')===$count && !(bool)$db->fetchOne('SELECT id FROM tl_song_cover WHERE song=999997'), 'Failed cover left DB records');
