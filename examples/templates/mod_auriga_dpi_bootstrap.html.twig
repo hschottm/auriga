@@ -1,0 +1,21 @@
+{% extends '@Contao/mod_auriga_dpi.html.twig' %}
+
+{% block form_attributes %} class="mb-4"{% endblock %}
+{% block search_attributes %} class="form-control mt-2"{% endblock %}
+{% block field_attributes %} class="form-select mt-2"{% endblock %}
+{% block results_attributes %} class="form-select mt-2 w-auto"{% endblock %}
+{% block submit_class %}{{ parent() }} btn btn-primary{% endblock %}
+
+{% block search_fields %}
+    <div class="d-flex flex-wrap align-items-end gap-3 mb-3">
+        {{ block('search_input') }}
+        {{ block('field_select') }}
+        {{ block('submit_button') }}
+    </div>
+{% endblock %}
+
+{% block result_info_class %}{{ parent() }} mb-3{% endblock %}
+{% block table_wrapper %}
+    <div class="table-responsive">{{ parent() }}</div>
+{% endblock %}
+{% block table_attributes %} class="table table-striped table-hover align-middle"{% endblock %}

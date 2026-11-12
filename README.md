@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.4.0.2**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.4.1**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:1.4.0.2 --with-all-dependencies
+composer require hschottm/auriga:1.4.1 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -269,3 +269,19 @@ URLs through audio players. The original exposes an `archive_player` block.
 - Hide the entire player column for unauthorized visitors.
 - Keep MediafileBrowser icons and filenames together on one line.
 - Database migration is required for the new module settings.
+
+## DPI template blocks in 1.4.1
+
+The original DPI search template now provides `headline`, `search_form`,
+`hidden_fields`, `search_fields`, `search_input`, `field_select`, `submit_button`,
+`results_select`, `result_info`, `table_wrapper`, `table_head`, `table_body`,
+`table_row` and `pagination` blocks, plus attribute/class blocks for Bootstrap
+styling. The original retains its framework-independent presentation and now uses
+wrapping labels for its controls. Field names, CSRF token, search options, results
+and pagination remain in the original template.
+
+Copy `examples/templates/mod_auriga_dpi_bootstrap.html.twig` to your project's
+`templates/` directory and select it in the DPI module. This small inherited
+variant styles the form and results table without duplicating the data loops.
+Existing project overrides are not replaced automatically. No database migration
+is required for this release.

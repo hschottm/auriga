@@ -1,26 +1,35 @@
 {% block content %}
 <div{{ attrs(cssID|default).addClass([class|default, 'ptw_broadcast']).addStyle(style|default) }}>
-{% if headline %}
+{% block headline %}
+{% if headline %}<{{ hl }}>{{ headline }}</{{ hl }}>{% endif %}
+{% endblock %}
 
-<{{ hl }}>{{ headline }}</{{ hl }}>
-{% endif %}
-
-<form method="POST" action="{{ formaction }}">
+{% block search_form %}
+<form method="POST" action="{{ formaction }}"{% block form_attributes %}{% endblock %}>
+{% block hidden_fields %}
 <input type="hidden" name="FORM_SUBMIT" value="dpi" />
 <input type="hidden" name="REQUEST_TOKEN" value="{{ contao.request_token }}" />
+{% endblock %}
+{% block search_fields %}
 <div>
-{{ lngSearch }} <input type="text" name="search" value="{{ savedSearch|default }}"/> {{ lngIn }}
-<select name="field">{% for option in options %}<option value="{{ option }}" {% if option == savedField %} selected{% endif %}>{{ attribute(_context, option) }}</option>{% endfor %}</select>
-<input type="submit" class="submit" name="submit" value="{{ lngSearchButton }}" />
+{% block search_input %}<label>{{ lngSearch }} <input type="text" name="search" value="{{ savedSearch|default }}"{% block search_attributes %}{% endblock %}/></label>{% endblock %}
+{% block field_select %}<label>{{ lngIn }} <select name="field"{% block field_attributes %}{% endblock %}>{% for option in options %}<option value="{{ option }}" {% if option == savedField %} selected{% endif %}>{{ attribute(_context, option) }}</option>{% endfor %}</select></label>{% endblock %}
+{% block submit_button %}<input type="submit" class="{% block submit_class %}submit{% endblock %}" name="submit" value="{{ lngSearchButton }}" />{% endblock %}
 </div>
+{% endblock %}
+{% block results_select %}
 <div>
-	{{ resultsperpage }} <select name="results">{% for result in results %}<option value="{{ result }}" {% if result == savedResults %} selected{% endif %}>{{ result }}</option>{% endfor %}</select>
+<label>{{ resultsperpage }} <select name="results"{% block results_attributes %}{% endblock %}>{% for result in results %}<option value="{{ result }}" {% if result == savedResults %} selected{% endif %}>{{ result }}</option>{% endfor %}</select></label>
 </div>
+{% endblock %}
 </form>
+{% endblock %}
 
 {% if foundResults %}
-<div class="resultinfo">{{ searchResult }} {{ resFrom }} - {{ resTo }} {{ of }} {{ resTotal }}</div>
-<table>
+{% block result_info %}<div class="{% block result_info_class %}resultinfo{% endblock %}">{{ searchResult }} {{ resFrom }} - {{ resTo }} {{ of }} {{ resTotal }}</div>{% endblock %}
+{% block table_wrapper %}
+<table{% block table_attributes %}{% endblock %}>
+{% block table_head %}
 	<thead>
 	<tr>
 		<th>{{ adventure }}</th>
@@ -32,8 +41,11 @@
 		<th>{{ genres }}</th>
 	</tr>
 	</thead>
+{% endblock %}
+{% block table_body %}
 	<tbody>
 {% for song in foundsongs %}
+{% block table_row %}
 	<tr>
 		<td><a href="{{ song.advurl }}">{{ song.adventure }}</a></td>
 		<td>{{ song.special|raw }}</td>
@@ -45,10 +57,13 @@
 		<td><a href="{{ song.labelurl }}">{{ song.labelcode }}</a></td>
 		<td>{{ song.genres|join('/') }}</td>
 	</tr>
+{% endblock %}
 {% endfor %}
 	</tbody>
+{% endblock %}
 </table>
-{{ pagination|raw }}
+{% endblock %}
+{% block pagination %}{{ pagination|raw }}{% endblock %}
 {% endif %}
 </div>
 {% endblock %}
