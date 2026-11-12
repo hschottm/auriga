@@ -26,3 +26,5 @@ $GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['actions'] = 'Play / Download
 $GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['download'] = 'Download';
 $GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['locked'] = 'Authorized members only';
 $GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['play'] = 'Play';
+
+$GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['title'] = 'Title';

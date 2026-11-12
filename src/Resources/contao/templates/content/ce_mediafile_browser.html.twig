@@ -8,17 +8,18 @@
         {% block listing %}
         <div class="table-responsive" style="overflow-x:auto">
             <table class="table table-hover mediafile-browser-table" style="width:100%">
-                <thead><tr><th scope="col">{{ labels.name }}</th><th scope="col">{{ labels.modified }}</th><th scope="col">{{ labels.size }}</th><th scope="col">{{ labels.actions }}</th></tr></thead>
+                <thead><tr><th scope="col">{{ labels.name }}</th><th scope="col">{{ labels.modified }}</th><th scope="col">{{ labels.size }}</th><th scope="col">{{ labels.title }}</th><th scope="col">{{ labels.actions }}</th></tr></thead>
                 <tbody>
                 {% if parentUrl is not null %}
-                    <tr><td colspan="4"><a href="{{ parentUrl }}"><span aria-hidden="true">📁 ..</span> {{ labels.parent }}</a></td></tr>
+                    <tr><td colspan="5"><span aria-hidden="true">📁</span> <a href="{{ parentUrl }}">{{ labels.parent }}</a></td></tr>
                 {% endif %}
                 {% for entry in entries %}
                     {% block entry %}
                     <tr>
-                        <td>{% if entry.directory %}<a href="{{ entry.url }}">{% endif %}<span role="img" aria-label="{{ entry.directory ? labels.folder : labels.file }}">{{ entry.directory ? '📁' : '📄' }}</span> {{ entry.name }}{% if entry.directory %}</a>{% endif %}</td>
+                        <td><span role="img" aria-label="{{ entry.directory ? labels.folder : labels.file }}">{{ entry.directory ? '📁' : '📄' }}</span> {% if entry.directory %}<a href="{{ entry.url }}">{% endif %}{{ entry.name }}{% if entry.directory %}</a>{% endif %}</td>
                         <td style="white-space:nowrap">{{ entry.date }}</td>
                         <td style="white-space:nowrap">{{ entry.formattedSize }}</td>
+                        <td>{{ entry.title|default }}</td>
                         <td>
                             {% if not entry.directory %}
                                 {% if entry.allowed %}
@@ -29,7 +30,7 @@
                         </td>
                     </tr>
                     {% endblock %}
-                {% else %}<tr><td colspan="4">{{ labels.empty }}</td></tr>{% endfor %}
+                {% else %}<tr><td colspan="5">{{ labels.empty }}</td></tr>{% endfor %}
                 </tbody>
             </table>
         </div>

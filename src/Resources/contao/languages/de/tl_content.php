@@ -26,3 +26,5 @@ $GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['actions'] = 'Abspielen / Dow
 $GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['download'] = 'Herunterladen';
 $GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['locked'] = 'Nur für berechtigte Mitglieder';
 $GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['play'] = 'Abspielen';
+
+$GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['title'] = 'Titel';

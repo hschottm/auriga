@@ -18,6 +18,10 @@ $GLOBALS['objPage'] = new Contao\PageModel();
 try {
     $html = (new ContentMediafileBrowser($model))->generate();
     assertOutput(str_contains($html,'example.mp3') && str_contains($html, 'sub') && str_contains($html, '13'), 'Listing metadata missing');
+    file_put_contents($folder.'/example.mp3', 'TAG'.str_pad('<Titel & mehr>', 30, "\0").str_repeat("\0", 95));
+    $html = (new ContentMediafileBrowser($model))->generate();
+    assertOutput(str_contains($html, '&lt;Titel &amp; mehr&gt;') && !str_contains($html, '<Titel & mehr>'), 'ID3 title must be displayed and escaped');
+    file_put_contents($folder.'/example.mp3', 'test download');
     $request->query->set('auriga_browser_987654', 'sub');
     $html = (new ContentMediafileBrowser($model))->generate();
     assertOutput(str_contains($html, 'Parent directory') || str_contains($html, 'Übergeordnetes Verzeichnis'), 'Missing parent navigation');

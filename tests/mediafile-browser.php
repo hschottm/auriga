@@ -1,5 +1,6 @@
 <?php
 require __DIR__.'/../src/MediafileBrowser.php';
+require __DIR__.'/../src/Mp3Title.php';
 use Hschottm\AurigaBundle\MediafileBrowser;
 function ensureBrowser($ok) { if (!$ok) throw new RuntimeException('Browser assertion failed'); }
 $base = sys_get_temp_dir().'/auriga-browser-'.bin2hex(random_bytes(6));
@@ -8,6 +9,8 @@ file_put_contents($base.'/files/archive/sub/recording.mp3', 'audio');
 file_put_contents($base.'/files/archive/z.txt', 'hello');
 file_put_contents($base.'/files/archive/.hidden', 'secret');
 file_put_contents($base.'/outside', 'secret');
+mkdir($base.'/files/archive/@eaDir');
+file_put_contents($base.'/files/archive/@eaDir/thumb.mp3', 'hidden');
 symlink($base.'/outside', $base.'/files/archive/escape');
 try {
     $browser = new MediafileBrowser($base.'/files', $base.'/files/archive', 'mp3,txt');
@@ -19,7 +22,7 @@ try {
     ensureBrowser($rows[1]['size'] === 5 && $rows[1]['modified'] > 0);
     ensureBrowser($browser->entries('sub')[0]['path'] === 'sub/recording.mp3');
     ensureBrowser(file_get_contents($browser->resolve('sub/recording.mp3')) === 'audio');
-    foreach (['../outside', '/etc/passwd', 'sub/../../outside', '.hidden', 'escape', "bad\0file", 'sub\\..\\outside'] as $path) {
+    foreach (['@eaDir', '@eaDir/thumb.mp3', '../outside', '/etc/passwd', 'sub/../../outside', '.hidden', 'escape', "bad\0file", 'sub\\..\\outside'] as $path) {
         $failed = false;
         try { $browser->resolve($path); } catch (InvalidArgumentException $e) { $failed = true; }
         ensureBrowser($failed);
@@ -29,6 +32,7 @@ try {
     ensureBrowser($failed);
     echo "OK: listing, metadata, subdirectories, root confinement, traversal, hidden files and escaping symlinks\n";
 } finally {
+    unlink($base.'/files/archive/@eaDir/thumb.mp3'); rmdir($base.'/files/archive/@eaDir');
     unlink($base.'/files/archive/escape'); unlink($base.'/outside');
     unlink($base.'/files/archive/.hidden'); unlink($base.'/files/archive/z.txt');
     unlink($base.'/files/archive/sub/recording.mp3'); rmdir($base.'/files/archive/sub');

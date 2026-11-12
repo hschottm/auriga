@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.4.0**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.4.0.1**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:^1.4.0 --with-all-dependencies
+composer require hschottm/auriga:1.4.0.1 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -223,3 +223,21 @@ who can view the element. Both playback and downloads recheck access on each
 request. Protect the element/page as well if filenames must be hidden from guests;
 otherwise guests can browse the list but see no player or download link for private
 files. Never expose private directories through manually created public symlinks.
+
+The browser's **Title** column (after Size) reads embedded MP3 titles from ID3v2.2,
+ID3v2.3 or ID3v2.4, falling back to ID3v1. Latin-1, UTF-8 and UTF-16 text are
+supported. Missing titles and non-MP3 entries leave the cell empty. Titles are
+escaped by Twig. The reader loads at most 1 MiB of ID3v2 metadata plus the ID3v1
+footer, never the full recording. Oversized, compressed or encrypted metadata may
+fall back to ID3v1 or yield an empty title; audio files are not modified.
+
+Directories whose names start with `@` (including Synology `@eaDir`) are excluded
+from listings and cannot be accessed through direct navigation or file requests.
+
+## MediafileBrowser update 1.4.0.1
+
+- Added the MP3 ID3 title column after file size.
+- Excluded directories starting with `@`, including Synology `@eaDir`, from listing and direct access.
+- Linked only folder names, leaving icons outside links; removed `..` from the parent-directory label.
+
+MediafileBrowser follow-up releases use a fourth version component (`1.4.0.x`).

@@ -32,6 +32,7 @@ final class MediafileBrowser
         $candidate = $this->root;
         foreach ($relative === '' ? [] : explode('/', $relative) as $part) {
             $candidate .= '/'.$part;
+            if (str_starts_with($part, '@') && is_dir($candidate)) throw new \InvalidArgumentException('System directories are not browsable');
             if (is_link($candidate)) throw new \InvalidArgumentException('Symlinks are not browsable');
         }
         $path = realpath($this->root.($relative !== '' ? '/'.$relative : ''));
@@ -54,12 +55,14 @@ final class MediafileBrowser
         foreach (new \FilesystemIterator($directory, \FilesystemIterator::SKIP_DOTS) as $file) {
             // Do not expose hidden files or follow directory aliases.
             if (str_starts_with($file->getFilename(), '.') || $file->isLink() || !$file->isReadable() || (!$file->isDir() && !$file->isFile())) continue;
+            if ($file->isDir() && str_starts_with($file->getFilename(), '@')) continue;
             if ($file->isFile() && !$this->allows($file->getFilename())) continue;
             $entries[] = [
                 'name' => $file->getFilename(),
                 'path' => ($relative !== '' ? $relative.'/' : '').$file->getFilename(),
                 'directory' => $file->isDir(),
                 'modified' => $file->getMTime(),
+                'title' => $file->isFile() && strtolower($file->getExtension()) === 'mp3' ? Mp3Title::read($file->getPathname()) : '',
                 'size' => $file->isDir() ? null : $file->getSize(),
             ];
         }
