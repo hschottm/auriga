@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.4 — 2026-11-14
+
+- Match both album and label code corrections by the original album/label pair, independently of artist. Update both fields together so simultaneous changes cannot affect the destination group.
+- Update editor guidance and regression coverage for the new grouping.
+
 ## 1.4.3 — 2026-11-14
 
 - Propagate album corrections to songs with the same original artist and album; propagate label code corrections only within the same original artist/album/label group.

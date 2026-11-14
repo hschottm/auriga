@@ -60,8 +60,8 @@ try {
         $row=$db->fetchAssociative('SELECT * FROM tl_broadcast_song WHERE id=?',[$relatedId]);
         assertOutput($row['title']==='Sibling', 'Sibling title changed');
         assertOutput($row['artist']===($name==='otherArtist' ? 'Other Artist' : ($name==='caseDifference' ? 'artist' : 'Artist')), 'Sibling artist changed');
-        assertOutput($row['album']===(in_array($name,['same','otherLabel','destination'],true) ? 'New Album' : 'Album'), 'Wrong album propagation: '.$name);
-        assertOutput($row['labelcode']===($name==='same' ? 'LC123' : ($name==='otherLabel' ? 'LC2' : 'LC1')), 'Wrong label propagation: '.$name);
+        assertOutput($row['album']===(in_array($name,['same','otherArtist','caseDifference','destination'],true) ? 'New Album' : 'Album'), 'Wrong album propagation: '.$name);
+        assertOutput($row['labelcode']===(in_array($name,['same','otherArtist','caseDifference'],true) ? 'LC123' : ($name==='otherLabel' ? 'LC2' : 'LC1')), 'Wrong label propagation: '.$name);
     }
     $request->setMethod('GET'); $request->request->replace([]);
     assertOutput(str_contains($view->edit($id,true,$saved), '&lt;test&gt;'), 'Metadata not escaped');

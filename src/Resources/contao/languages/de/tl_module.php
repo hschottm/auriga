@@ -55,4 +55,4 @@ $GLOBALS['TL_LANG']['tl_module']['song_edit_heading'] = 'Songdaten bearbeiten';
 $GLOBALS['TL_LANG']['tl_module']['song_edit_save'] = 'Änderungen speichern';
 $GLOBALS['TL_LANG']['tl_module']['song_edit_invalid'] = 'Bitte gültige Texte eingeben (Titel, Interpret und Album: höchstens 255 Zeichen; Labelcode: 100 Zeichen). Das Jahr muss leer oder vierstellig sein.';
 
-$GLOBALS['TL_LANG']['tl_module']['song_edit_scope'] = 'Albumänderungen gelten auch für alle Songs mit demselben bisherigen Interpreten und Albumtitel. Labelcode-Änderungen gelten zusätzlich nur bei gleichem bisherigen Labelcode. Titel, Interpret und Jahr werden nur bei diesem Song geändert.';
+$GLOBALS['TL_LANG']['tl_module']['song_edit_scope'] = 'Albumtitel- und Labelcode-Änderungen gelten für alle Songs mit demselben bisherigen Albumtitel und Labelcode, unabhängig vom Interpreten. Titel, Interpret und Jahr werden nur bei diesem Song geändert.';

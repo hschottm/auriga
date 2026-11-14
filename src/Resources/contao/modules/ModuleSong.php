@@ -103,16 +103,11 @@ class ModuleSong extends ModulePTW
         $values['tstamp'] = time();
         $this->Database->beginTransaction();
         try {
-            // Match the old group before changing either the album or the artist.
-            // Apply the narrower label correction first so simultaneous album changes
-            // cannot include records that already belonged to the destination album.
-            if ($values['labelcode'] !== (string) $data['labelcode']) {
-                $this->Database->prepare('UPDATE tl_broadcast_song SET labelcode = ?, tstamp = ? WHERE BINARY artist = BINARY ? AND BINARY album = BINARY ? AND BINARY labelcode = BINARY ?')
-                    ->execute($values['labelcode'], $values['tstamp'], $data['artist'], $data['album'], $data['labelcode']);
-            }
-            if ($values['album'] !== (string) $data['album']) {
-                $this->Database->prepare('UPDATE tl_broadcast_song SET album = ?, tstamp = ? WHERE BINARY artist = BINARY ? AND BINARY album = BINARY ?')
-                    ->execute($values['album'], $values['tstamp'], $data['artist'], $data['album']);
+            // Update both grouping fields together, matching only the original pair.
+            // Sequential updates would lose matches or include the destination group.
+            if ($values['album'] !== (string) $data['album'] || $values['labelcode'] !== (string) $data['labelcode']) {
+                $this->Database->prepare('UPDATE tl_broadcast_song SET album = ?, labelcode = ?, tstamp = ? WHERE BINARY album = BINARY ? AND BINARY labelcode = BINARY ?')
+                    ->execute($values['album'], $values['labelcode'], $values['tstamp'], $data['album'], $data['labelcode']);
             }
             $this->Database->prepare('UPDATE tl_broadcast_song %s WHERE id = ?')->set($values)->execute($songId);
             $this->Database->commitTransaction();
