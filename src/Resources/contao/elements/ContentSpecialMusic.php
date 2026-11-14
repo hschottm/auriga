@@ -108,7 +108,7 @@ class ContentSpecialMusic extends \Contao\ContentElement
 			}
 			else
 			{
-				$cover = '<img src="bundles/hschottmauriga/images/disc.svg" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" />';
+				$cover = '<img src="bundles/hschottmauriga/images/cover-placeholder.svg" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" />';
 			}
 			$arrSongs[] = array
 			(

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.6 — 2026-11-14
+
+- Replace the large disc placeholder with a square light-gray SVG containing a small, thin gray music note in broadcast lists, background music, special music and search results.
+- Keep the existing cover sizing CSS compatible; use a new asset filename to avoid stale disc images in browser caches.
+
 ## 1.4.5 — 2026-11-14
 
 - Replace the CD GIF placeholder in broadcast tracks, background music, special music and search results with the Lucide disc SVG; include its license.
