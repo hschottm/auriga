@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.5 — 2026-11-14
+
+- Replace the CD GIF placeholder in broadcast tracks, background music, special music and search results with the Lucide disc SVG; include its license.
+
 ## 1.4.4 — 2026-11-14
 
 - Match both album and label code corrections by the original album/label pair, independently of artist. Update both fields together so simultaneous changes cannot affect the destination group.

@@ -135,7 +135,7 @@ class ModuleBroadcast extends ModulePTW
 				}
 				else
 				{
-					$cover = '<img src="bundles/hschottmauriga/images/cd.gif" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" />';
+					$cover = '<img src="bundles/hschottmauriga/images/disc.svg" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" />';
 				}
 				$arrSongs[] = array
 				(
@@ -209,7 +209,7 @@ class ModuleBroadcast extends ModulePTW
 					}
 					else
 					{
-						$cover = '<img src="bundles/hschottmauriga/images/cd.gif" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" />';
+						$cover = '<img src="bundles/hschottmauriga/images/disc.svg" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" />';
 					}
 					$titlesong['cover'] = $cover;
 					switch ($titlesong['songtype'])

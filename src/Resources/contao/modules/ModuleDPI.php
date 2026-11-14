@@ -134,7 +134,7 @@ class ModuleDPI extends ModulePTW
 				}
 				else
 				{
-					$cover = '<img src="bundles/hschottmauriga/images/cd.gif" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" />';
+					$cover = '<img src="bundles/hschottmauriga/images/disc.svg" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" />';
 				}
 				array_push($arrFoundSongs, array(
 					'adventure' => \Contao\StringUtil::specialchars($objSong->numbering) . '. ' . \Contao\StringUtil::specialchars($objSong->adventuretitle),
