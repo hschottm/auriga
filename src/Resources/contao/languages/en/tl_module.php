@@ -50,3 +50,7 @@ $GLOBALS['TL_LANG']['tl_module']['auriga_archive_legend'] = 'Audio archive';
 $GLOBALS['TL_LANG']['tl_module']['aurigaArchiveRoot'] = ['Archive folder', 'Select the root folder. Recordings are located under ptw/000/filename.'];
 $GLOBALS['TL_LANG']['tl_module']['aurigaArchiveGroups'] = ['Allowed member groups', 'Only logged-in members of these groups may see the player column and play recordings.'];
 $GLOBALS['TL_LANG']['tl_module']['aurigaArchivePlayer'] = 'Play';
+
+$GLOBALS['TL_LANG']['tl_module']['song_edit_heading'] = 'Edit song details';
+$GLOBALS['TL_LANG']['tl_module']['song_edit_save'] = 'Save changes';
+$GLOBALS['TL_LANG']['tl_module']['song_edit_invalid'] = 'Enter valid text (title, artist and album: up to 255 characters; label code: 100 characters). The year must be empty or four digits.';

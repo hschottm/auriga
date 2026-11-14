@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.2 — 2026-11-14
+
+- Allow members of the configured cover administrator groups to edit the current song’s title, artist, album, year and label code.
+- Add an inheritable Bootstrap-compatible `song_editor` form with Contao request tokens, server-side permission checks and field validation.
+- Reset session cover suggestions after metadata changes, preserve existing covers, and redirect after successful saves.
+- Disable public caching of the personalized song view and add isolated metadata editing integration tests.
+
 ## 1.4.1.2 — 2026-11-12
 
 - Add automatically loaded, scoped CSS for a compact MediafileBrowser table with vertically centered cells and separate date/time lines.

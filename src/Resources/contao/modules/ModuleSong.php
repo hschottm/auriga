@@ -65,6 +65,49 @@ class ModuleSong extends ModulePTW
         );
     }
 
+    /** Only the current song and the explicitly editable metadata may be changed. */
+    protected function editSongMetadata(int $songId, bool $allowed, string $action, array $data): void
+    {
+        $container = \Contao\System::getContainer();
+        $request = $container->get('request_stack')->getCurrentRequest();
+        $formId = 'auriga_song_metadata_'.$this->id.'_'.$songId;
+        $this->Template->metadataFormId = $formId;
+        $this->Template->metadataValues = $data;
+        $this->Template->metadataErrors = [];
+        if (!$request || !$request->isMethod('POST') || ($request->request->all()['FORM_SUBMIT'] ?? null) !== $formId) return;
+        if (!$allowed) throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException('Song editing requires cover administrator permissions');
+        $post = $request->request->all();
+        $token = $post['REQUEST_TOKEN'] ?? null;
+        if (!is_string($token) || !$container->get('contao.csrf.token_manager')->isTokenValid(
+            new \Symfony\Component\Security\Csrf\CsrfToken($container->getParameter('contao.csrf_token_name'), $token)
+        )) throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException('Invalid request token');
+        $values = [];
+        $errors = [];
+        foreach (['title' => 255, 'artist' => 255, 'album' => 255, 'year' => 4, 'labelcode' => 100] as $field => $limit) {
+            $value = $post['song_'.$field] ?? null;
+            if (!is_string($value) || !mb_check_encoding($value, 'UTF-8')) {
+                $errors[] = $GLOBALS['TL_LANG']['tl_module']['song_edit_invalid'];
+                continue;
+            }
+            $values[$field] = trim($value);
+            if (mb_strlen($values[$field]) > $limit || preg_match('/[\x00-\x1F\x7F]/u', $values[$field])
+                || ($field === 'year' && $values[$field] !== '' && !preg_match('/^[0-9]{4}$/D', $values[$field]))) {
+                $errors[] = $GLOBALS['TL_LANG']['tl_module']['song_edit_invalid'];
+            }
+        }
+        $this->Template->metadataValues = array_replace($data, $values);
+        if ($errors) {
+            $this->Template->metadataErrors = array_unique($errors);
+            return;
+        }
+        $values['tstamp'] = time();
+        $this->Database->prepare('UPDATE tl_broadcast_song %s WHERE id = ?')->set($values)->execute($songId);
+        // A changed artist or album needs a fresh cover suggestion context.
+        $this->session()->remove('auriga_cover_candidates_'.$songId);
+        $this->session()->remove('auriga_cover_search_'.$songId);
+        $this->redirect($action, 303);
+    }
+
 	protected function coverSearch(): CoverSearch
 	{
 		return new CoverSearch(provider: (string) (\Contao\Config::get('aurigaCoverProvider') ?: 'musicbrainz'), discogsToken: (string) \Contao\Config::get('aurigaDiscogsToken'));
@@ -311,6 +354,10 @@ class ModuleSong extends ModulePTW
 		}
 		$data['genres'] = $foundgenres;
 		$is_admin = $this->canEditCovers($admingroups);
+		$this->Template->formaction = $objPageSong->getFrontendUrl('/song/' . $objSong->id);
+        if ($objPage) { $objPage->cache = 0; $objPage->clientCache = 0; }
+        $this->Template->metadataLabels = $GLOBALS['TL_LANG']['tl_module'];
+        $this->editSongMetadata((int) $songid, $is_admin, $this->Template->formaction, $data);
 		if ($is_admin) $this->uploadCoverFile($objSong->id, $data);
 
 		$foundimages = $this->session()->get('auriga_cover_candidates_' . $objSong->id);

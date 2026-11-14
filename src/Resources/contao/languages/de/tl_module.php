@@ -50,3 +50,7 @@ $GLOBALS['TL_LANG']['tl_module']['auriga_archive_legend'] = 'Audio-Archiv';
 $GLOBALS['TL_LANG']['tl_module']['aurigaArchiveRoot'] = ['Archivordner', 'Startordner auswählen. Aufnahmen werden unter ptw/000/Dateiname gesucht.'];
 $GLOBALS['TL_LANG']['tl_module']['aurigaArchiveGroups'] = ['Erlaubte Mitgliedergruppen', 'Nur angemeldete Mitglieder dieser Gruppen sehen die Playerspalte und dürfen Aufnahmen abspielen.'];
 $GLOBALS['TL_LANG']['tl_module']['aurigaArchivePlayer'] = 'Abspielen';
+
+$GLOBALS['TL_LANG']['tl_module']['song_edit_heading'] = 'Songdaten bearbeiten';
+$GLOBALS['TL_LANG']['tl_module']['song_edit_save'] = 'Änderungen speichern';
+$GLOBALS['TL_LANG']['tl_module']['song_edit_invalid'] = 'Bitte gültige Texte eingeben (Titel, Interpret und Album: höchstens 255 Zeichen; Labelcode: 100 Zeichen). Das Jahr muss leer oder vierstellig sein.';

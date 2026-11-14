@@ -111,6 +111,27 @@
 {% endif %}
 	</tbody>
 </table>
+{% block song_editor %}
+{% if isAdmin|default(false) and metadataFormId|default %}
+<section class="auriga-song-editor mt-4">
+    <h3>{{ metadataLabels.song_edit_heading }}</h3>
+    {% for error in metadataErrors|default([]) %}<p class="error alert alert-danger" role="alert">{{ error }}</p>{% endfor %}
+    <form method="post" action="{{ formaction }}">
+        <input type="hidden" name="FORM_SUBMIT" value="{{ metadataFormId }}">
+        <input type="hidden" name="REQUEST_TOKEN" value="{{ contao.request_token }}">
+        <div class="row g-3">
+        {% for field, limit in {title: 255, artist: 255, album: 255, year: 4, labelcode: 100} %}
+            <div class="col-12 col-md-6 mb-3">
+                <label class="form-label" for="{{ metadataFormId }}-{{ field }}">{{ attribute(metadataLabels, 'song_' ~ field) }}</label>
+                <input class="form-control" type="text" id="{{ metadataFormId }}-{{ field }}" name="song_{{ field }}" value="{{ attribute(metadataValues, field) }}" maxlength="{{ limit }}"{% if field == 'year' %} inputmode="numeric" pattern="[0-9]{4}"{% endif %}>
+            </div>
+        {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">{{ metadataLabels.song_edit_save }}</button>
+    </form>
+</section>
+{% endif %}
+{% endblock %}
 </div>
 {% endif %}
 {% endblock %}

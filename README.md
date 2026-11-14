@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.4.1.2**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.4.2**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:1.4.1.2 --with-all-dependencies
+composer require hschottm/auriga:1.4.2 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -318,3 +318,19 @@ Custom styles can override the defaults, for example:
 Existing custom templates must adopt the new column classes and `data-label`
 attributes to use the mobile layout. The original `entry.date` remains available;
 `entry.dateOnly`, `entry.timeOnly` and `entry.datetime` are also provided.
+
+### Song metadata editing in 1.4.2
+
+Members of the song module's cover administrator groups can edit title, artist,
+album, year and label code in a separate frontend form. Only the current song is
+updated; existing cover assignments and other songs remain unchanged. Text limits
+match the backend fields (255 characters for title/artist/album, 100 for label
+code); year is optional or exactly four digits. Successful saves redirect to the
+song and reset its session cover search context.
+
+The `song_editor` Twig block is inherited by the supplied Bootstrap cover
+variant. Overrides replacing the entire `content` block must incorporate this
+block. The form uses Bootstrap 5 classes and also works without Bootstrap.
+Validation: `tests/song-metadata.php` exercises authorization, CSRF rejection,
+input validation, database updates, redirects and output escaping in the isolated
+Contao test installation.
