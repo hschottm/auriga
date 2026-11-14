@@ -54,3 +54,5 @@ $GLOBALS['TL_LANG']['tl_module']['aurigaArchivePlayer'] = 'Play';
 $GLOBALS['TL_LANG']['tl_module']['song_edit_heading'] = 'Edit song details';
 $GLOBALS['TL_LANG']['tl_module']['song_edit_save'] = 'Save changes';
 $GLOBALS['TL_LANG']['tl_module']['song_edit_invalid'] = 'Enter valid text (title, artist and album: up to 255 characters; label code: 100 characters). The year must be empty or four digits.';
+
+$GLOBALS['TL_LANG']['tl_module']['song_edit_scope'] = 'Album changes also apply to songs with the same previous artist and album title. Label code changes additionally require the same previous label code. Title, artist and year are changed only for this song.';

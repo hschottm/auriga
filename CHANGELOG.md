@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.3 — 2026-11-14
+
+- Propagate album corrections to songs with the same original artist and album; propagate label code corrections only within the same original artist/album/label group.
+- Save the corrections transactionally, match exact values, and explain the affected scope in the editor.
+- Test simultaneous artist/album/label changes, other label codes, unrelated artists, and existing destination albums.
+
 ## 1.4.2 — 2026-11-14
 
 - Allow members of the configured cover administrator groups to edit the current song’s title, artist, album, year and label code.

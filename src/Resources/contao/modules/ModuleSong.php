@@ -65,7 +65,7 @@ class ModuleSong extends ModulePTW
         );
     }
 
-    /** Only the current song and the explicitly editable metadata may be changed. */
+    /** Edit metadata and propagate album/label corrections using the original grouping. */
     protected function editSongMetadata(int $songId, bool $allowed, string $action, array $data): void
     {
         $container = \Contao\System::getContainer();
@@ -101,7 +101,25 @@ class ModuleSong extends ModulePTW
             return;
         }
         $values['tstamp'] = time();
-        $this->Database->prepare('UPDATE tl_broadcast_song %s WHERE id = ?')->set($values)->execute($songId);
+        $this->Database->beginTransaction();
+        try {
+            // Match the old group before changing either the album or the artist.
+            // Apply the narrower label correction first so simultaneous album changes
+            // cannot include records that already belonged to the destination album.
+            if ($values['labelcode'] !== (string) $data['labelcode']) {
+                $this->Database->prepare('UPDATE tl_broadcast_song SET labelcode = ?, tstamp = ? WHERE BINARY artist = BINARY ? AND BINARY album = BINARY ? AND BINARY labelcode = BINARY ?')
+                    ->execute($values['labelcode'], $values['tstamp'], $data['artist'], $data['album'], $data['labelcode']);
+            }
+            if ($values['album'] !== (string) $data['album']) {
+                $this->Database->prepare('UPDATE tl_broadcast_song SET album = ?, tstamp = ? WHERE BINARY artist = BINARY ? AND BINARY album = BINARY ?')
+                    ->execute($values['album'], $values['tstamp'], $data['artist'], $data['album']);
+            }
+            $this->Database->prepare('UPDATE tl_broadcast_song %s WHERE id = ?')->set($values)->execute($songId);
+            $this->Database->commitTransaction();
+        } catch (\Throwable $exception) {
+            $this->Database->rollbackTransaction();
+            throw $exception;
+        }
         // A changed artist or album needs a fresh cover suggestion context.
         $this->session()->remove('auriga_cover_candidates_'.$songId);
         $this->session()->remove('auriga_cover_search_'.$songId);

@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.4.2**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.4.3**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:1.4.2 --with-all-dependencies
+composer require hschottm/auriga:1.4.3 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -323,7 +323,11 @@ attributes to use the mobile layout. The original `entry.date` remains available
 
 Members of the song module's cover administrator groups can edit title, artist,
 album, year and label code in a separate frontend form. Only the current song is
-updated; existing cover assignments and other songs remain unchanged. Text limits
+updated for title, artist and year; existing cover assignments remain unchanged.
+Album corrections also update songs matching the original artist and album exactly.
+Label code corrections additionally match the original label code. Both corrections
+use the original group even when artist, album and label code change together, and
+are saved in one transaction. Matching is case-sensitive. Text limits
 match the backend fields (255 characters for title/artist/album, 100 for label
 code); year is optional or exactly four digits. Successful saves redirect to the
 song and reset its session cover search context.

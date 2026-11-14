@@ -115,6 +115,7 @@
 {% if isAdmin|default(false) and metadataFormId|default %}
 <section class="auriga-song-editor mt-4">
     <h3>{{ metadataLabels.song_edit_heading }}</h3>
+    <p class="form-text">{{ metadataLabels.song_edit_scope }}</p>
     {% for error in metadataErrors|default([]) %}<p class="error alert alert-danger" role="alert">{{ error }}</p>{% endfor %}
     <form method="post" action="{{ formaction }}">
         <input type="hidden" name="FORM_SUBMIT" value="{{ metadataFormId }}">
