@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.4.9**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.4.10**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:1.4.9 --with-all-dependencies
+composer require hschottm/auriga:1.4.10 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -386,3 +386,12 @@ placeholders use a 4rem square with centered cropping, cells are vertically
 aligned, and years do not wrap. Override `--auriga-cover-size` on
 `.auriga-special-music` to adjust the size. Derived templates inherit the wrapper
 class; templates replacing the whole content block must retain it explicitly.
+
+### Removing an incorrect album cover
+
+Members of the configured cover administrator groups can remove an existing
+cover assignment in the song view. This affects every song with the exact same
+album title and label code, regardless of artist. Image files and other albums
+remain untouched. An explicit empty mapping prevents automatic cover inheritance;
+a new cover can still be selected manually. The separate `cover_remove` Twig
+block is also inherited by Bootstrap variants overriding `cover_display`.

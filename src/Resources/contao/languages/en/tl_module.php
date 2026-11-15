@@ -56,3 +56,6 @@ $GLOBALS['TL_LANG']['tl_module']['song_edit_save'] = 'Save changes';
 $GLOBALS['TL_LANG']['tl_module']['song_edit_invalid'] = 'Enter valid text (title, artist and album: up to 255 characters; label code: 100 characters). The year must be empty or four digits.';
 
 $GLOBALS['TL_LANG']['tl_module']['song_edit_scope'] = 'Album title and label code changes apply to all songs with the same previous album title and label code, regardless of artist. Title, artist and year are changed only for this song.';
+
+$GLOBALS['TL_LANG']['tl_module']['song_cover_remove'] = 'Remove album cover assignment';
+$GLOBALS['TL_LANG']['tl_module']['song_cover_remove_help'] = 'Removes cover assignments for all songs with the same album title and label code, regardless of artist. The image file is preserved.';

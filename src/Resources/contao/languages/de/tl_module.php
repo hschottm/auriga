@@ -56,3 +56,6 @@ $GLOBALS['TL_LANG']['tl_module']['song_edit_save'] = 'Änderungen speichern';
 $GLOBALS['TL_LANG']['tl_module']['song_edit_invalid'] = 'Bitte gültige Texte eingeben (Titel, Interpret und Album: höchstens 255 Zeichen; Labelcode: 100 Zeichen). Das Jahr muss leer oder vierstellig sein.';
 
 $GLOBALS['TL_LANG']['tl_module']['song_edit_scope'] = 'Albumtitel- und Labelcode-Änderungen gelten für alle Songs mit demselben bisherigen Albumtitel und Labelcode, unabhängig vom Interpreten. Titel, Interpret und Jahr werden nur bei diesem Song geändert.';
+
+$GLOBALS['TL_LANG']['tl_module']['song_cover_remove'] = 'Albumcover-Zuordnung entfernen';
+$GLOBALS['TL_LANG']['tl_module']['song_cover_remove_help'] = 'Entfernt die Cover-Zuordnung aller Songs mit gleichem Albumtitel und Labelcode, unabhängig vom Interpreten. Die Bilddatei bleibt erhalten.';

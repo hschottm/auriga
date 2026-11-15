@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.10 — 2026-11-15
+
+- Allow cover editors to remove cover assignments for all songs with the same album title and label code, including compilations. Require a valid CSRF-protected POST and prevent automatic reassignment while preserving image files and other albums.
+
 ## 1.4.9 — 2026-11-15
 
 - Give special music its own scoped stylesheet with 4rem square cropped covers, matching placeholders, vertically centered cells and non-wrapping years. Replace legacy 22px cover dimensions with 64px dimensions.

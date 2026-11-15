@@ -218,7 +218,7 @@ class ModulePTW extends \Contao\Module
 			$samefound = array_unique(array_merge($sameLC, $sameAlbum));
 			if (count($samefound))
 			{
-				$arrCover = $this->Database->prepare("SELECT * FROM tl_song_cover WHERE song IN (" . join(',', $samefound) . ")")
+				$arrCover = $this->Database->prepare("SELECT * FROM tl_song_cover WHERE cover > 0 AND song IN (" . join(',', $samefound) . ")")
 					->execute()
 					->fetchAssoc();
 				if (is_array($arrCover))

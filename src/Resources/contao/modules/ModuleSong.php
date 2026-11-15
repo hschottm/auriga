@@ -65,6 +65,40 @@ class ModuleSong extends ModulePTW
         );
     }
 
+    protected function removeAlbumCover(int $songId, bool $allowed, string $action): void
+    {
+        $container = \Contao\System::getContainer();
+        $request = $container->get('request_stack')->getCurrentRequest();
+        $formId = 'auriga_remove_cover_'.$this->id.'_'.$songId;
+        $this->Template->removeCoverFormId = $formId;
+        if (!$request || !$request->isMethod('POST')) return;
+        $post = $request->request->all();
+        if (($post['FORM_SUBMIT'] ?? null) !== $formId) return;
+        if (!$allowed) throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException('Cover editor permission required');
+        $token = $post['REQUEST_TOKEN'] ?? null;
+        if (!is_string($token) || !$container->get('contao.csrf.token_manager')->isTokenValid(
+            new \Symfony\Component\Security\Csrf\CsrfToken($container->getParameter('contao.csrf_token_name'), $token)
+        )) throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException('Invalid request token');
+        $db = $container->get('database_connection');
+        $db->transactional(function ($db) use ($songId): void {
+            $album = $db->fetchAssociative('SELECT album, labelcode FROM tl_broadcast_song WHERE id = ?', [$songId]);
+            if (!$album) throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException('Song not found');
+            $ids = $db->fetchFirstColumn('SELECT id FROM tl_broadcast_song WHERE BINARY album = BINARY ? AND BINARY labelcode = BINARY ?', [$album['album'], $album['labelcode']]);
+            foreach ($ids as $id) {
+                // Keep an explicit opt-out, including songs without a mapping, so
+                // automatic inheritance cannot restore the removed album cover.
+                if ($db->fetchOne('SELECT id FROM tl_song_cover WHERE song = ?', [$id]) !== false) {
+                    $db->executeStatement('UPDATE tl_song_cover SET cover = 0, tstamp = ? WHERE song = ?', [time(), $id]);
+                } else {
+                    $db->insert('tl_song_cover', ['song' => $id, 'cover' => 0, 'tstamp' => time()]);
+                }
+                $this->session()->remove('auriga_cover_candidates_'.$id);
+                $this->session()->remove('auriga_cover_search_'.$id);
+            }
+        });
+        $this->redirect($action, 303);
+    }
+
     /** Edit metadata and propagate album/label corrections using the original grouping. */
     protected function editSongMetadata(int $songId, bool $allowed, string $action, array $data): void
     {
@@ -370,6 +404,7 @@ class ModuleSong extends ModulePTW
 		$this->Template->formaction = $objPageSong->getFrontendUrl('/song/' . $objSong->id);
         if ($objPage) { $objPage->cache = 0; $objPage->clientCache = 0; }
         $this->Template->metadataLabels = $GLOBALS['TL_LANG']['tl_module'];
+        $this->removeAlbumCover((int) $songid, $is_admin, $this->Template->formaction);
         $this->editSongMetadata((int) $songid, $is_admin, $this->Template->formaction, $data);
 		if ($is_admin) $this->uploadCoverFile($objSong->id, $data);
 

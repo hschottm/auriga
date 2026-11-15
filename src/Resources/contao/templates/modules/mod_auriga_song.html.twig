@@ -36,6 +36,16 @@
 {{ possibleImage|raw }}
 {% endif %}
 {% endblock %}
+{% block cover_remove %}
+{% if isAdmin|default(false) and albumcover|default is not empty and removeCoverFormId|default %}
+<form class="auriga-cover-remove mt-2" method="post" action="{{ formaction }}">
+    <input type="hidden" name="FORM_SUBMIT" value="{{ removeCoverFormId }}">
+    <input type="hidden" name="REQUEST_TOKEN" value="{{ contao.request_token }}">
+    <button class="btn btn-outline-danger btn-sm" type="submit">{{ metadataLabels.song_cover_remove }}</button>
+    <p class="form-text">{{ metadataLabels.song_cover_remove_help }}</p>
+</form>
+{% endif %}
+{% endblock %}
 {% block cover_tools %}
 {% if isAdmin %}
 {% if not albumcover|default and not possibleImage|default %}
