@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.4.6**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.4.7**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:1.4.6 --with-all-dependencies
+composer require hschottm/auriga:1.4.7 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -338,3 +338,23 @@ block. The form uses Bootstrap 5 classes and also works without Bootstrap.
 Validation: `tests/song-metadata.php` exercises authorization, CSRF rejection,
 input validation, database updates, redirects and output escaping in the isolated
 Contao test installation.
+
+### Active adventure in 1.4.7
+
+The adventure list marks the entry matching the `adventure` URL parameter with
+`isActive`. The default template adds `active` to its row and link and
+`aria-current="page"` to the link. No selection or an unknown ID leaves all rows
+unselected. The Bootstrap example retains the active row class.
+
+Copy `examples/css/adventurelist-active.css` into your site stylesheet for a blue
+highlight. The CSS targets the link so existing `row_attributes` overrides still
+work. To also mark rows in an existing Bootstrap override, use:
+
+```twig
+{% block row_attributes %}
+    class="m-0 p-0{{ adventure.isActive|default(false) ? ' active' : '' }}"
+{% endblock %}
+```
+
+Templates replacing the entire `table_body` or `content` must incorporate the
+active link markup themselves.

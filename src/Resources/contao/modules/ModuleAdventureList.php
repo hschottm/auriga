@@ -52,6 +52,8 @@ class ModuleAdventureList extends ModulePTW
 	{
 		global $objPage;
 		
+		$selected = \Contao\Input::get('adventure');
+        $selectedId = is_scalar($selected) && preg_match('/^[1-9][0-9]*$/D', (string) $selected) ? (string) $selected : null;
 		$arrAdventures = array();
 		$objAdventure = $this->Database->prepare("SELECT * FROM tl_adventure ORDER BY firstbroadcast DESC")
 			->execute();
@@ -67,6 +69,7 @@ class ModuleAdventureList extends ModulePTW
 				'alias' => $objAdventure->alias,
 				'numbering' => $objAdventure->numbering,
 				'url' => $objPageAdventure->getFrontendUrl('/adventure/' . $objAdventure->id),    
+				'isActive' => $selectedId !== null && $selectedId === (string) $objAdventure->id,
 				'id' => $objAdventure->id
 			);
 		}

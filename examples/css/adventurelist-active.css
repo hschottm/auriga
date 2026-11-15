@@ -1,0 +1,15 @@
+/* Works even when a custom template overrides the row_attributes block. */
+.ptw_adventurelist a.active[aria-current="page"] {
+    display: block;
+    padding: .2rem .4rem;
+    border-inline-start: 3px solid #0d6efd;
+    border-radius: .2rem;
+    background-color: #e7f1ff;
+    color: #084298;
+    font-weight: 700;
+    text-decoration: none;
+}
+.ptw_adventurelist a.active[aria-current="page"]:hover {
+    background-color: #cfe2ff;
+    text-decoration: underline;
+}

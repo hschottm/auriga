@@ -11,9 +11,9 @@
 <table{% block table_attributes %}{% endblock %}>
 {% block table_body %}
 {% for adventure in adventures %}
-  <tr{% block row_attributes %}{% endblock %}>
+  <tr{% block row_attributes %}{{ attrs().addClass('active', adventure.isActive|default(false)) }}{% endblock %}>
 		<td{% block numbering_attributes %}{% endblock %}>{{ adventure.numbering }}.</td>
-		<td{% block title_attributes %}{% endblock %}><a href="{{ adventure.url }}" title="{{ adventure.title }}">{{ adventure.title }}</a></td>
+		<td{% block title_attributes %}{% endblock %}><a href="{{ adventure.url }}" title="{{ adventure.title }}"{% if adventure.isActive|default(false) %} class="active" aria-current="page"{% endif %}>{{ adventure.title }}</a></td>
 	</tr>
 {% endfor %}
 {% endblock %}

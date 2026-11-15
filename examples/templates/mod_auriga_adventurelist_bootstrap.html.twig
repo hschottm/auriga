@@ -19,6 +19,6 @@
 
 {% block table_attributes %} class="table table-borderless"{% endblock %}
 {% block table_body %}<tbody>{{ parent() }}</tbody>{% endblock %}
-{% block row_attributes %} class="m-0 p-0"{% endblock %}
+{% block row_attributes %} class="m-0 p-0{{ adventure.isActive|default(false) ? ' active' : '' }}"{% endblock %}
 {% block numbering_attributes %} class="m-0 p-0 pe-2"{% endblock %}
 {% block title_attributes %} class="m-0 p-0"{% endblock %}

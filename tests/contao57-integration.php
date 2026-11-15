@@ -49,6 +49,15 @@ Contao\Input::setGet('adventure', (string)$adventure); Contao\Input::setGet('bro
 foreach ([AdventureView::class=>'Test Adventure', BroadcastListView::class=>'Test Broadcast', BroadcastView::class=>'Test Song', SongView::class=>'Test Song', SearchView::class=>''] as $class=>$expected) {
     $module=new $class($model); $html=$module->render(); check($expected==='' || str_contains($html,$expected), $class.' failed to render'); echo 'OK: '.$class."\n";
 }
+// Selection is keyed by adventure ID, independent of its numbering.
+$html = (new AdventureView($model))->render();
+check(substr_count($html, 'aria-current="page"') === 1 && str_contains($html, 'class="active"'), 'Selected adventure not marked');
+foreach ([null, '999999', 'invalid'] as $selection) {
+    Contao\Input::setGet('adventure', $selection);
+    check(!str_contains((new AdventureView($model))->render(), 'aria-current="page"'), 'Unselected adventure marked active');
+}
+Contao\Input::setGet('adventure', (string) $adventure);
+echo "OK: adventure selection and absent/unknown selection\n";
 Contao\Input::setGet('song','999999');
 try { (new SongView($model))->render(); throw new RuntimeException('Expected 404'); } catch (Contao\CoreBundle\Exception\PageNotFoundException $expected) {}
 echo "OK: missing record returns 404\n";

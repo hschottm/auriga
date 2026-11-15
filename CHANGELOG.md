@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.7 — 2026-11-15
+
+- Mark the selected adventure with active row/link classes and aria-current in the adventure list.
+- Update the Bootstrap example and provide scoped highlight CSS compatible with existing row overrides.
+- Verify selected, missing, invalid and unknown adventure parameters in the Contao integration suite.
+
 ## 1.4.6 — 2026-11-14
 
 - Replace the large disc placeholder with a square light-gray SVG containing a small, thin gray music note in broadcast lists, background music, special music and search results.
