@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.4.7**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.4.8**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:1.4.7 --with-all-dependencies
+composer require hschottm/auriga:1.4.8 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -358,3 +358,23 @@ work. To also mark rows in an existing Bootstrap override, use:
 
 Templates replacing the entire `table_body` or `content` must incorporate the
 active link markup themselves.
+
+### Chapter navigation in 1.4.8
+
+The broadcast template uses inline Lucide chevrons for first, previous, next and
+last chapter. Unavailable destinations are disabled spans rather than links.
+The module automatically loads `bundles/hschottmauriga/css/chapter-navigation.css`
+with keyboard focus styles and touch-friendly controls. The Lucide license is
+included under `src/Resources/public/images/LUCIDE-LICENSE.txt`.
+
+Overrides inheriting `navigation_controls` receive the SVG controls automatically.
+To remove an existing outer Bootstrap border, use the updated wrapper:
+
+```twig
+{% block navigation_wrapper %}
+    <span class="auriga-chapter-navigation">{{ block('navigation_controls') }}</span>
+{% endblock %}
+```
+
+Validation: Contao integration suite and `tests/chapter-navigation.php` cover
+rendering, navigation URLs and disabled destinations.

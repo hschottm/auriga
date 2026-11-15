@@ -49,6 +49,7 @@ class ModuleBroadcast extends ModulePTW
 	 */
 	protected function compile()
 	{
+        $GLOBALS['TL_CSS'][] = 'bundles/hschottmauriga/css/chapter-navigation.css|static';
 		global $objPage;
 		
 		// Redirect to jumpTo page

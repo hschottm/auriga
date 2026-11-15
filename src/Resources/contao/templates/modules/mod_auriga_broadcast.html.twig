@@ -12,10 +12,81 @@
 		{% block navigation_wrapper %}
 		<div class="auriganav">
             {% block navigation_controls %}
-			{% if nav_first_url|default is not empty %}<a href="{{ nav_first_url }}">{% endif %}<img src="files/auriga/images/control_start{{ nav_first_url|default is not empty ? '_blue' : '' }}.png" alt="{{ nav_first_title }}" title="{{ nav_first_title }}" />{% if nav_first_url|default is not empty %}</a>{% endif %}
-			{% if nav_prev_url|default is not empty %}<a href="{{ nav_prev_url }}">{% endif %}<img src="files/auriga/images/control_rewind{{ nav_prev_url|default is not empty ? '_blue' : '' }}.png" alt="{{ nav_prev_title }}" title="{{ nav_prev_title }}" />{% if nav_prev_url|default is not empty %}</a>{% endif %}
-			{% if nav_next_url|default is not empty %}<a href="{{ nav_next_url }}">{% endif %}<img src="files/auriga/images/control_fastforward{{ nav_next_url|default is not empty ? '_blue' : '' }}.png" alt="{{ nav_next_title }}" title="{{ nav_next_title }}" />{% if nav_next_url|default is not empty %}</a>{% endif %}
-			{% if nav_last_url|default is not empty %}<a href="{{ nav_last_url }}">{% endif %}<img src="files/auriga/images/control_end{{ nav_last_url|default is not empty ? '_blue' : '' }}.png" alt="{{ nav_last_title }}" title="{{ nav_last_title }}"/>{% if nav_last_url|default is not empty %}</a>{% endif %}
+            <span class="auriga-chapter-controls">
+            {% for key in ['first', 'prev', 'next', 'last'] %}
+                {% set target = attribute(_context, 'nav_' ~ key ~ '_url')|default('') %}
+                {% set label = attribute(_context, 'nav_' ~ key ~ '_title')|default('') %}
+                {% if target %}
+                    <a class="auriga-chapter-control" href="{{ target }}" title="{{ label }}" aria-label="{{ label }}">
+                {% else %}
+                    <span class="auriga-chapter-control is-disabled" role="link" aria-disabled="true" title="{{ label }}" aria-label="{{ label }}">
+                {% endif %}
+                {% if key == 'first' %}
+<svg aria-hidden="true" focusable="false"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m11 17-5-5 5-5" />
+  <path d="m18 17-5-5 5-5" />
+</svg>
+
+                {% elseif key == 'prev' %}
+<svg aria-hidden="true" focusable="false"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m15 18-6-6 6-6" />
+</svg>
+
+                {% elseif key == 'next' %}
+<svg aria-hidden="true" focusable="false"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+
+                {% elseif key == 'last' %}
+<svg aria-hidden="true" focusable="false"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m6 17 5-5-5-5" />
+  <path d="m13 17 5-5-5-5" />
+</svg>
+
+                {% endif %}
+                {% if target %}</a>{% else %}</span>{% endif %}
+            {% endfor %}
+            </span>
             {% endblock %}
 		</div>
         {% endblock %}

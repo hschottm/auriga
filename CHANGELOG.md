@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.8 — 2026-11-15
+
+- Replace chapter navigation PNGs with inline Lucide chevron SVGs, accessible labels and disabled states.
+- Automatically load scoped button styles with keyboard focus and touch-friendly targets; update the Bootstrap wrapper example.
+
 ## 1.4.7 — 2026-11-15
 
 - Mark the selected adventure with active row/link classes and aria-current in the adventure list.
