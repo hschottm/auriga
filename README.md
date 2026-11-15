@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.4.8**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.4.9**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:1.4.8 --with-all-dependencies
+composer require hschottm/auriga:1.4.9 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -378,3 +378,11 @@ To remove an existing outer Bootstrap border, use the updated wrapper:
 
 Validation: Contao integration suite and `tests/chapter-navigation.php` cover
 rendering, navigation URLs and disabled destinations.
+
+### Special music cover layout in 1.4.9
+
+The special music element automatically loads `special-music.css`. Covers and
+placeholders use a 4rem square with centered cropping, cells are vertically
+aligned, and years do not wrap. Override `--auriga-cover-size` on
+`.auriga-special-music` to adjust the size. Derived templates inherit the wrapper
+class; templates replacing the whole content block must retain it explicitly.

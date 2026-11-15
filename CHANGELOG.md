@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.9 — 2026-11-15
+
+- Give special music its own scoped stylesheet with 4rem square cropped covers, matching placeholders, vertically centered cells and non-wrapping years. Replace legacy 22px cover dimensions with 64px dimensions.
+- Extend chapter navigation regression coverage to the inherited Bootstrap template.
+
 ## 1.4.8 — 2026-11-15
 
 - Replace chapter navigation PNGs with inline Lucide chevron SVGs, accessible labels and disabled states.

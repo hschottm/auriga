@@ -62,6 +62,7 @@ class ContentSpecialMusic extends \Contao\ContentElement
 	 */
 	protected function compile()
 	{
+        $GLOBALS['TL_CSS'][] = 'bundles/hschottmauriga/css/special-music.css|static';
 		global $objPage;
 		
 		$this->loadLanguageFile('tl_module');
@@ -104,7 +105,7 @@ class ContentSpecialMusic extends \Contao\ContentElement
 			if ($objSong->cover > 0)
 			{
 				$imagename = ModulePTW::_getCovername($objSong->cover);
-				$cover = '<img src="' . htmlspecialchars((string) $imagename, ENT_QUOTES, 'UTF-8') . '" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" width="22" height="22" />';
+				$cover = '<img src="' . htmlspecialchars((string) $imagename, ENT_QUOTES, 'UTF-8') . '" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" width="64" height="64" />';
 			}
 			else
 			{

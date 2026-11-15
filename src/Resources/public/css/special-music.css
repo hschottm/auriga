@@ -1,0 +1,23 @@
+.auriga-special-music {
+    --auriga-cover-size: 4rem;
+}
+.auriga-special-music table > :is(thead, tbody) > tr > :is(th, td) {
+    vertical-align: middle;
+}
+.auriga-special-music td.cover {
+    min-width: calc(var(--auriga-cover-size) + 1rem);
+}
+.auriga-special-music td.cover img {
+    display: block;
+    width: var(--auriga-cover-size);
+    height: var(--auriga-cover-size);
+    max-width: none;
+    max-height: none;
+    object-fit: cover;
+    object-position: center;
+}
+.auriga-special-music td:nth-child(7) {
+    white-space: nowrap;
+    overflow-wrap: normal;
+    word-break: normal;
+}
