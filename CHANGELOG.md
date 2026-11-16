@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.11 — 2026-11-16
+
+- Fix the broadcast preview in the adventure backend by using the namespaced Contao Date class; add coverage for the registered child-record callback.
+
 ## 1.4.10 — 2026-11-15
 
 - Allow cover editors to remove cover assignments for all songs with the same album title and label code, including compilations. Require a valid CSRF-protected POST and prevent automatic reassignment while preserving image files and other albums.

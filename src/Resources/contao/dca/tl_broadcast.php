@@ -256,7 +256,7 @@ class tl_broadcast extends \Contao\Backend
 			$return .= '</span>';
 		}
 		$return .= ' (';
-		$date = new Date($row['date']);
+		$date = new \Contao\Date($row['date']);
 		$return .= $date->date;
 		$return .= ')';
 		$return .= "</div>";
