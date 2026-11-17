@@ -168,6 +168,7 @@ class ModuleBroadcast extends ModulePTW
 				'chapter' => $objBroadcast->chapter,
 				'isStory' => ($objBroadcast->story) ? true : false,
 				'storycontent' => (string) ($objBroadcast->storycontent ?? ''),
+				'storyhtml' => StoryMarkdown::render((string) ($objBroadcast->storycontent ?? '')),
 				'isSpecial' => ($objBroadcast->special) ? true : false,
 				'isComplete' => ($objBroadcast->complete) ? true : false,
 				'length' => $objBroadcast->length,

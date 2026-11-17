@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.14 — 2026-11-17
+
+- Render adventure transcripts as safe CommonMark Markdown, supporting emphasis, person links, headings and plain-text timestamps. Preserve soft line breaks in existing text; escape embedded HTML and reject unsafe link schemes.
+
 ## 1.4.13 — 2026-11-17
 
 - Display non-empty adventure transcripts after background music in the broadcast template, with preserved line breaks, HTML escaping and overridable Twig blocks.

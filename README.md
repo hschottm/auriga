@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.4.13**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.4.14**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:1.4.13 --with-all-dependencies
+composer require hschottm/auriga:1.4.14 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -404,5 +404,24 @@ breaks in a LONGTEXT column. Disabling Story hides the field without deleting
 its contents. Run Contao's database migration after updating.
 
 Non-empty transcripts appear after background music in the broadcast view.
-Line breaks are preserved and HTML is escaped. Customize the `story_section`,
+Markdown is rendered using CommonMark; line breaks are preserved and embedded HTML is escaped. Customize the `story_section`,
 `story_heading` and `story_content` Twig blocks in derived templates.
+
+### Markdown transcripts (1.4.14)
+
+The adventure transcript supports CommonMark headings, emphasis, lists and links:
+
+```markdown
+## Small Talk an der Treppe
+
+[10:42] **Paul:** „Kann ich reinkommen?“
+
+[Major Renault](/personen/major-renault.html) hatte ihm den Hinweis gegeben.
+```
+
+Person links require a corresponding destination page. `[MM:SS]` timestamps
+remain readable text, not player controls: the broadcast view currently has no
+uniquely associated audio player. Existing plain-text line breaks are preserved.
+Embedded HTML is escaped and unsafe link schemes are disabled. The template
+receives `broadcast.storycontent` as the source and `broadcast.storyhtml` as
+the safely rendered HTML. No additional database migration is required.
