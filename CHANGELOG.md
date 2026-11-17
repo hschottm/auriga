@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.12 — 2026-11-17
+
+- Add a large plain-text adventure transcript field (`tl_broadcast.storycontent`, LONGTEXT), shown when Story is enabled in the broadcast editor.
+
 ## 1.4.11 — 2026-11-16
 
 - Fix the broadcast preview in the adventure backend by using the namespaced Contao Date class; add coverage for the registered child-record callback.

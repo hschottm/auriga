@@ -87,7 +87,13 @@ $GLOBALS['TL_DCA']['tl_broadcast'] = array
 	// Palettes
 	'palettes' => array
 	(
+		'__selector__'                => array('story'),
 		'default'                     => '{title_legend},title,date,hour,chapter;{special_legend},story,special;{recording_legend},length,complete,providers,frequency,samplerate,files',
+	),
+
+	'subpalettes' => array
+	(
+		'story' => 'storycontent',
 	),
 
 	// Fields
@@ -139,7 +145,15 @@ $GLOBALS['TL_DCA']['tl_broadcast'] = array
 			'exclude'                 => true,
 			'filter'                  => true,
 			'inputType'               => 'checkbox',
-			'eval'                    => array('tl_class'=>'w50 m12')
+			'eval'                    => array('submitOnChange'=>true, 'tl_class'=>'w50 m12')
+		),
+		'storycontent' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_broadcast']['storycontent'],
+			'exclude'                 => true,
+			'inputType'               => 'textarea',
+			'eval'                    => array('rows'=>24, 'preserveTags'=>true, 'tl_class'=>'clr'),
+			'sql'                     => 'longtext NULL',
 		),
 		'special' => array
 		(

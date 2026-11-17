@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.4.11**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.4.12**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:1.4.11 --with-all-dependencies
+composer require hschottm/auriga:1.4.12 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -395,3 +395,10 @@ album title and label code, regardless of artist. Image files and other albums
 remain untouched. An explicit empty mapping prevents automatic cover inheritance;
 a new cover can still be selected manually. The separate `cover_remove` Twig
 block is also inherited by Bootstrap variants overriding `cover_display`.
+
+### Adventure transcripts
+
+Enable “Geschichte” in the broadcast editor to display “Abenteuergeschichte”.
+The optional `storycontent` field stores long plain-text transcripts with line
+breaks in a LONGTEXT column. Disabling Story hides the field without deleting
+its contents. Run Contao's database migration after updating.

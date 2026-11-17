@@ -38,6 +38,16 @@ $GLOBALS['objPage']=$page->loadDetails();
 $request->attributes->set('pageModel', $page);
 $db->insert('tl_adventure', ['title'=>'Test Adventure','numbering'=>'1','firstbroadcast'=>-1000]); $adventure=(int)$db->lastInsertId();
 $db->insert('tl_broadcast', ['pid'=>$adventure,'title'=>'Test Broadcast','date'=>1000,'hour'=>'1','chapter'=>'1','providers'=>serialize([999999])]); $broadcast=(int)$db->lastInsertId();
+// Long transcripts must survive storage and toggling the story flag.
+$transcript = str_repeat("Eine lange Abenteuergeschichte mit Umlauten: ÄÖÜ äöü ß.\n\n", 2000);
+$db->update('tl_broadcast', ['story'=>'1', 'storycontent'=>$transcript], ['id'=>$broadcast]);
+check($db->fetchOne('SELECT storycontent FROM tl_broadcast WHERE id=?', [$broadcast]) === $transcript, 'Long story transcript truncated');
+$db->update('tl_broadcast', ['story'=>''], ['id'=>$broadcast]);
+check($db->fetchOne('SELECT storycontent FROM tl_broadcast WHERE id=?', [$broadcast]) === $transcript, 'Story transcript lost when disabled');
+$broadcastDca = $GLOBALS['TL_DCA']['tl_broadcast'];
+check(in_array('story', $broadcastDca['palettes']['__selector__'], true) && $broadcastDca['fields']['story']['eval']['submitOnChange'], 'Missing story selector');
+check($broadcastDca['subpalettes']['story'] === 'storycontent', 'Missing conditional story editor');
+echo "OK: long adventure transcript storage and conditional editor\n";
 $db->insert('tl_broadcast_song', ['pid'=>$broadcast,'title'=>'Test Song','artist'=>'Test Artist','album'=>'','songtype'=>1,'genres'=>serialize([999999])]); $song=(int)$db->lastInsertId();
 class AdventureView extends Hschottm\AurigaBundle\ModuleAdventureList { public function render() { $this->Template=new Contao\FrontendTemplate($this->strTemplate); $this->compile(); return $this->Template->parse(); } }
 class BroadcastListView extends Hschottm\AurigaBundle\ModuleBroadcastList { public function render() { $this->Template=new Contao\FrontendTemplate($this->strTemplate); $this->compile(); return $this->Template->parse(); } }
