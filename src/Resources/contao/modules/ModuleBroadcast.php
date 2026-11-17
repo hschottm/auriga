@@ -167,6 +167,7 @@ class ModuleBroadcast extends ModulePTW
 				'hour' => $objBroadcast->hour,
 				'chapter' => $objBroadcast->chapter,
 				'isStory' => ($objBroadcast->story) ? true : false,
+				'storycontent' => (string) ($objBroadcast->storycontent ?? ''),
 				'isSpecial' => ($objBroadcast->special) ? true : false,
 				'isComplete' => ($objBroadcast->complete) ? true : false,
 				'length' => $objBroadcast->length,
@@ -240,6 +241,7 @@ class ModuleBroadcast extends ModulePTW
 		$this->Template->adventure = $objAdventure->row();
 		$this->Template->urlUp = $objPageAdventure->getFrontendUrl('/adventure/' . $objBroadcast->pid);
 		$this->Template->broadcasts = $arrBroadcasts;
+		$this->Template->lngAdventureStory = $GLOBALS['TL_LANG']['tl_module']['adventure_story'];
 		$this->Template->lngBackgroundMusic = $GLOBALS['TL_LANG']['tl_module']['background_music'];
 		$this->Template->lngTitle = $GLOBALS['TL_LANG']['tl_module']['song_title'];
 		$this->Template->lngArtist = $GLOBALS['TL_LANG']['tl_module']['song_artist'];

@@ -59,6 +59,16 @@ Contao\Input::setGet('adventure', (string)$adventure); Contao\Input::setGet('bro
 foreach ([AdventureView::class=>'Test Adventure', BroadcastListView::class=>'Test Broadcast', BroadcastView::class=>'Test Song', SongView::class=>'Test Song', SearchView::class=>''] as $class=>$expected) {
     $module=new $class($model); $html=$module->render(); check($expected==='' || str_contains($html,$expected), $class.' failed to render'); echo 'OK: '.$class."\n";
 }
+$storyText = "Erster Absatz <script>alert(1)</script>\n\nZweiter Absatz & Ende";
+$db->update('tl_broadcast', ['storycontent'=>$storyText], ['id'=>$broadcast]);
+$html = (new BroadcastView($model))->render();
+check(str_contains($html, '<h4>Abenteuergeschichte</h4>'), 'Missing story heading');
+check(str_contains($html, '&lt;script&gt;') && !str_contains($html, '<script>alert(1)</script>') && str_contains($html, '<br'), 'Unsafe transcript or lost line breaks');
+foreach ([null, '', " \n\t"] as $emptyStory) {
+    $db->update('tl_broadcast', ['storycontent'=>$emptyStory], ['id'=>$broadcast]);
+    check(!str_contains((new BroadcastView($model))->render(), 'auriga-adventure-story'), 'Empty transcript section visible');
+}
+echo "OK: story output, escaping, line breaks and empty-state handling\n";
 // Selection is keyed by adventure ID, independent of its numbering.
 $html = (new AdventureView($model))->render();
 check(substr_count($html, 'aria-current="page"') === 1 && str_contains($html, 'class="active"'), 'Selected adventure not marked');

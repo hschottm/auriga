@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.4.12**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.4.13**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:1.4.12 --with-all-dependencies
+composer require hschottm/auriga:1.4.13 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -402,3 +402,7 @@ Enable “Geschichte” in the broadcast editor to display “Abenteuergeschicht
 The optional `storycontent` field stores long plain-text transcripts with line
 breaks in a LONGTEXT column. Disabling Story hides the field without deleting
 its contents. Run Contao's database migration after updating.
+
+Non-empty transcripts appear after background music in the broadcast view.
+Line breaks are preserved and HTML is escaped. Customize the `story_section`,
+`story_heading` and `story_content` Twig blocks in derived templates.

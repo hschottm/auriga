@@ -59,3 +59,5 @@ $GLOBALS['TL_LANG']['tl_module']['song_edit_scope'] = 'Albumtitel- und Labelcode
 
 $GLOBALS['TL_LANG']['tl_module']['song_cover_remove'] = 'Albumcover-Zuordnung entfernen';
 $GLOBALS['TL_LANG']['tl_module']['song_cover_remove_help'] = 'Entfernt die Cover-Zuordnung aller Songs mit gleichem Albumtitel und Labelcode, unabhängig vom Interpreten. Die Bilddatei bleibt erhalten.';
+
+$GLOBALS['TL_LANG']['tl_module']['adventure_story'] = 'Abenteuergeschichte';

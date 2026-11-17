@@ -159,6 +159,20 @@
 {% endblock %}
 {% endif %}
 
+{% block story_section %}
+{% set storyBroadcasts = broadcasts|filter(broadcast => broadcast.storycontent|default('')|trim is not empty) %}
+{% if storyBroadcasts|length %}
+<section class="auriga-adventure-story">
+    {% block story_heading %}<h4>{{ lngAdventureStory }}</h4>{% endblock %}
+    {% block story_content %}
+    {% for broadcast in storyBroadcasts %}
+        <div class="auriga-story-text">{{ broadcast.storycontent|nl2br }}</div>
+    {% endfor %}
+    {% endblock %}
+</section>
+{% endif %}
+{% endblock %}
+
 </div>
 {% endif %}
 {% endblock %}

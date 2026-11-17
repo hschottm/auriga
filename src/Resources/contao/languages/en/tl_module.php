@@ -59,3 +59,5 @@ $GLOBALS['TL_LANG']['tl_module']['song_edit_scope'] = 'Album title and label cod
 
 $GLOBALS['TL_LANG']['tl_module']['song_cover_remove'] = 'Remove album cover assignment';
 $GLOBALS['TL_LANG']['tl_module']['song_cover_remove_help'] = 'Removes cover assignments for all songs with the same album title and label code, regardless of artist. The image file is preserved.';
+
+$GLOBALS['TL_LANG']['tl_module']['adventure_story'] = 'Adventure story';

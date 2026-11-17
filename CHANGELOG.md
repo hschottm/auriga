@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.13 — 2026-11-17
+
+- Display non-empty adventure transcripts after background music in the broadcast template, with preserved line breaks, HTML escaping and overridable Twig blocks.
+
 ## 1.4.12 — 2026-11-17
 
 - Add a large plain-text adventure transcript field (`tl_broadcast.storycontent`, LONGTEXT), shown when Story is enabled in the broadcast editor.
