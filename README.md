@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.4.14**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.4.15**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:1.4.14 --with-all-dependencies
+composer require hschottm/auriga:1.4.15 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -407,7 +407,7 @@ Non-empty transcripts appear after background music in the broadcast view.
 Markdown is rendered using CommonMark; line breaks are preserved and embedded HTML is escaped. Customize the `story_section`,
 `story_heading` and `story_content` Twig blocks in derived templates.
 
-### Markdown transcripts (1.4.14)
+### Markdown transcripts (1.4.15)
 
 The adventure transcript supports CommonMark headings, emphasis, lists and links:
 
@@ -425,3 +425,11 @@ uniquely associated audio player. Existing plain-text line breaks are preserved.
 Embedded HTML is escaped and unsafe link schemes are disabled. The template
 receives `broadcast.storycontent` as the source and `broadcast.storyhtml` as
 the safely rendered HTML. No additional database migration is required.
+
+### Auriga-Lexikon
+
+Nach dem Update die Contao-Datenbankmigration ausführen. Unter **Auriga → Lexikon** lassen sich Begriffe mit Markdown-Beschreibung und Veröffentlichungsstatus pflegen. Leere Aliasse werden aus dem Begriff erzeugt; doppelte automatisch erzeugte Aliasse erhalten einen eindeutigen Zusatz. Manuell vergebene Aliasse müssen eindeutig sein. Bestehende Aliasse bleiben beim Ändern des Begriffs erhalten.
+
+Ein Frontend-Modul vom Typ **Auriga-Lexikon** anlegen und auf einer Seite einfügen. Es zeigt eine alphabetische Übersicht veröffentlichter Einträge; die Links öffnen deren Detailansicht auf derselben Seite. Diese Links können in Markdown-Beschreibungen und Abenteuergeschichten verwendet werden. Bei einer Seite `lexikon.html` lautet ein Detail-Link beispielsweise `lexikon/lexicon/major-renault.html`. Den tatsächlich erzeugten Link aus der Übersicht kopieren, insbesondere bei abweichenden URL-Einstellungen. Nachträgliche Alias-Änderungen ändern die URL; alte Links werden nicht automatisch weitergeleitet.
+
+Nicht veröffentlichte oder unbekannte Einträge liefern HTTP 404. Markdown wird wie bei Abenteuergeschichten sicher gerendert: HTML wird als Text behandelt und unsichere Link-Schemata werden verworfen. Das Template `mod_auriga_lexicon.html.twig` bietet die Blöcke `lexicon_list`, `lexicon_entry`, `lexicon_entry_heading`, `lexicon_description` und `lexicon_back` für eigene Gestaltung.

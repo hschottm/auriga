@@ -91,3 +91,5 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['aurigaArchiveGroups'] = [
     'exclude' => true, 'inputType' => 'checkbox', 'foreignKey' => 'tl_member_group.name',
     'eval' => ['multiple' => true], 'sql' => 'blob NULL',
 ];
+
+$GLOBALS['TL_DCA']['tl_module']['palettes']['auriga_lexicon'] = '{title_legend},name,headline,type;{template_legend:hide},aurigaTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';

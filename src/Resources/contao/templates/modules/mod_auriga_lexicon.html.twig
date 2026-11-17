@@ -1,0 +1,22 @@
+{% block content %}
+<div{{ attrs(cssID|default).addClass([class|default, 'auriga-lexicon', 'block']).addStyle(style|default) }}>
+    {% if headline|default %}<{{ hl }}>{{ headline }}</{{ hl }}>{% endif %}
+    {% if entry|default %}
+        {% block lexicon_entry %}
+        <article class="auriga-lexicon-entry">
+            {% block lexicon_entry_heading %}<h2>{{ entry.term }}</h2>{% endblock %}
+            {% block lexicon_description %}<div class="auriga-lexicon-description">{{ entry.html|raw }}</div>{% endblock %}
+        </article>
+        {% endblock %}
+        {% block lexicon_back %}<p><a href="{{ overviewUrl }}">{{ labels.back }}</a></p>{% endblock %}
+    {% else %}
+        {% block lexicon_list %}
+        {% if entries|default is not empty %}
+            <ul class="auriga-lexicon-list">
+            {% for item in entries %}<li><a href="{{ item.url }}">{{ item.term }}</a></li>{% endfor %}
+            </ul>
+        {% else %}<p>{{ labels.empty }}</p>{% endif %}
+        {% endblock %}
+    {% endif %}
+</div>
+{% endblock %}

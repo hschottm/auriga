@@ -68,3 +68,6 @@ $GLOBALS['TL_HOOKS']['addCustomRegexp'][] = array('auriga.listener.addcustomrege
 
 
 $GLOBALS['TL_CTE']['files']['mediafile_browser'] = \Hschottm\AurigaBundle\ContentMediafileBrowser::class;
+
+$GLOBALS['BE_MOD']['auriga']['auriga_lexicon'] = ['tables' => ['tl_auriga_lexicon']];
+$GLOBALS['FE_MOD']['auriga']['auriga_lexicon'] = \Hschottm\AurigaBundle\ModuleLexicon::class;

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.15 — 2026-11-17
+
+- Add an Auriga lexicon backend with unique stable aliases, Markdown descriptions and publication control, plus a frontend overview/detail module with safe Markdown rendering and overridable Twig blocks.
+
 ## 1.4.14 — 2026-11-17
 
 - Render adventure transcripts as safe CommonMark Markdown, supporting emphasis, person links, headings and plain-text timestamps. Preserve soft line breaks in existing text; escape embedded HTML and reject unsafe link schemes.

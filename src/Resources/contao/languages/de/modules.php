@@ -12,3 +12,6 @@ $GLOBALS['TL_LANG']['MOD']['provider'] = array('Provider', 'Erzeuge/Bearbeite di
 $GLOBALS['TL_LANG']['MOD']['songtype'] = array('Liedertypen', 'Erzeuge/Bearbeite spezielle Typen von Musiktiteln.');
 $GLOBALS['TL_LANG']['MOD']['broadcasttype'] = array('Sendungstypen', 'Erzeuge/Bearbeite unterschiedliche Sendungstypen.');
 
+
+$GLOBALS['TL_LANG']['MOD']['auriga_lexicon'] = ['Lexikon', 'Begriffe und Beschreibungen pflegen.'];
+$GLOBALS['TL_LANG']['FMD']['auriga_lexicon'] = ['Auriga-Lexikon', 'Lexikonübersicht und Detailansicht mit Markdown-Beschreibungen.'];

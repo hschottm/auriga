@@ -12,3 +12,6 @@ $GLOBALS['TL_LANG']['MOD']['provider'] = array('Provider', 'Create/edit the prov
 $GLOBALS['TL_LANG']['MOD']['songtype'] = array('Song types', 'Create/edit the special song types.');
 $GLOBALS['TL_LANG']['MOD']['broadcasttype'] = array('Broadcast types', 'Create/edit the different broadcast types.');
 
+
+$GLOBALS['TL_LANG']['MOD']['auriga_lexicon'] = ['Lexicon', 'Manage terms and descriptions.'];
+$GLOBALS['TL_LANG']['FMD']['auriga_lexicon'] = ['Auriga lexicon', 'Lexicon index and entry view with Markdown descriptions.'];
