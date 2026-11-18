@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.18 — 2026-11-18
+
+- Compact the chapter player into icon navigation and a one-line current-segment selector. Expand full titles inline, close the list after selection, and support Escape and visible keyboard focus.
+
 ## 1.4.17 — 2026-11-18
 
 - Add automatic LRC segment navigation to archive-browser and broadcast-list audio players, with previous/next buttons, clickable timestamps and current-segment highlighting. Preserve protected playback and the standard player for recordings without valid sidecars.

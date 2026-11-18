@@ -29,6 +29,10 @@ try {
     $html = (new BroadcastListView($model))->render();
     check(substr_count($html,'<audio') === 1 && str_contains($html,'<th>Abspielen</th>'), 'Expected one existing recording player');
     check(!str_contains($html,'files/auriga') && !str_contains($html,'mp3.nasbrill'), 'Raw archive URL leaked');
+    check(!str_contains($html, 'data-auriga-audio-player'), 'Unexpected chapters without sidecar');
+    file_put_contents($folder.'/ptw/001/ptw_4902_2.lrc', "[00:00.00] Begrüßung\n[03:15.00] Was bisher geschah\n[08:14.00] Cape Knox <Test>\n");
+    $html = (new BroadcastListView($model))->render();
+    check(str_contains($html, 'data-auriga-audio-player') && str_contains($html, 'data-chapter-start="195"') && str_contains($html, 'Cape Knox &lt;Test&gt;'), 'Database reference must resolve sibling LRC and render chapters');
     $request->query->set($key,$broadcast.':0');
     try { (new BroadcastListView($model))->render(); throw new RuntimeException('Expected audio response'); }
     catch (Contao\CoreBundle\Exception\ResponseException $e) {
@@ -50,5 +54,6 @@ try {
     $request->getSession()->remove('_security_contao_frontend');
     if (isset($storage)) $storage->setToken($previous);
     $db->executeStatement('DELETE FROM tl_files WHERE uuid=?',[$uuid]);
+    @unlink($folder.'/ptw/001/ptw_4902_2.lrc');
     unlink($folder.'/ptw/001/ptw_4902_2.mp3'); rmdir($folder.'/ptw/001'); rmdir($folder.'/ptw'); rmdir($folder);
 }
