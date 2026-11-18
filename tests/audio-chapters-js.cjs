@@ -3,15 +3,17 @@ const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const source = fs.readFileSync(__dirname + '/../src/Resources/public/js/audio-chapters.js', 'utf8');
 function element() {
-    return {dataset: {}, events: {}, attrs: {}, addEventListener(name, cb) { this.events[name] = cb; }, setAttribute(k,v) {this.attrs[k]=v;}, removeAttribute(k) {delete this.attrs[k];}};
+    return {dataset: {}, events: {}, attrs: {}, addEventListener(name, cb) { this.events[name] = cb; }, setAttribute(k,v) {this.attrs[k]=v;}, removeAttribute(k) {delete this.attrs[k];}, getAttribute(k) {return this.attrs[k];}, toggleAttribute(k,on) {if(on) this.attrs[k]=''; else delete this.attrs[k];}};
 }
-const audio = Object.assign(element(), {currentTime: 0, duration: NaN, readyState: 0, paused: true, load() {this.loaded = true;}});
+const audio = Object.assign(element(), {currentTime: 0, duration: NaN, readyState: 0, paused: true, volume: 1, muted: false, play() {this.paused = false; return Promise.resolve();}, pause() {this.paused = true;}, load() {this.loaded = true;}});
 const items = [0,195,494,888].map((time,i) => Object.assign(element(), {dataset: {chapterStart: String(time)}, querySelector() {return {textContent: 'Part '+i};}}));
 const previous = element(), next = element(), current = element(), controls = element();
 const summary = {focus() {this.focused = true;}};
 const details = {open: true, querySelector() {return summary;}};
-const root = Object.assign(element(), {querySelector(selector) {return {'details':details,'audio':audio,'[data-chapter-previous]':previous,'[data-chapter-next]':next,'[data-chapter-current]':current,'.auriga-audio-chapters':controls}[selector];}, querySelectorAll() {return items;}});
-vm.runInNewContext(source, {document: {readyState:'complete',querySelectorAll() {return [root];}}});
+const extra = Object.fromEntries(['.auriga-audio-ui','[data-audio-play]','[data-audio-seek]','[data-audio-volume]','[data-audio-mute]','[data-audio-status]','[data-play-icon]','[data-pause-icon]','[data-audio-clock]','[data-muted-icon]'].map(key => [key,element()]));
+extra['[data-audio-play]'].dataset = {playLabel:'Play',pauseLabel:'Pause'};
+const root = Object.assign(element(), {querySelector(selector) {return {...extra,'details':details,'audio':audio,'[data-chapter-previous]':previous,'[data-chapter-next]':next,'[data-chapter-current]':current,'.auriga-audio-chapters':controls}[selector];}, querySelectorAll() {return items;}});
+vm.runInNewContext(source, {document: {readyState:'complete',querySelectorAll(selector) {return selector.endsWith(' audio') ? [audio] : [root];}}});
 assert.equal(previous.disabled,true);
 next.events.click();
 assert.equal(audio.loaded,true);
@@ -30,3 +32,19 @@ assert.equal(summary.focused, true);
 assert.equal(current.textContent, '1/4 · Part 0');
 details.open = true; root.events.keydown({key:'Escape'}); assert.equal(details.open, false);
 console.log('OK: deferred seek, previous/next, direct chapter selection, boundaries and playback state');
+
+assert.equal(audio.controls,false); assert.equal(audio.hidden,true);
+assert.equal(extra['.auriga-audio-ui'].hidden,false);
+const seek = extra['[data-audio-seek]']; seek.value = 200; seek.events.input(); seek.events.change(); assert.equal(audio.currentTime,200);
+extra['[data-audio-mute]'].events.click(); assert.equal(audio.muted,true);
+extra['[data-audio-volume]'].value = 0.4; extra['[data-audio-volume]'].events.input(); assert.equal(audio.volume,0.4); assert.equal(audio.muted,false);
+// A recording without a sidecar uses the same transport, with chapter controls disabled.
+const plainAudio = Object.assign(element(), {currentTime:0, duration:100, readyState:1, paused:true, volume:1, muted:false});
+const plainElements = Object.fromEntries(Object.keys(extra).map(key => [key,element()]));
+const plainPrevious = element(), plainNext = element();
+plainElements['[data-audio-play]'].dataset = {playLabel:'Play',pauseLabel:'Pause'};
+const plainRoot = Object.assign(element(), {querySelector(selector) { return {...plainElements, 'audio':plainAudio, '[data-chapter-previous]':plainPrevious, '[data-chapter-next]':plainNext}[selector] || null; }, querySelectorAll() {return [];}});
+vm.runInNewContext(source, {document:{readyState:'complete',querySelectorAll() {return [plainRoot];}}});
+assert.equal(plainPrevious.disabled,true); assert.equal(plainNext.disabled,true);
+assert.equal(plainElements['[data-audio-seek]'].disabled,false);
+assert.equal(plainElements['.auriga-audio-ui'].hidden,false);

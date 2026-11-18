@@ -444,8 +444,10 @@ browser's allowed download extensions.
 
 The player provides previous/next segment buttons, a collapsible clickable segment
 list and the current segment title. Seeking preserves playback/pause state;
-previous goes to the preceding segment. Without usable marks (or JavaScript), the
-native audio controls remain available. Timestamps outside the recording duration
+previous goes to the preceding segment. Without usable marks, the same custom player remains available with disabled
+segment buttons. Without JavaScript, native audio controls remain available.
+The unified player includes play/pause, seeking, elapsed/total time, volume/mute
+and loading/error feedback; starting a recording pauses other players on the page. Timestamps outside the recording duration
 are disabled once metadata is loaded. Minutes may exceed 59. LRC offset tags and
 multiple timestamps per line are supported. Sidecars are limited to 256 KiB and
 symlink sidecars are ignored. Chapter metadata is only read for authorized players;

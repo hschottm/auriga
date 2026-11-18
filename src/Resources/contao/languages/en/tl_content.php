@@ -30,3 +30,10 @@ $GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['play'] = 'Play';
 $GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['title'] = 'Title';
 
 $GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters'] = ['previous' => 'Previous segment', 'next' => 'Next segment', 'list' => 'Segments / chapter marks'];
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['play'] = 'Play';
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['pause'] = 'Pause';
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['mute'] = 'Mute';
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['position'] = 'Playback position';
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['volume'] = 'Volume';
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['loading'] = 'Loading …';
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['error'] = 'Playback failed. Please retry or reload the page.';

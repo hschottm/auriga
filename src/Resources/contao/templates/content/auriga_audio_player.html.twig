@@ -1,10 +1,21 @@
-{% if chapters|default([]) %}<div class="auriga-audio-player" data-auriga-audio-player>{% endif %}
+<div class="auriga-audio-player" data-auriga-audio-player>
 <audio controls preload="none" aria-label="{{ title }}"><source src="{{ url }}" type="{{ type }}"></audio>
-{% if chapters|default([]) %}
-    <div class="auriga-audio-chapters" hidden>
-        <button class="auriga-audio-skip" type="button" data-chapter-previous aria-label="{{ chapterLabels.previous }}" title="{{ chapterLabels.previous }}">
-            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 5v14M18 5l-9 7 9 7Z"/></svg>
+<div class="auriga-audio-ui" hidden>
+    <div class="auriga-audio-transport">
+        <button type="button" data-chapter-previous aria-label="{{ chapterLabels.previous }}" title="{{ chapterLabels.previous }}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14M18 5l-9 7 9 7Z"/></svg></button>
+        <button type="button" class="auriga-audio-play" data-audio-play data-play-label="{{ chapterLabels.play }}" data-pause-label="{{ chapterLabels.pause }}" aria-label="{{ chapterLabels.play }}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path data-play-icon d="m8 5 11 7-11 7Z"/><path data-pause-icon d="M8 5v14M16 5v14" hidden/></svg>
         </button>
+        <button type="button" data-chapter-next aria-label="{{ chapterLabels.next }}" title="{{ chapterLabels.next }}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5v14M6 5l9 7-9 7Z"/></svg></button>
+        <span class="auriga-audio-clock" data-audio-clock>0:00 / —</span>
+        <button type="button" data-audio-mute aria-label="{{ chapterLabels.mute }}" title="{{ chapterLabels.mute }}" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4ZM15 8q6 4 0 8"/><path data-muted-icon d="m3 3 18 18" hidden/></svg></button>
+    </div>
+    <div class="auriga-audio-sliders">
+        <input data-audio-seek type="range" min="0" max="100" value="0" step="0.1" disabled aria-label="{{ chapterLabels.position }}">
+        <input data-audio-volume type="range" min="0" max="1" value="1" step="0.05" aria-label="{{ chapterLabels.volume }}">
+    </div>
+    {% if chapters|default([]) %}
+    <div class="auriga-audio-chapters">
         <details>
             <summary aria-label="{{ chapterLabels.list }}">
                 <span class="auriga-audio-current" data-chapter-current>{{ chapterLabels.list }}</span>
@@ -14,9 +25,8 @@
                 <li><button type="button" data-chapter-start="{{ chapter.start }}"><span class="auriga-audio-time">{{ chapter.time }}</span> <span data-chapter-title>{{ chapter.title }}</span></button></li>
             {% endfor %}</ol>
         </details>
-        <button class="auriga-audio-skip" type="button" data-chapter-next aria-label="{{ chapterLabels.next }}" title="{{ chapterLabels.next }}">
-            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M18 5v14M6 5l9 7-9 7Z"/></svg>
-        </button>
     </div>
+    {% endif %}
+    <p class="auriga-audio-status" data-audio-status role="status" data-loading="{{ chapterLabels.loading }}" data-error="{{ chapterLabels.error }}" hidden></p>
 </div>
-{% endif %}
+</div>

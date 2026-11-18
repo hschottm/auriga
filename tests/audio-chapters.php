@@ -27,11 +27,11 @@ if ($autoload) {
  $loader = new Twig\Loader\FilesystemLoader();
  $loader->addPath(__DIR__.'/../src/Resources/contao/templates/content', 'Contao');
  $twig = new Twig\Environment($loader, ['autoescape' => 'html', 'strict_variables' => true]);
- $data = ['title'=>'Test', 'url'=>'/protected?file=1&play=1', 'type'=>'audio/mpeg', 'chapters'=>$chapters, 'chapterLabels'=>['previous'=>'Previous', 'next'=>'Next', 'list'=>'Chapters']];
+ $data = ['title'=>'Test', 'url'=>'/protected?file=1&play=1', 'type'=>'audio/mpeg', 'chapters'=>$chapters, 'chapterLabels'=>['previous'=>'Previous', 'next'=>'Next', 'list'=>'Chapters', 'play'=>'Play', 'pause'=>'Pause', 'mute'=>'Mute', 'position'=>'Position', 'volume'=>'Volume', 'loading'=>'Loading', 'error'=>'Error']];
  $html = $twig->render('@Contao/auriga_audio_player.html.twig', $data);
  verify(str_contains($html, 'data-chapter-start="195"') && !str_contains($html, '<script>') && str_contains($html, '&lt;script&gt;'), 'Render and escape chapter titles');
  $data['chapters'] = [];
  $html = $twig->render('@Contao/auriga_audio_player.html.twig', $data);
- verify(str_contains($html, '<audio') && !str_contains($html, 'data-auriga-audio-player'), 'Standard player fallback');
+ verify(str_contains($html, '<audio') && str_contains($html, 'data-audio-play') && !str_contains($html, 'data-chapter-start'), 'Standard player fallback');
 }
 echo "OK: LRC parsing, time ordering, offsets, sidecar limits, symlink rejection and player template\n";

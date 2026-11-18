@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.19 — 2026-11-18
+
+- Use a unified audio player for all recordings, with play/pause, seeking, time display, volume/mute, loading/error feedback and automatic pausing of other recordings. Disable chapter navigation without LRC marks; retain native controls without JavaScript.
+
 ## 1.4.18 — 2026-11-18
 
 - Compact the chapter player into icon navigation and a one-line current-segment selector. Expand full titles inline, close the list after selection, and support Escape and visible keyboard focus.

@@ -30,3 +30,10 @@ $GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['play'] = 'Abspielen';
 $GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['title'] = 'Titel';
 
 $GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters'] = ['previous' => 'Vorheriger Beitrag', 'next' => 'Nächster Beitrag', 'list' => 'Beiträge / Sprungmarken'];
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['play'] = 'Abspielen';
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['pause'] = 'Pause';
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['mute'] = 'Stummschalten';
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['position'] = 'Wiedergabeposition';
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['volume'] = 'Lautstärke';
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['loading'] = 'Wird geladen …';
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['error'] = 'Wiedergabe nicht möglich. Bitte erneut versuchen oder die Seite neu laden.';
