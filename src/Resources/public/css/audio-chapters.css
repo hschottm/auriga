@@ -1,0 +1,12 @@
+.auriga-audio-player { width: 100%; min-width: 15rem; max-width: 32rem; }
+.auriga-audio-player audio { display: block; width: 100%; }
+.auriga-audio-chapters[hidden] { display: none; }
+.auriga-audio-navigation { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .5rem; }
+.auriga-audio-chapters button { font: inherit; cursor: pointer; }
+.auriga-audio-chapters button:disabled { opacity: .5; cursor: default; }
+.auriga-audio-current { margin: .5rem 0; overflow-wrap: anywhere; }
+.auriga-audio-chapters summary { cursor: pointer; }
+.auriga-audio-chapters ol { max-height: 18rem; overflow-y: auto; list-style: none; padding: 0; margin: .5rem 0; }
+.auriga-audio-chapters li button { width: 100%; text-align: left; padding: .4rem; border: 1px solid transparent; background: transparent; color: inherit; overflow-wrap: anywhere; }
+.auriga-audio-chapters li button[aria-current] { font-weight: bold; border-color: currentColor; }
+.auriga-audio-time { font-variant-numeric: tabular-nums; white-space: nowrap; }

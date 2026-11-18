@@ -43,6 +43,8 @@ class ContentMediafileBrowser extends \Contao\ContentElement
             $this->Template->message = 'MediafileBrowser';
             return;
         }
+        AudioChapters::assets();
+        $this->Template->chapterLabels = AudioChapters::labels();
         $GLOBALS['TL_CSS'][] = 'bundles/hschottmauriga/css/mediafile-browser.css|static';
         // Lists and downloads must not be served from the public page cache.
         global $objPage;
@@ -86,6 +88,7 @@ class ContentMediafileBrowser extends \Contao\ContentElement
                 $entry['url'] = $entry['allowed'] ? $url($entry['path'], $entry['directory'] ? '' : '1') : null;
                 $entry['audioType'] = !$entry['directory'] ? (self::AUDIO[strtolower(pathinfo($entry['name'], PATHINFO_EXTENSION))] ?? null) : null;
                 $entry['playUrl'] = $entry['allowed'] && $entry['audioType'] ? $url($entry['path'], 'play') : null;
+                $entry['chapters'] = $entry['playUrl'] ? AudioChapters::read($browser->resolve($entry['path'])) : [];
                 $entry['date'] = \Contao\Date::parse(\Contao\Config::get('datimFormat'), $entry['modified']);
                 $entry['dateOnly'] = \Contao\Date::parse(\Contao\Config::get('dateFormat'), $entry['modified']);
                 $entry['timeOnly'] = \Contao\Date::parse(\Contao\Config::get('timeFormat'), $entry['modified']);

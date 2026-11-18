@@ -1,0 +1,18 @@
+{% if chapters|default([]) %}<div class="auriga-audio-player" data-auriga-audio-player>{% endif %}
+<audio controls preload="none" aria-label="{{ title }}"><source src="{{ url }}" type="{{ type }}"></audio>
+{% if chapters|default([]) %}
+    <div class="auriga-audio-chapters" hidden>
+        <div class="auriga-audio-navigation">
+            <button type="button" data-chapter-previous>{{ chapterLabels.previous }}</button>
+            <button type="button" data-chapter-next>{{ chapterLabels.next }}</button>
+        </div>
+        <p class="auriga-audio-current" data-chapter-current></p>
+        <details>
+            <summary>{{ chapterLabels.list }}</summary>
+            <ol>{% for chapter in chapters %}
+                <li><button type="button" data-chapter-start="{{ chapter.start }}"><span class="auriga-audio-time">{{ chapter.time }}</span> <span data-chapter-title>{{ chapter.title }}</span></button></li>
+            {% endfor %}</ol>
+        </details>
+    </div>
+</div>
+{% endif %}

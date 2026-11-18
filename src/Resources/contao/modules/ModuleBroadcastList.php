@@ -105,6 +105,7 @@ class ModuleBroadcastList extends ModulePTW
 				}
 			}
             $audio = [];
+            $audioChapters = [];
             if ($archive && $archive->type === 'folder') {
                 $files = ArchiveAudio::files(self::projectDir().'/'.$container->getParameter('contao.upload_path'), self::projectDir().'/'.$archive->path, $objAdventure->numbering, $objBroadcast->files);
                 foreach ($files as $index => $file) {
@@ -119,6 +120,7 @@ class ModuleBroadcastList extends ModulePTW
                     }
                     $query = $params;
                     $query[$playKey] = $selection;
+                    $audioChapters[] = AudioChapters::read($file);
                     $audio[] = $request->getPathInfo().'?'.http_build_query($query, '', '&', PHP_QUERY_RFC3986);
                 }
             }
@@ -137,6 +139,7 @@ class ModuleBroadcastList extends ModulePTW
 				'samplerate' => $objBroadcast->samplerate,
 				'files' => [], // No direct archive URLs, including in old overrides.
                 'audio' => $audio,
+                'audioChapters' => $audioChapters,
 				'providers' => $foundproviders,
 				'url' => $objPageBroadcast->getFrontendUrl('/broadcast/' . $objBroadcast->date),
 				'id' => $objBroadcast->id
@@ -145,6 +148,10 @@ class ModuleBroadcastList extends ModulePTW
 
         if ($play !== null) throw new \Contao\CoreBundle\Exception\PageNotFoundException('Recording not found');
 		$this->loadLanguageFile('tl_module');
+        if ($allowed) {
+            AudioChapters::assets();
+            $this->Template->chapterLabels = AudioChapters::labels();
+        }
         $this->Template->lngArchivePlayer = $GLOBALS['TL_LANG']['tl_module']['aurigaArchivePlayer'];
 		ksort($allproviders);
 		$this->Template->providers = $allproviders;

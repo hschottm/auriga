@@ -28,3 +28,5 @@ $GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['locked'] = 'Authorized membe
 $GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['play'] = 'Play';
 
 $GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['title'] = 'Title';
+
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters'] = ['previous' => 'Previous segment', 'next' => 'Next segment', 'list' => 'Segments / chapter marks'];

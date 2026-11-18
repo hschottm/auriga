@@ -28,3 +28,5 @@ $GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['locked'] = 'Nur für berecht
 $GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['play'] = 'Abspielen';
 
 $GLOBALS['TL_LANG']['tl_content']['aurigaBrowser']['title'] = 'Titel';
+
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters'] = ['previous' => 'Vorheriger Beitrag', 'next' => 'Nächster Beitrag', 'list' => 'Beiträge / Sprungmarken'];

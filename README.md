@@ -433,3 +433,29 @@ Nach dem Update die Contao-Datenbankmigration ausführen. Unter **Auriga → Lex
 Ein Frontend-Modul vom Typ **Auriga-Lexikon** anlegen und auf einer Seite einfügen. Es zeigt eine alphabetische Übersicht veröffentlichter Einträge; die Links öffnen deren Detailansicht auf derselben Seite. Diese Links können in Markdown-Beschreibungen und Abenteuergeschichten verwendet werden. Bei einer Seite `lexikon.html` lautet ein Detail-Link beispielsweise `lexikon/lexicon/major-renault.html`. Den tatsächlich erzeugten Link aus der Übersicht kopieren, insbesondere bei abweichenden URL-Einstellungen. Nachträgliche Alias-Änderungen ändern die URL; alte Links werden nicht automatisch weitergeleitet.
 
 Nicht veröffentlichte oder unbekannte Einträge liefern HTTP 404. Markdown wird wie bei Abenteuergeschichten sicher gerendert: HTML wird als Text behandelt und unsichere Link-Schemata werden verworfen. Das Template `mod_auriga_lexicon.html.twig` bietet die Blöcke `lexicon_list`, `lexicon_entry`, `lexicon_entry_heading`, `lexicon_description` und `lexicon_back` für eigene Gestaltung.
+
+## LRC chapter navigation
+
+Both the mediafile browser and the broadcast list automatically enhance their audio
+players when a readable UTF-8 `.lrc` sidecar with valid timestamps exists next to
+the recording (for example `ptw_3001_2.mp3` and `ptw_3001_2.lrc`). No database
+migration or Jellyfin server is required. LRC does not need to be added to the
+browser's allowed download extensions.
+
+The player provides previous/next segment buttons, a collapsible clickable segment
+list and the current segment title. Seeking preserves playback/pause state;
+previous goes to the preceding segment. Without usable marks (or JavaScript), the
+native audio controls remain available. Timestamps outside the recording duration
+are disabled once metadata is loaded. Minutes may exceed 59. LRC offset tags and
+multiple timestamps per line are supported. Sidecars are limited to 256 KiB and
+symlink sidecars are ignored. Chapter metadata is only read for authorized players;
+existing playback authorization and byte-range delivery remain unchanged.
+
+Install the bundle assets and clear the Contao cache after updating. Templates
+that inherit the shipped templates automatically gain the player. Full custom
+copies overriding the player markup must adopt the shared
+`@Contao/auriga_audio_player.html.twig` include. `broadcast.audio` remains a list
+of URLs for compatibility; matching chapters are in `broadcast.audioChapters`.
+
+Tests: `php tests/audio-chapters.php` (optionally set `AURIGA_VENDOR_AUTOLOAD`
+for Twig rendering checks) and `node tests/audio-chapters-js.cjs`.

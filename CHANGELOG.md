@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.17 — 2026-11-18
+
+- Add automatic LRC segment navigation to archive-browser and broadcast-list audio players, with previous/next buttons, clickable timestamps and current-segment highlighting. Preserve protected playback and the standard player for recordings without valid sidecars.
+
 ## 1.4.16 — 2026-11-18
 
 - Preserve DPI search terms, fields and page sizes in shareable URLs; redirect submitted forms to GET requests, fix returning to page one, clamp outdated page numbers and use stable result ordering.

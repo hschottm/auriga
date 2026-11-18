@@ -23,7 +23,7 @@
                         <td class="mediafile-browser-actions" role="cell" data-label="{{ labels.actions }}">
                             {% if not entry.directory %}
                                 {% if entry.allowed %}<div class="mediafile-browser-controls">
-                                    {% if entry.playUrl %}<audio controls preload="none" aria-label="{{ labels.play }}: {{ entry.name }}"><source src="{{ entry.playUrl }}" type="{{ entry.audioType }}"></audio>{% endif %}
+                                    {% if entry.playUrl %}{% include '@Contao/auriga_audio_player.html.twig' with {url: entry.playUrl, type: entry.audioType, title: labels.play ~ ': ' ~ entry.name, chapters: entry.chapters|default([]), chapterLabels: chapterLabels|default({})} only %}{% endif %}
                                     <a href="{{ entry.url }}" download class="btn btn-sm btn-outline-primary">{{ labels.download }}</a></div>
                                 {% else %}<span>{{ labels.locked }}</span>{% endif %}
                             {% endif %}

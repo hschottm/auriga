@@ -31,7 +31,7 @@
 		<td>{{ broadcast.samplerate }}</td>
 		<td>{{ broadcast.providers|keys|join(',') }}</td>
 		{% if showArchivePlayer|default(false) %}
-        <td>{% block archive_player %}{% for url in broadcast.audio|default([]) %}<audio controls preload="none" aria-label="{{ broadcast.title }}"><source src="{{ url }}" type="audio/mpeg"></audio>{% endfor %}{% endblock %}</td>
+        <td>{% block archive_player %}{% for url in broadcast.audio|default([]) %}{% include '@Contao/auriga_audio_player.html.twig' with {url: url, type: 'audio/mpeg', title: broadcast.title, chapters: broadcast.audioChapters[loop.index0]|default([]), chapterLabels: chapterLabels|default({})} only %}{% endfor %}{% endblock %}</td>
         {% endif %}
 	</tr>
 {% endfor %}
