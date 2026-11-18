@@ -148,10 +148,7 @@ check(!$view->saveCover(999997,$gif),'Expected filesystem failure');
 check((int)$db->fetchOne('SELECT COUNT(*) FROM tl_cover')===$count && !(bool)$db->fetchOne('SELECT id FROM tl_song_cover WHERE song=999997'), 'Failed cover left DB records');
 unlink($blocked);
 echo "OK: real cover preview, download, persistence, shared-cover repair and transaction rollback\n";
-foreach ([['search'=>['invalid'], 'page'=>['invalid']], ['search'=>'Test Song', 'field'=>'bad', 'page'=>'2']] as $params) {
-    foreach ($params as $key=>$value) Contao\Input::setGet($key,$value);
-    check(is_string((new SearchView($model))->render()), 'Invalid search parameters failed');
-}
+require __DIR__.'/dpi-search-regression.php';
 foreach (['song'=>SongView::class,'broadcast'=>BroadcastView::class,'adventure'=>BroadcastListView::class] as $key=>$class) {
     Contao\Input::setGet($key, ['invalid']);
     try { (new $class($model))->render(); throw new RuntimeException('Expected invalid ID 404'); } catch (Contao\CoreBundle\Exception\PageNotFoundException $expected) {}
@@ -173,6 +170,6 @@ foreach (['broadcastlist'=>['adventure/'.$adventure,'Test Broadcast'], 'broadcas
     $module=new Contao\ModuleModel(); $module->pid=$theme->id; $module->type=$type; $module->name=$type; $module->jumpTo_adventure=$page->id; $module->jumpTo_broadcast=$page->id; $module->jumpTo_song=$page->id; $module->jumpTo_search=$page->id; $module->save();
     $targetLayout=new Contao\LayoutModel(); $targetLayout->pid=$theme->id; $targetLayout->name=$type; $targetLayout->template='fe_page'; $targetLayout->cols='1cl'; $targetLayout->rows='1rw'; $targetLayout->modules=serialize([['mod'=>$module->id,'col'=>'main','enable'=>1]]); $targetLayout->save();
     $target->layout=$targetLayout->id; $target->save();
-    $fixtures[]=['url'=>'https://auriga.test/auriga-'.$type.'/'.$params.'.html','text'=>$expected];
+    $fixtures[]=['url'=>$type === 'dpi' ? 'https://auriga.test/auriga-dpi.html?search=Test%20Song&field=title&results=10' : 'https://auriga.test/auriga-'.$type.'/'.$params.'.html','text'=>$expected];
 }
 file_put_contents($project.'/var/auriga-http-fixtures.json',json_encode($fixtures, JSON_THROW_ON_ERROR));

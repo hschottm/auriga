@@ -18,4 +18,6 @@
 {% block table_wrapper %}
     <div class="table-responsive">{{ parent() }}</div>
 {% endblock %}
-{% block table_attributes %} class="table table-striped table-hover align-middle"{% endblock %}
+{% block table_attributes %} class="auriga-search-table table table-striped table-hover align-middle"{% endblock %}
+
+{% block no_results_class %}{{ parent() }} alert alert-info{% endblock %}

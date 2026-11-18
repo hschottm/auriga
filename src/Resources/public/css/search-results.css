@@ -1,0 +1,104 @@
+.auriga-search {
+    --auriga-cover-size: 4rem;
+}
+.auriga-search table {
+    width: 100%;
+    table-layout: auto;
+}
+.auriga-search table > :is(thead, tbody) > tr > :is(th, td) {
+    vertical-align: middle;
+}
+.auriga-search table tbody td,
+.auriga-search table tbody td a {
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: normal;
+    hyphens: none;
+}
+.auriga-search td.cover {
+    width: calc(var(--auriga-cover-size) + 1rem);
+    min-width: calc(var(--auriga-cover-size) + 1rem);
+}
+.auriga-search td.cover img {
+    display: block;
+    width: var(--auriga-cover-size);
+    height: var(--auriga-cover-size);
+    max-width: none;
+    max-height: none;
+    object-fit: cover;
+    object-position: center;
+}
+.auriga-search table tbody td:nth-child(7) {
+    white-space: nowrap;
+}
+.auriga-search-empty {
+    margin-block: 1rem;
+    padding: 1rem;
+    background: #eef4f8;
+    border-left: 3px solid #687d8d;
+}
+@media (max-width: 767.98px) {
+    .auriga-search .auriga-search-table {
+        display: block;
+        font-size: .9rem;
+    }
+    /* Keep column headings accessible while visually hiding them. */
+    .auriga-search .auriga-search-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+    }
+    .auriga-search .auriga-search-table tbody {
+        display: block;
+    }
+    .auriga-search .auriga-search-table tbody tr {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        margin-bottom: 1rem;
+        padding: .75rem;
+        border: 1px solid #dee2e6;
+        border-radius: .25rem;
+    }
+    .auriga-search .auriga-search-table tbody td {
+        display: block;
+        grid-column: 1 / -1;
+        min-width: 0;
+        width: auto;
+        padding: .3rem 0;
+        border: 0;
+        box-shadow: none;
+        background: transparent;
+        overflow-wrap: anywhere;
+    }
+    .auriga-search .auriga-search-table tbody td a {
+        overflow-wrap: anywhere;
+    }
+    .auriga-search .auriga-search-table td[data-label]::before {
+        content: attr(data-label) ": ";
+        font-weight: 600;
+    }
+    .auriga-search .auriga-search-table td.auriga-search-adventure {
+        grid-column: 1;
+        grid-row: 1;
+        padding-right: .5rem;
+    }
+    .auriga-search .auriga-search-table td.auriga-search-cover {
+        grid-column: 2;
+        grid-row: 1 / 4;
+        padding-left: .5rem;
+    }
+    .auriga-search .auriga-search-table td.auriga-search-special {
+        grid-column: 1;
+        grid-row: 2;
+    }
+    .auriga-search .auriga-search-table td.auriga-search-special:empty {
+        display: none;
+    }
+    .auriga-search .auriga-search-table td.auriga-search-title {
+        grid-column: 1;
+        grid-row: 3;
+        padding-right: .5rem;
+    }
+}

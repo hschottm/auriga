@@ -21,3 +21,9 @@ assertOutput($xpath->query('//tbody/tr')->length === 1, 'Lost result row');
 $html = $template->render(array_replace($data,['foundResults'=>false]));
 assertOutput(!str_contains($html,'<table') && str_contains($html,'<form'), 'Empty result state broken');
 echo "OK: inherited Bootstrap DPI form, selected values, CSRF, escaping, result table and pagination\n";
+
+$html = $template->render(array_replace($data, ['foundResults'=>false, 'searchPerformed'=>true, 'noResults'=>'Keine Treffer']));
+assertOutput(str_contains($html, 'Keine Treffer') && str_contains($html, 'role="status"'), 'Missing empty-search feedback');
+$html = $template->render(array_replace($data, ['foundResults'=>false, 'searchPerformed'=>false, 'noResults'=>'Keine Treffer']));
+assertOutput(!str_contains($html, 'Keine Treffer'), 'Idle form reports missing results');
+echo "OK: empty search feedback and idle form distinction\n";

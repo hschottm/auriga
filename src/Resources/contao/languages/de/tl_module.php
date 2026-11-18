@@ -61,3 +61,5 @@ $GLOBALS['TL_LANG']['tl_module']['song_cover_remove'] = 'Albumcover-Zuordnung en
 $GLOBALS['TL_LANG']['tl_module']['song_cover_remove_help'] = 'Entfernt die Cover-Zuordnung aller Songs mit gleichem Albumtitel und Labelcode, unabhängig vom Interpreten. Die Bilddatei bleibt erhalten.';
 
 $GLOBALS['TL_LANG']['tl_module']['adventure_story'] = 'Abenteuergeschichte';
+
+$GLOBALS['TL_LANG']['tl_module']['auriga_no_results'] = 'Keine Treffer für diese Suche gefunden. Bitte ändere den Suchbegriff oder das Suchfeld.';

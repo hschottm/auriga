@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.16 — 2026-11-18
+
+- Preserve DPI search terms, fields and page sizes in shareable URLs; redirect submitted forms to GET requests, fix returning to page one, clamp outdated page numbers and use stable result ordering.
+- Show an explicit message for searches without matches.
+- Give search results uniform square covers, column classes and a responsive mobile layout; update the inherited Bootstrap example.
+
 ## 1.4.15 — 2026-11-17
 
 - Add an Auriga lexicon backend with unique stable aliases, Markdown descriptions and publication control, plus a frontend overview/detail module with safe Markdown rendering and overridable Twig blocks.

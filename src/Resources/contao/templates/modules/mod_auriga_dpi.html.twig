@@ -1,5 +1,5 @@
 {% block content %}
-<div{{ attrs(cssID|default).addClass([class|default, 'ptw_broadcast']).addStyle(style|default) }}>
+<div{{ attrs(cssID|default).addClass([class|default, 'ptw_broadcast', 'auriga-search']).addStyle(style|default) }}>
 {% block headline %}
 {% if headline %}<{{ hl }}>{{ headline }}</{{ hl }}>{% endif %}
 {% endblock %}
@@ -28,9 +28,9 @@
 {% if foundResults %}
 {% block result_info %}<div class="{% block result_info_class %}resultinfo{% endblock %}">{{ searchResult }} {{ resFrom }} - {{ resTo }} {{ of }} {{ resTotal }}</div>{% endblock %}
 {% block table_wrapper %}
-<table{% block table_attributes %}{% endblock %}>
+<table{% block table_attributes %} class="auriga-search-table"{% endblock %}>
 {% block table_head %}
-	<thead>
+	<thead{% block table_head_attributes %}{% endblock %}>
 	<tr>
 		<th>{{ adventure }}</th>
 		<th colspan="2">{{ title }}</th>
@@ -47,15 +47,15 @@
 {% for song in foundsongs %}
 {% block table_row %}
 	<tr>
-		<td><a href="{{ song.advurl }}">{{ song.adventure }}</a></td>
-		<td>{{ song.special|raw }}</td>
-		<td><a href="{{ song.titleurl }}">{{ song.title }}</a></td>
-		<td><a href="{{ song.artisturl }}">{{ song.artist }}</a></td>
-		<td class="cover"><a href="{{ song.idurl }}">{{ song.cover|raw }}</a></td>
-		<td><a href="{{ song.albumurl }}">{{ song.album }}</a></td>
-		<td>{{ song.year }}</td>
-		<td><a href="{{ song.labelurl }}">{{ song.labelcode }}</a></td>
-		<td>{{ song.genres|join('/') }}</td>
+		<td class="auriga-search-adventure" data-label="{{ adventure }}"><a href="{{ song.advurl }}">{{ song.adventure }}</a></td>
+		<td class="auriga-search-special">{{ song.special|raw }}</td>
+		<td class="auriga-search-title" data-label="{{ title }}"><a href="{{ song.titleurl }}">{{ song.title }}</a></td>
+		<td class="auriga-search-artist" data-label="{{ artist }}"><a href="{{ song.artisturl }}">{{ song.artist }}</a></td>
+		<td class="cover auriga-search-cover"><a href="{{ song.idurl }}">{{ song.cover|raw }}</a></td>
+		<td class="auriga-search-album" data-label="{{ album }}"><a href="{{ song.albumurl }}">{{ song.album }}</a></td>
+		<td class="auriga-search-year" data-label="{{ year }}">{{ song.year }}</td>
+		<td class="auriga-search-labelcode" data-label="{{ labelcode }}"><a href="{{ song.labelurl }}">{{ song.labelcode }}</a></td>
+		<td class="auriga-search-genres" data-label="{{ genres }}">{{ song.genres|join('/') }}</td>
 	</tr>
 {% endblock %}
 {% endfor %}
@@ -64,6 +64,10 @@
 </table>
 {% endblock %}
 {% block pagination %}{{ pagination|raw }}{% endblock %}
+{% elseif searchPerformed|default %}
+{% block no_results %}
+<p class="{% block no_results_class %}auriga-search-empty{% endblock %}" role="status">{{ noResults }}</p>
+{% endblock %}
 {% endif %}
 </div>
 {% endblock %}

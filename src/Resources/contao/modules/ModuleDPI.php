@@ -65,32 +65,41 @@ class ModuleDPI extends ModulePTW
 			$genres[$genre['id']] = $genre;
 		}
 		
-		// Request/session values may be null or arrays; pagination requires integers.
-		$options = array('title', 'artist', 'album', 'year', 'labelcode');
-		$arrResults = array(10, 20, 50, 100, 1000);
-		$scalar = static function ($value) { return is_scalar($value) ? (string) $value : ''; };
-		$savedField = $scalar($this->session()->get('dpi_field'));
-		$savedSearch = $scalar($this->session()->get('dpi_search'));
-		if ($scalar(\Contao\Input::get('page')) === '') $savedSearch = '';
-		$field = $scalar(\Contao\Input::post('field'));
-		if ($field === '') $field = $scalar(\Contao\Input::get('field'));
-		if ($field === '') $field = $savedField;
-		if (!in_array($field, $options, true)) $field = 'title';
-		$search = $scalar(\Contao\Input::post('search'));
-		if ($search === '') $search = $scalar(\Contao\Input::get('search'));
-		if ($search === '') $search = $savedSearch;
-		$results = $scalar(\Contao\Input::post('results'));
-		if ($results === '') $results = $scalar($this->session()->get('dpi_results'));
-		$results = (int) $results;
-		if (!in_array($results, $arrResults, true)) $results = 10;
-		$page = filter_var(\Contao\Input::get('page'), FILTER_VALIDATE_INT, array(
-			'options' => array('min_range' => 1, 'max_range' => intdiv(PHP_INT_MAX, $results) - 1)
-		));
-		if ($page === false) $page = 1;
+        $GLOBALS['TL_CSS'][] = 'bundles/hschottmauriga/css/search-results.css|static';
+        $this->Template->class = trim((string) $this->Template->class . ' auriga-search');
 
-		$this->session()->set('dpi_field', $field);
-		$this->session()->set('dpi_search', $search);
-		$this->session()->set('dpi_results', $results);
+        $options = array('title', 'artist', 'album', 'year', 'labelcode');
+        $arrResults = array(10, 20, 50, 100, 1000);
+        $scalar = static function ($value) { return is_scalar($value) ? (string) $value : ''; };
+        $submitted = $scalar(\Contao\Input::post('FORM_SUBMIT')) === 'dpi';
+        $field = $scalar($submitted ? \Contao\Input::post('field') : \Contao\Input::get('field'));
+        $search = trim($scalar($submitted ? \Contao\Input::post('search') : \Contao\Input::get('search')));
+        $resultsValue = $submitted ? \Contao\Input::post('results') : \Contao\Input::get('results');
+
+        // Upgrade old pagination URLs once. New links carry the complete search state.
+        if (!$submitted && \Contao\Input::get('search') === null && \Contao\Input::get('page') !== null) {
+            $search = $scalar($this->session()->get('dpi_search'));
+            $field = $scalar($this->session()->get('dpi_field'));
+        }
+        if (!in_array($field, $options, true)) $field = 'title';
+        if ($resultsValue === null) $resultsValue = $this->session()->get('dpi_results');
+        $results = (int) $scalar($resultsValue);
+        if (!in_array($results, $arrResults, true)) $results = 10;
+        $page = filter_var(\Contao\Input::get('page'), FILTER_VALIDATE_INT, array(
+            'options' => array('min_range' => 1, 'max_range' => intdiv(PHP_INT_MAX, $results) - 1)
+        ));
+        if ($page === false || $submitted) $page = 1;
+
+        $this->session()->set('dpi_field', $field);
+        $this->session()->set('dpi_search', $search);
+        $this->session()->set('dpi_results', $results);
+
+        // POST/Redirect/GET avoids resubmission and makes browser Back/Forward reliable.
+        // Also normalize old /search/.../field/... links before paginating them.
+        $request = \Contao\System::getContainer()->get('request_stack')->getCurrentRequest();
+        if ($submitted || ($search !== '' && (!$request->query->has('search') || !$request->query->has('results')))) {
+            $this->redirect(self::searchUrl($objPageSearch, $search, $field, $results, $page), 303);
+        }
 		$arrFoundSongs = array();
 		$foundResults = false;
 		$totalcount = 0;
@@ -101,8 +110,12 @@ class ModuleDPI extends ModulePTW
 			$objSong = $this->Database->prepare("SELECT tl_broadcast_song.id FROM tl_adventure, tl_broadcast, tl_broadcast_song LEFT JOIN tl_song_cover ON tl_broadcast_song.id = tl_song_cover.song WHERE tl_broadcast.id = tl_broadcast_song.pid AND tl_broadcast_song.$field LIKE ? AND tl_adventure.id = tl_broadcast.pid ORDER BY cast(tl_broadcast.date AS UNSIGNED) DESC")
 				->execute('%' . $search . '%');
 			$totalcount = $objSong->numRows;
+            $lastPage = max(1, (int) ceil($totalcount / $results));
+            if ($page > $lastPage) {
+                $this->redirect(self::searchUrl($objPageSearch, $search, $field, $results, $lastPage), 303);
+            }
 
-			$objSong = $this->Database->prepare("SELECT tl_broadcast_song.*, tl_song_cover.cover, tl_adventure.id adventureid, tl_adventure.title adventuretitle, tl_adventure.numbering FROM tl_adventure, tl_broadcast, tl_broadcast_song LEFT JOIN tl_song_cover ON tl_broadcast_song.id = tl_song_cover.song WHERE tl_broadcast.id = tl_broadcast_song.pid AND tl_broadcast_song.$field LIKE ? AND tl_adventure.id = tl_broadcast.pid ORDER BY tl_broadcast_song.artist ASC, cast(tl_broadcast.date AS UNSIGNED) DESC")
+			$objSong = $this->Database->prepare("SELECT tl_broadcast_song.*, tl_song_cover.cover, tl_adventure.id adventureid, tl_adventure.title adventuretitle, tl_adventure.numbering FROM tl_adventure, tl_broadcast, tl_broadcast_song LEFT JOIN tl_song_cover ON tl_broadcast_song.id = tl_song_cover.song WHERE tl_broadcast.id = tl_broadcast_song.pid AND tl_broadcast_song.$field LIKE ? AND tl_adventure.id = tl_broadcast.pid ORDER BY tl_broadcast_song.artist ASC, cast(tl_broadcast.date AS UNSIGNED) DESC, tl_broadcast_song.id ASC")
 				->limit($results, ($page-1)*$results)
 				->execute('%' . $search . '%');
 				
@@ -130,7 +143,7 @@ class ModuleDPI extends ModulePTW
 				if ($objSong->cover > 0)
 				{
 					$imagename = $this->getCovername($objSong->cover);
-					$cover = '<img src="' . htmlspecialchars((string) $imagename, ENT_QUOTES, 'UTF-8') . '" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" width="22" height="22" />';
+					$cover = '<img src="' . htmlspecialchars((string) $imagename, ENT_QUOTES, 'UTF-8') . '" alt="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][0] . '" title="' . $GLOBALS['TL_LANG']['tl_broadcast_song']['cover'][1] . '" width="64" height="64" />';
 				}
 				else
 				{
@@ -145,11 +158,11 @@ class ModuleDPI extends ModulePTW
 					'special' => $special,
 					'cover' => $cover,
 					'idurl' => $objPageSong->getFrontendUrl('/song/' . $objSong->id),
-					'titleurl' => $objPageSearch->getFrontendUrl('/search/' . \Contao\StringUtil::specialchars($objSong->title) . '/field/title'),
+					'titleurl' => self::searchUrl($objPageSearch, (string) $objSong->title, 'title', $results),
 					'advurl' => $objPageAdventure->getFrontendUrl('/adventure/' . $objSong->adventureid),
-					'labelurl' => $objPageSearch->getFrontendUrl('/search/' . \Contao\StringUtil::specialchars($objSong->labelcode) . '/field/labelcode'),
-					'albumurl' => $objPageSearch->getFrontendUrl('/search/' . \Contao\StringUtil::specialchars($objSong->album) . '/field/album'),
-					'artisturl' => $objPageSearch->getFrontendUrl('/search/' . \Contao\StringUtil::specialchars($objSong->artist) . '/field/artist'),
+					'labelurl' => self::searchUrl($objPageSearch, (string) $objSong->labelcode, 'labelcode', $results),
+					'albumurl' => self::searchUrl($objPageSearch, (string) $objSong->album, 'album', $results),
+					'artisturl' => self::searchUrl($objPageSearch, (string) $objSong->artist, 'artist', $results),
 					'labelcode' => \Contao\StringUtil::specialchars($objSong->labelcode),
 					'length' => \Contao\StringUtil::specialchars($objSong->length),
 					'composer' => \Contao\StringUtil::specialchars($objSong->composer),
@@ -173,8 +186,10 @@ class ModuleDPI extends ModulePTW
 		$this->Template->results = $arrResults;
 		$this->Template->formaction = $objPage->getFrontendUrl('');
 		$this->Template->foundResults = $foundResults;
+        $this->Template->searchPerformed = $search !== '';
+        $this->Template->noResults = $GLOBALS['TL_LANG']['tl_module']['auriga_no_results'];
 		$this->Template->foundsongs = $arrFoundSongs;
-		$this->Template->resFrom = ($page-1)*$results+1;
+		$this->Template->resFrom = $totalcount > 0 ? ($page-1)*$results+1 : 0;
 		$until = ($page-1)*$results+$results;
 		$this->Template->resTo = ($until > $totalcount) ? $totalcount : $until;
 		$this->Template->resTotal = $totalcount;
@@ -191,5 +206,13 @@ class ModuleDPI extends ModulePTW
 			$this->Template->$option = $GLOBALS['TL_LANG']['tl_module']['song_' . $option];
 		}
 	}
+    private static function searchUrl(PageModel $page, string $search, string $field, int $results, int $number = 1): string
+    {
+        $url = $page->getFrontendUrl();
+        $parameters = ['search' => $search, 'field' => $field, 'results' => $results];
+        if ($number > 1) $parameters['page'] = $number;
+        return $url . (str_contains($url, '?') ? '&' : '?') . http_build_query($parameters, '', '&', PHP_QUERY_RFC3986);
+    }
+
 }
 
