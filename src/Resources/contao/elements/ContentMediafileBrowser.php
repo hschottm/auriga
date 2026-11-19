@@ -45,6 +45,7 @@ class ContentMediafileBrowser extends \Contao\ContentElement
         }
         AudioChapters::assets();
         $this->Template->chapterLabels = AudioChapters::labels();
+        $this->Template->playerPreference = PlayerPreference::context();
         $GLOBALS['TL_CSS'][] = 'bundles/hschottmauriga/css/mediafile-browser.css|static';
         // Lists and downloads must not be served from the public page cache.
         global $objPage;

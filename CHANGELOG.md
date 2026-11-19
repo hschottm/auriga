@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.21 — 2026-11-19
+
+- Remember full-broadcast/story-only choices per Contao member, synchronize supported players on the current page and restore the account preference on future visits. Requires the new `tl_member.aurigaPlaybackMode` database column.
+
 ## 1.4.20 — 2026-11-19
 
 - Detect validated JSON `.story` sidecars in both archive views and offer full-broadcast/story-only playback with range navigation, a condensed timeline and stopping at the final range.

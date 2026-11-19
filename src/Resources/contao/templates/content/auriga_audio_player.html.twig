@@ -1,4 +1,4 @@
-<div class="auriga-audio-player" data-auriga-audio-player>
+<div class="auriga-audio-player" data-auriga-audio-player data-preferred-mode="{{ playerPreference.mode|default('full') }}"{% if playerPreference.token|default %} data-preference-token="{{ playerPreference.token }}"{% endif %} data-preference-error="{{ chapterLabels.preferenceError|default('') }}">
 <audio controls preload="none" aria-label="{{ title }}"><source src="{{ url }}" type="{{ type }}"></audio>
 <div class="auriga-audio-ui" hidden>
     {% if story|default([]) %}

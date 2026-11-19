@@ -5,6 +5,20 @@
         const total = Math.max(0, Math.floor(seconds));
         return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
     };
+    const players = [];
+    let saveQueue = Promise.resolve();
+    function savePreference(root, mode, report) {
+        if (!root.dataset.preferenceToken) return;
+        // Serialize writes so a quick second choice cannot be overwritten by the first.
+        saveQueue = saveQueue.catch(() => {}).then(async () => {
+            try {
+                const body = new URLSearchParams({FORM_SUBMIT: 'auriga_player_preference', REQUEST_TOKEN: root.dataset.preferenceToken, mode});
+                const response = await fetch(window.location.href, {method: 'POST', credentials: 'same-origin', body, headers: {'Accept': 'application/json'}});
+                if (!response.ok || (await response.json()).mode !== mode) throw new Error('Preference not saved');
+                report('');
+            } catch (error) { report(root.dataset.preferenceError); }
+        });
+    }
     function init() {
         document.querySelectorAll('[data-auriga-audio-player]').forEach(root => {
             if (root.dataset.initialized) return;
@@ -154,18 +168,19 @@
                 details.open = false;
                 details.querySelector('summary').focus();
             }));
-            modes.forEach(button => button.addEventListener('click', () => {
-                storyMode = button.dataset.audioMode === 'story';
+            function setMode(value, explicit = false) {
+                if (!modes.length) return;
+                storyMode = value === 'story';
                 storyFinished = false;
                 pending = null;
                 items = storyMode ? storyItems : fullItems;
                 times = items.map(item => Number(storyMode ? item.dataset.storyStart : item.dataset.chapterStart));
                 find('[data-full-list]').hidden = storyMode;
                 find('[data-story-list]').hidden = !storyMode;
-                modes.forEach(mode => mode.setAttribute('aria-pressed', String(mode === button)));
+                modes.forEach(mode => mode.setAttribute('aria-pressed', String(mode.dataset.audioMode === value)));
                 if (details) details.hidden = items.length === 0;
                 if (storyMode) {
-                    if (audio.readyState === 0) { pending = 0; audio.load(); }
+                    if (audio.readyState === 0) { pending = 0; if (explicit) audio.load(); }
                     else {
                         const segments = ranges();
                         if (segments.length && audio.currentTime >= segments[segments.length - 1].end) audio.currentTime = segments[0].start;
@@ -173,7 +188,14 @@
                     }
                 }
                 update();
+            }
+            players.push({root, setMode});
+            modes.forEach(button => button.addEventListener('click', () => {
+                const value = button.dataset.audioMode;
+                players.forEach(player => player.setMode(value, player.root === root));
+                savePreference(root, value, message);
             }));
+            setMode(root.dataset.preferredMode === 'story' ? 'story' : 'full');
             if (details) details.hidden = items.length === 0;
             root.addEventListener('keydown', event => {
                 if (event.key === 'Escape' && details && details.open) {

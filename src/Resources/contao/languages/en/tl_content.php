@@ -40,3 +40,4 @@ $GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['error'] = 'Playback fa
 $GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['mode'] = 'Playback version';
 $GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['full'] = 'Full broadcast';
 $GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['story'] = 'Story only';
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['preferenceError'] = 'Your preference could not be saved. Please select it again or reload the page.';

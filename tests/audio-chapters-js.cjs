@@ -69,3 +69,32 @@ modeButtons[0].events.click(); assert.equal(storyControls['[data-audio-seek]'].m
 modeButtons[1].events.click(); assert.equal(storyAudio.currentTime,10);
 storyAudio.readyState=0; modeButtons[0].events.click(); modeButtons[1].events.click(); storyAudio.readyState=1; storyAudio.events.loadedmetadata(); assert.equal(storyAudio.currentTime,10);
 console.log('OK: story gaps, virtual seeking, skip, final stop, mode changes and metadata loading');
+// Saved account defaults apply without loading all recordings in a long archive.
+function preferencePlayer(preferred) {
+    const audio = Object.assign(element(), {currentTime:0,duration:NaN,readyState:0,paused:true,volume:1,muted:false,loads:0,load(){this.loads++;},pause(){this.paused=true;}});
+    const controls = Object.fromEntries(Object.keys(extra).map(key => [key,element()]));
+    controls['[data-audio-play]'].dataset = {playLabel:'Play',pauseLabel:'Pause'};
+    const chapters = [[10,20],[40,60]].map(([start,end]) => Object.assign(element(), {dataset:{storyStart:String(start),storyEnd:String(end)},querySelector(){return {textContent:'Story'};}}));
+    const modes = ['full','story'].map(mode => Object.assign(element(),{dataset:{audioMode:mode}}));
+    const nodes = {...controls,'audio':audio,'[data-chapter-previous]':element(),'[data-chapter-next]':element(),'[data-chapter-current]':element(),'details':{querySelector(){return {focus(){}};}},'[data-full-list]':{},'[data-story-list]':{}};
+    const root = Object.assign(element(), {dataset:{preferredMode:preferred,preferenceToken:'csrf',preferenceError:'Save failed'},querySelector(selector){return nodes[selector] || null;},querySelectorAll(selector){return selector === '[data-story-start]' ? chapters : selector === '[data-audio-mode]' ? modes : [];}});
+    return {root,audio,modes,nodes};
+}
+const firstPreference = preferencePlayer('story'), secondPreference = preferencePlayer('story');
+const writes = [];
+vm.runInNewContext(source, {clearTimeout(){},setTimeout(){},URLSearchParams,window:{location:{href:'https://auriga.test/archive'}},fetch:async (url,options) => {writes.push(options.body.get('mode')); return {ok:true,json:async()=>({mode:options.body.get('mode')})};},document:{readyState:'complete',querySelectorAll(){return [firstPreference.root,secondPreference.root];}}});
+assert.equal(firstPreference.modes[1].attrs['aria-pressed'],'true');
+assert.equal(secondPreference.modes[1].attrs['aria-pressed'],'true');
+assert.equal(firstPreference.audio.loads,0); assert.equal(secondPreference.audio.loads,0);
+firstPreference.modes[0].events.click();
+assert.equal(secondPreference.modes[0].attrs['aria-pressed'],'true');
+firstPreference.modes[1].events.click();
+assert.equal(secondPreference.modes[1].attrs['aria-pressed'],'true');
+assert.equal(secondPreference.audio.loads,0);
+secondPreference.audio.readyState=1; secondPreference.audio.duration=100; secondPreference.audio.events.loadedmetadata();
+assert.equal(secondPreference.audio.currentTime,10);
+(async () => {
+    for (let i=0; i<20; i++) await Promise.resolve();
+    assert.deepEqual(writes,['full','story']);
+    console.log('OK: account default, synchronized players, lazy media loading and ordered saves');
+})().catch(error => {console.error(error); process.exitCode=1;});

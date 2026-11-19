@@ -40,3 +40,4 @@ $GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['error'] = 'Wiedergabe 
 $GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['mode'] = 'Wiedergabefassung';
 $GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['full'] = 'Ganze Sendung';
 $GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['story'] = 'Nur Abenteuer';
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['preferenceError'] = 'Die Auswahl konnte nicht gespeichert werden. Bitte erneut wählen oder die Seite neu laden.';

@@ -154,6 +154,7 @@ class ModuleBroadcastList extends ModulePTW
         if ($allowed) {
             AudioChapters::assets();
             $this->Template->chapterLabels = AudioChapters::labels();
+        $this->Template->playerPreference = PlayerPreference::context();
         }
         $this->Template->lngArchivePlayer = $GLOBALS['TL_LANG']['tl_module']['aurigaArchivePlayer'];
 		ksort($allproviders);

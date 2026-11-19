@@ -489,3 +489,16 @@ to the media duration once known. The original recording is unchanged; browser
 seeking may buffer at transitions. This is playback navigation, not sample-exact
 editing or an access restriction on the original MP3. Browser scheduling,
 especially in background tabs, can affect boundary timing.
+
+## Member playback preference
+
+Explicit full-broadcast/story-only selections are saved on the logged-in member
+account and synchronized across supported players on the page. Subsequent visits
+(including another device) use the stored preference. Recordings without story
+ranges always play in full and do not overwrite the preference. Restoring the
+preference does not preload every audio file or start playback.
+
+Run `contao:migrate --env=prod` after updating to add
+`tl_member.aurigaPlaybackMode` (default `full`). Saves use authenticated,
+CSRF-protected POST requests; failed saves show a message in the player. Public
+guest players can switch locally but do not save an account preference.
