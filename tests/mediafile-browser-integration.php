@@ -56,7 +56,11 @@ try {
     }
     $request->query->remove('auriga_browser_987654_download');
     $request->query->set('auriga_browser_987654', '');
+    file_put_contents($folder.'/example.story', '[{"start":"00:10","end":"00:20","title":"Private story"}]');
     $html = (new AuthorizedBrowser($model))->generate();
+    assertOutput(str_contains($html, 'data-story-start="10"'), 'Browser story missing');
+    $guestHtml = (new ContentMediafileBrowser($model))->generate();
+    assertOutput(!str_contains($guestHtml, 'Private story'), 'Private story leaked to guest');
     assertOutput(str_contains($html, '<audio controls preload="none"') && str_contains($html, 'play'), 'Audio player missing');
     $request->query->set('auriga_browser_987654', 'example.mp3');
     $request->query->set('auriga_browser_987654_download', '1');
@@ -92,5 +96,6 @@ try {
     echo "OK: Contao registration, Twig rendering, directory navigation, private file response and guest visibility\n";
 } finally {
     $db->executeStatement('DELETE FROM tl_files WHERE uuid=?', [$uuid]);
+    @unlink($folder.'/example.story');
     unlink($folder.'/example.mp3'); rmdir($folder.'/sub'); rmdir($folder);
 }

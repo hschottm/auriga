@@ -114,3 +114,7 @@
     .auriga-audio-sliders input { height: 32px; }
     .auriga-audio-ui .auriga-audio-chapters summary { min-height: 44px; }
 }
+.auriga-audio-modes { display: flex; gap: 2px; padding: 2px; margin-bottom: 5px; border-radius: 7px; background: rgba(127,127,127,.1); }
+.auriga-audio-modes button { flex: 1; min-height: 30px; padding: 4px 6px; font: inherit; border: 0; border-radius: 5px; background: transparent; color: inherit; cursor: pointer; }
+.auriga-audio-modes button[aria-pressed="true"] { background: var(--auriga-player-accent); color: #fff; }
+@media (pointer: coarse) { .auriga-audio-modes button { min-height: 44px; } }

@@ -106,6 +106,7 @@ class ModuleBroadcastList extends ModulePTW
 			}
             $audio = [];
             $audioChapters = [];
+            $audioStories = [];
             if ($archive && $archive->type === 'folder') {
                 $files = ArchiveAudio::files(self::projectDir().'/'.$container->getParameter('contao.upload_path'), self::projectDir().'/'.$archive->path, $objAdventure->numbering, $objBroadcast->files);
                 foreach ($files as $index => $file) {
@@ -121,6 +122,7 @@ class ModuleBroadcastList extends ModulePTW
                     $query = $params;
                     $query[$playKey] = $selection;
                     $audioChapters[] = AudioChapters::read($file);
+                    $audioStories[] = AudioChapters::story($file);
                     $audio[] = $request->getPathInfo().'?'.http_build_query($query, '', '&', PHP_QUERY_RFC3986);
                 }
             }
@@ -140,6 +142,7 @@ class ModuleBroadcastList extends ModulePTW
 				'files' => [], // No direct archive URLs, including in old overrides.
                 'audio' => $audio,
                 'audioChapters' => $audioChapters,
+                'audioStories' => $audioStories,
 				'providers' => $foundproviders,
 				'url' => $objPageBroadcast->getFrontendUrl('/broadcast/' . $objBroadcast->date),
 				'id' => $objBroadcast->id

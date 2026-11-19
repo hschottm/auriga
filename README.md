@@ -461,3 +461,31 @@ of URLs for compatibility; matching chapters are in `broadcast.audioChapters`.
 
 Tests: `php tests/audio-chapters.php` (optionally set `AURIGA_VENDOR_AUTOLOAD`
 for Twig rendering checks) and `node tests/audio-chapters-js.cjs`.
+
+## Story-only playback
+
+Place `ptw_3001_2.story` beside `ptw_3001_2.mp3`. Its UTF-8 JSON content is a
+chronological list of non-overlapping ranges, for example:
+
+```json
+[
+  {"start": "03:15", "end": "08:14", "title": "Previously"},
+  {"start": "14:48", "end": "21:37", "title": "Chapter 1"}
+]
+```
+
+Both archive views offer “Full broadcast / Story only” when a valid file exists.
+The full broadcast remains the default and uses LRC chapters if available.
+Story mode works without an LRC file and uses the story ranges as chapters.
+Its time display and seek slider exclude the gaps. Skipping and selecting chapters
+preserve pause/play state. Switching into story mode keeps an in-range position,
+otherwise moves to the next range (or restarts if past the final range).
+Playback pauses after the final range. A `.story` file needs no database entry.
+
+Use `MM:SS`, `MM:SS.mmm` or `HH:MM:SS.mmm` strings and a nonempty title.
+Malformed JSON, reversed/overlapping/unordered ranges and sidecar symlinks are
+ignored as a whole. Maximum size is 256 KiB / 2000 ranges. Range ends are clamped
+to the media duration once known. The original recording is unchanged; browser
+seeking may buffer at transitions. This is playback navigation, not sample-exact
+editing or an access restriction on the original MP3. Browser scheduling,
+especially in background tabs, can affect boundary timing.

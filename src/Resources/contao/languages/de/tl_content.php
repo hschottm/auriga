@@ -37,3 +37,6 @@ $GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['position'] = 'Wiederga
 $GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['volume'] = 'Lautstärke';
 $GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['loading'] = 'Wird geladen …';
 $GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['error'] = 'Wiedergabe nicht möglich. Bitte erneut versuchen oder die Seite neu laden.';
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['mode'] = 'Wiedergabefassung';
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['full'] = 'Ganze Sendung';
+$GLOBALS['TL_LANG']['tl_content']['aurigaAudioChapters']['story'] = 'Nur Abenteuer';

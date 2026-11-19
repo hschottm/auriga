@@ -35,3 +35,14 @@ if ($autoload) {
  verify(str_contains($html, '<audio') && str_contains($html, 'data-audio-play') && !str_contains($html, 'data-chapter-start'), 'Standard player fallback');
 }
 echo "OK: LRC parsing, time ordering, offsets, sidecar limits, symlink rejection and player template\n";
+
+verify(count(AudioChapters::parseStory('[{"start":"03:15","end":"08:14","title":"Story"}]')) === 1, 'Story pair');
+verify(AudioChapters::parseStory('[{"start":"01:02:03.250","end":"01:03:00","title":"Story"}]')[0]['start'] === 3723.25, 'Story hours');
+foreach (['broken', '{}', '[{"start":"00:10","end":"00:05","title":"Bad"}]', '[{"start":"00:00","end":"00:10","title":"A"},{"start":"00:09","end":"00:20","title":"B"}]', '[{"start":"00:99","end":"01:10","title":"Bad"}]'] as $invalid) verify(AudioChapters::parseStory($invalid) === [], 'Reject invalid story');
+if ($autoload) {
+ $data['story'] = AudioChapters::parseStory('[{"start":"03:15","end":"08:14","title":"<Story>"}]');
+ $data['chapterLabels'] += ['mode'=>'Mode', 'full'=>'Full broadcast', 'story'=>'Story only'];
+ $html = $twig->render('@Contao/auriga_audio_player.html.twig', $data);
+ verify(str_contains($html, 'data-story-start="195"') && str_contains($html, 'data-story-end="494"') && str_contains($html, '&lt;Story&gt;') && str_contains($html, 'data-audio-mode="story"'), 'Story-only template and escaping');
+}
+echo "OK: story JSON validation and mode switch template\n";

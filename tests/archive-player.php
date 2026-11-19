@@ -33,6 +33,9 @@ try {
     file_put_contents($folder.'/ptw/001/ptw_4902_2.lrc', "[00:00.00] Begrüßung\n[03:15.00] Was bisher geschah\n[08:14.00] Cape Knox <Test>\n");
     $html = (new BroadcastListView($model))->render();
     check(str_contains($html, 'data-auriga-audio-player') && str_contains($html, 'data-chapter-start="195"') && str_contains($html, 'Cape Knox &lt;Test&gt;'), 'Database reference must resolve sibling LRC and render chapters');
+    file_put_contents($folder.'/ptw/001/ptw_4902_2.story', '[{"start":"03:15","end":"08:14","title":"Story test"}]');
+    $html = (new BroadcastListView($model))->render();
+    check(str_contains($html, 'data-story-start="195"') && str_contains($html, 'data-audio-mode="story"'), 'Broadcast story sidecar missing');
     $request->query->set($key,$broadcast.':0');
     try { (new BroadcastListView($model))->render(); throw new RuntimeException('Expected audio response'); }
     catch (Contao\CoreBundle\Exception\ResponseException $e) {
@@ -55,5 +58,6 @@ try {
     if (isset($storage)) $storage->setToken($previous);
     $db->executeStatement('DELETE FROM tl_files WHERE uuid=?',[$uuid]);
     @unlink($folder.'/ptw/001/ptw_4902_2.lrc');
+    @unlink($folder.'/ptw/001/ptw_4902_2.story');
     unlink($folder.'/ptw/001/ptw_4902_2.mp3'); rmdir($folder.'/ptw/001'); rmdir($folder.'/ptw'); rmdir($folder);
 }

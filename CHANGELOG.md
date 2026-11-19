@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.20 — 2026-11-19
+
+- Detect validated JSON `.story` sidecars in both archive views and offer full-broadcast/story-only playback with range navigation, a condensed timeline and stopping at the final range.
+
 ## 1.4.19 — 2026-11-18
 
 - Use a unified audio player for all recordings, with play/pause, seeking, time display, volume/mute, loading/error feedback and automatic pausing of other recordings. Disable chapter navigation without LRC marks; retain native controls without JavaScript.

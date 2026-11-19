@@ -89,6 +89,7 @@ class ContentMediafileBrowser extends \Contao\ContentElement
                 $entry['audioType'] = !$entry['directory'] ? (self::AUDIO[strtolower(pathinfo($entry['name'], PATHINFO_EXTENSION))] ?? null) : null;
                 $entry['playUrl'] = $entry['allowed'] && $entry['audioType'] ? $url($entry['path'], 'play') : null;
                 $entry['chapters'] = $entry['playUrl'] ? AudioChapters::read($browser->resolve($entry['path'])) : [];
+                $entry['story'] = $entry['playUrl'] ? AudioChapters::story($browser->resolve($entry['path'])) : [];
                 $entry['date'] = \Contao\Date::parse(\Contao\Config::get('datimFormat'), $entry['modified']);
                 $entry['dateOnly'] = \Contao\Date::parse(\Contao\Config::get('dateFormat'), $entry['modified']);
                 $entry['timeOnly'] = \Contao\Date::parse(\Contao\Config::get('timeFormat'), $entry['modified']);
