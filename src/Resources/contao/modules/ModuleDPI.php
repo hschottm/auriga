@@ -50,6 +50,9 @@ class ModuleDPI extends ModulePTW
 	protected function compile()
 	{
 		global $objPage;
+
+		// DPI can be rendered without a song module loading these labels first.
+		$this->loadLanguageFile('tl_broadcast_song');
 		
 		// Redirect to jumpTo page
 		$objPageAdventure = ModulePTW::resolvePage($this->jumpTo_adventure);

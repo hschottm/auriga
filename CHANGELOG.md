@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.22 — 2026-11-22
+
+- Load song translations explicitly in DPI so direct search requests render cover, musicbox and marvel labels without undefined-array warnings.
+
 ## 1.4.21 — 2026-11-19
 
 - Remember full-broadcast/story-only choices per Contao member, synchronize supported players on the current page and restore the account preference on future visits. Requires the new `tl_member.aurigaPlaybackMode` database column.
