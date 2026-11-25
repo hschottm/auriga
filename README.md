@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.4.23**, available on `master`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.4.24**, available on `master`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:1.4.23 --with-all-dependencies
+composer require hschottm/auriga:1.4.24 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -538,3 +538,24 @@ The automatic JSON backup records byte-exact `before` and `after` values in base
 is modified. The command is idempotent while the assignments are unchanged, but
 running it again after deliberately removing an old assignment in the backend
 will import that legacy assignment again. It is not a scheduled synchronization.
+
+### Missing file records (1.4.24)
+
+If the recordings exist on disk but are absent from `tl_files`, explicitly supply
+the current archive directory (relative to the Contao project):
+
+```sh
+php vendor/bin/contao-console auriga:migrate-recordings --archive-root=files/auriga/archiv --env=prod
+php vendor/bin/contao-console auriga:migrate-recordings --archive-root=files/auriga/archiv --apply --env=prod
+```
+
+This checks only `<archive-root>/ptw/NNN/<referenced filename>`. The dry-run reports
+pending registrations without writing to `tl_files`. Apply registers these files
+and their parent folders through Contao Dbafs, then stores the generated UUIDs.
+It never registers directories recursively. Contao computes the MP3 hashes once,
+so this step may take appreciably longer than the dry-run; progress is printed
+for each registered file. Registration and broadcast updates share the database
+transaction. The report lists registered paths/UUIDs; the backup keeps the original
+broadcast selections and, on success, their final UUID values. New file entries
+remain available in the file manager if broadcast selections are later restored.
+Missing, unreadable, ambiguous, or out-of-archive files are not imported.

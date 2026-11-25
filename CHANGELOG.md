@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.24 — 2026-11-25
+
+- Extend recording migration with `--archive-root` to locate referenced MP3s that are not yet in `tl_files`. Dry-run reports pending registrations; apply registers individual files through Contao Dbafs and stores their UUIDs transactionally. No recursive archive scan is performed.
+
 ## 1.4.23 — 2026-11-25
 
 - Add `auriga:migrate-recordings` to transfer historic recording filenames and path-based selections into the backend file tree as binary UUIDs. Preserve multiple recordings and existing selections; report missing or ambiguous references without modifying those broadcasts.

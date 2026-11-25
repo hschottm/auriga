@@ -3,4 +3,8 @@ services:
         arguments:
             $connection: '@database_connection'
             $projectDir: '%kernel.project_dir%'
+            $registrar: '@Hschottm\AurigaBundle\ContaoRecordingRegistrar'
         tags: ['console.command']
+    Hschottm\AurigaBundle\ContaoRecordingRegistrar:
+        arguments:
+            $framework: '@contao.framework'

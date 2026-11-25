@@ -11,7 +11,7 @@ final class RecordingMigration
     private array $byPath = [];
     private array $byArchiveName = [];
 
-    public function __construct(array $files)
+    public function __construct(array $files, private ?\Closure $missingFile = null)
     {
         foreach ($files as $file) {
             $uuid = self::uuid($file['uuid']);
@@ -49,6 +49,7 @@ final class RecordingMigration
         $uuids = [];
         $paths = [];
         $issues = [];
+        $registrations = [];
         foreach ($references as $reference) {
             if (!is_string($reference) || $reference === '') {
                 $issues[] = 'Leere oder ungültige Dateireferenz.';
@@ -68,6 +69,16 @@ final class RecordingMigration
                     $matches = $this->byArchiveName[(int) $adventure.'/'.basename($path)] ?? [];
                 }
                 $label = $reference;
+                if (!$matches && $this->missingFile !== null) {
+                    $candidate = ($this->missingFile)($path, $adventure);
+                    if ($candidate !== null) {
+                        // Path placeholders are replaced with Contao UUIDs only during apply.
+                        $uuids[$candidate] = $candidate;
+                        $paths[$candidate] = $candidate;
+                        $registrations[$candidate] = $candidate;
+                        continue;
+                    }
+                }
             }
             $matches = array_values(array_unique($matches));
             if (count($matches) !== 1) {
@@ -80,6 +91,6 @@ final class RecordingMigration
         }
         if ($issues) return ['status' => 'skipped', 'issues' => $issues];
         $value = $uuids ? serialize(array_values($uuids)) : $stored;
-        return ['status' => $value === $stored ? 'unchanged' : 'change', 'value' => $value, 'paths' => array_values($paths), 'issues' => []];
+        return ['status' => $value === $stored && !$registrations ? 'unchanged' : 'change', 'value' => $value, 'paths' => array_values($paths), 'issues' => [], 'registrations' => array_values($registrations)];
     }
 }

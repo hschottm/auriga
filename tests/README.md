@@ -42,3 +42,9 @@ from `AURIGA_VENDOR_AUTOLOAD` and a disposable MariaDB database named by
 It drops and recreates four fixture tables; never use a production database.
 Coverage includes dry-run, multiple UUID selections, report/backup permissions,
 idempotence, missing references, transactional rollback and command registration.
+
+`tests/recording-registration-contao.php` additionally runs the real Contao Dbafs
+API in a disposable installed project (`AURIGA_TEST_PROJECT`, `DATABASE_URL` with
+an `auriga57_test_` database). It checks physical-but-unregistered recordings,
+ancestor registration, UUID selection, idempotence, unrelated files staying
+unregistered, and Dbafs participation in the same rollback transaction.

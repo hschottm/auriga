@@ -6,6 +6,8 @@ namespace Hschottm\AurigaBundle\Command;
 
 use Doctrine\DBAL\Connection;
 use Hschottm\AurigaBundle\RecordingMigration;
+use Hschottm\AurigaBundle\RecordingRegistrar;
+use Hschottm\AurigaBundle\ArchiveRecordingLocator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,7 +18,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'auriga:migrate-recordings', description: 'Übernimmt alte Aufnahme-Zuordnungen in die Contao-Dateiauswahl (standardmäßig nur Prüflauf).')]
 final class MigrateRecordingsCommand extends Command
 {
-    public function __construct(private Connection $connection, private string $projectDir)
+    public function __construct(private Connection $connection, private string $projectDir, private ?RecordingRegistrar $registrar = null)
     {
         parent::__construct();
     }
@@ -24,6 +26,7 @@ final class MigrateRecordingsCommand extends Command
     protected function configure(): void
     {
         $this->addOption('apply', null, InputOption::VALUE_NONE, 'Geprüfte Änderungen mit Sicherung in die Datenbank schreiben.')
+            ->addOption('archive-root', null, InputOption::VALUE_REQUIRED, 'Aktueller Archivpfad, z. B. files/auriga/archiv; registriert fehlende MP3s nur mit --apply.')
             ->addOption('report', null, InputOption::VALUE_REQUIRED, 'Absoluter Pfad für einen neuen JSON-Bericht.');
     }
 
@@ -36,7 +39,9 @@ final class MigrateRecordingsCommand extends Command
         $directory = $this->projectDir.'/var/auriga-recording-migration';
         $reportFile = $input->getOption('report') ?: $directory.'/'.$stamp.'-report.json';
         if (!str_starts_with($reportFile, '/')) throw new \InvalidArgumentException('--report benötigt einen absoluten Pfad.');
-        $planner = new RecordingMigration($db->fetchAllAssociative("SELECT uuid, path FROM tl_files WHERE type = 'file' AND LOWER(path) LIKE '%.mp3'"));
+        $archive = $input->getOption('archive-root');
+        $locator = $archive !== null ? new ArchiveRecordingLocator($this->projectDir, $archive) : null;
+        $planner = new RecordingMigration($db->fetchAllAssociative("SELECT uuid, path FROM tl_files WHERE type = 'file' AND LOWER(path) LIKE '%.mp3'"), $locator !== null ? $locator(...) : null);
         $legacy = [];
         foreach ($db->fetchAllAssociative('SELECT pid, filename FROM tl_broadcast_file ORDER BY pid, sorting, id') as $row) {
             $legacy[$row['pid']][] = $row['filename'];
@@ -47,9 +52,9 @@ final class MigrateRecordingsCommand extends Command
             $plan = $planner->plan($row['files'], $legacy[$row['id']] ?? [], $row['numbering']);
             ++$report['counts'][$plan['status']];
             if ($plan['status'] === 'unchanged') continue;
-            $report['broadcasts'][] = ['id' => $row['id'], 'adventure' => $row['numbering'], 'status' => $plan['status'], 'paths' => $plan['paths'] ?? [], 'issues' => $plan['issues']];
+            $report['broadcasts'][] = ['id' => $row['id'], 'adventure' => $row['numbering'], 'status' => $plan['status'], 'paths' => $plan['paths'] ?? [], 'registrations' => $plan['registrations'] ?? [], 'issues' => $plan['issues']];
             if ($plan['status'] === 'change') {
-                $changes[] = ['id' => $row['id'], 'before' => $row['files'] === null ? null : base64_encode($row['files']), 'after' => base64_encode($plan['value'])];
+                $changes[] = ['id' => $row['id'], 'before' => $row['files'] === null ? null : base64_encode($row['files']), 'after' => base64_encode($plan['value']), 'registrations' => $plan['registrations'] ?? []];
             }
         }
         // Reserve the report before any database writes; never overwrite previous reports.
@@ -60,14 +65,33 @@ final class MigrateRecordingsCommand extends Command
             $report['backup'] = $backupFile;
             $db->beginTransaction();
             try {
-                foreach ($changes as $change) {
+                $registered = [];
+                foreach ($changes as &$change) {
                     $current = $db->fetchAssociative('SELECT files FROM tl_broadcast WHERE id = ? FOR UPDATE', [$change['id']]);
                     $before = $change['before'] === null ? null : base64_decode($change['before'], true);
                     if ($current === false || $current['files'] !== $before) {
                         throw new \RuntimeException('Sendung '.$change['id'].' wurde inzwischen geändert. Alle Änderungen zurückgerollt; bitte erneut prüfen.');
                     }
-                    $db->update('tl_broadcast', ['files' => base64_decode($change['after'], true)], ['id' => $change['id']]);
+                    $values = unserialize(base64_decode($change['after'], true), ['allowed_classes' => false]);
+                    foreach ($change['registrations'] as $path) {
+                        if ($this->registrar === null) throw new \RuntimeException('Contao-Dateiregistrierung nicht verfügbar.');
+                        // Recheck the physical file immediately before registering it.
+                        if ($locator === null || !$locator->contains($path)) throw new \RuntimeException('Aufnahme nicht mehr erreichbar: '.$path);
+                        if (!isset($registered[$path])) {
+                            $registered[$path] = $this->registrar->register($path);
+                            $io->writeln('Registriert: '.$path);
+                        }
+                        foreach ($values as &$value) if ($value === $path) $value = $registered[$path];
+                        unset($value);
+                    }
+                    $value = serialize(array_values(array_unique($values)));
+                    $change['after'] = base64_encode($value);
+                    $db->update('tl_broadcast', ['files' => $value], ['id' => $change['id']]);
                 }
+                unset($change);
+                // Complete the backup with actual UUIDs before committing.
+                self::updateReport($backupFile, ['created' => date(DATE_ATOM), 'table' => 'tl_broadcast', 'column' => 'files', 'encoding' => 'base64', 'rows' => $changes]);
+                $report['registered'] = array_map('bin2hex', $registered);
                 $db->commit();
                 $report['applied'] = count($changes);
             } catch (\Throwable $e) {

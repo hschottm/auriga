@@ -2,6 +2,9 @@
 /** Dedicated disposable database only: creates and drops the four fixture tables. */
 require getenv('AURIGA_VENDOR_AUTOLOAD') ?: dirname(__DIR__).'/vendor/autoload.php';
 require __DIR__.'/../src/RecordingMigration.php';
+require __DIR__.'/../src/ArchiveRecordingLocator.php';
+require __DIR__.'/../src/RecordingRegistrar.php';
+require __DIR__.'/../src/ContaoRecordingRegistrar.php';
 require __DIR__.'/../src/Command/MigrateRecordingsCommand.php';
 use Doctrine\DBAL\DriverManager;
 use Hschottm\AurigaBundle\Command\MigrateRecordingsCommand;
@@ -59,12 +62,14 @@ echo "OK: MariaDB command dry-run, apply, binary preservation, backup, skipped r
 // The shipped service YAML and Symfony command compiler must expose the command.
 $container = new Symfony\Component\DependencyInjection\ContainerBuilder();
 $container->setParameter('kernel.project_dir', $dir);
+$container->register('contao.framework', Contao\CoreBundle\Framework\ContaoFramework::class)->setSynthetic(true)->setPublic(true);
 $container->register('database_connection', Doctrine\DBAL\Connection::class)->setSynthetic(true)->setPublic(true);
 $loader = new Symfony\Component\DependencyInjection\Loader\YamlFileLoader($container, new Symfony\Component\Config\FileLocator(__DIR__.'/../src/Resources/config'));
 $loader->load('services.yml');
 $container->addCompilerPass(new Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass());
 $container->compile();
 $container->set('database_connection', $db);
+$container->set('contao.framework', (new ReflectionClass(Contao\CoreBundle\Framework\ContaoFramework::class))->newInstanceWithoutConstructor());
 $commands=$container->get('console.command_loader');
 check($commands->has('auriga:migrate-recordings'), 'Command not registered');
 check($commands->get('auriga:migrate-recordings')->getName()==='auriga:migrate-recordings', 'Command not instantiable');

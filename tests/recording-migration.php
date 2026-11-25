@@ -34,3 +34,22 @@ echo "OK: recording migration planner, ambiguity, preservation, binary UUIDs, id
 
 $short = new RecordingMigration([['uuid'=>$a, 'path'=>'files/ptw/001/abcdefghijkl.mp3']]);
 check($short->plan(null, ['abcdefghijkl.mp3'], 1)['value'] === serialize([$a]), '16-byte filename mistaken for binary UUID');
+require __DIR__.'/../src/ArchiveRecordingLocator.php';
+$dir = sys_get_temp_dir().'/auriga-locator-'.bin2hex(random_bytes(5));
+mkdir($dir.'/files/auriga/archiv/ptw/014', 0777, true);
+$physical = $dir.'/files/auriga/archiv/ptw/014/ptw_1403_2.mp3';
+file_put_contents($physical, 'fixture');
+$locator = new Hschottm\AurigaBundle\ArchiveRecordingLocator($dir, 'files/auriga/archiv');
+$p = new RecordingMigration([], $locator(...));
+$legacy = ['files/auriga/recordings/ptw/014/ptw_1403_2.mp3'];
+$r = $p->plan(null, $legacy, 14);
+check($r['status']==='change' && $r['registrations']===['files/auriga/archiv/ptw/014/ptw_1403_2.mp3'], 'Unregistered NAS recording not planned');
+check($p->plan(null, $legacy, 15)['status']==='skipped', 'Missing physical file must be skipped');
+check($p->plan(null, array_merge($legacy,['missing.mp3']), 14)['status']==='skipped', 'Partial broadcast must not register files');
+$pending = $p->plan(serialize($r['registrations']), [], 14);
+check($pending['status']==='change', 'Existing path still needs registration');
+symlink('/etc/hosts', $dir.'/files/auriga/archiv/ptw/014/outside.mp3');
+check($locator('outside.mp3',14)===null, 'Symlink escaping archive accepted');
+unlink($dir.'/files/auriga/archiv/ptw/014/outside.mp3');
+unlink($physical);
+echo "OK: targeted archive lookup, pending registration, absent files, boundary checks.\n";
