@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.4.15**, available on `master` and `contao57`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.4.23**, available on `master`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:1.4.15 --with-all-dependencies
+composer require hschottm/auriga:1.4.23 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -502,3 +502,39 @@ Run `contao:migrate --env=prod` after updating to add
 `tl_member.aurigaPlaybackMode` (default `full`). Saves use authenticated,
 CSRF-protected POST requests; failed saves show a message in the player. Public
 guest players can switch locally but do not save an account preference.
+
+## Legacy recording assignments (1.4.23)
+
+The backend file tree reads `tl_broadcast.files` as serialized binary file UUIDs.
+Historic `tl_broadcast_file.filename` rows and path strings in `tl_broadcast.files`
+can be transferred using this explicit, one-time command:
+
+```sh
+# Read-only database inspection, writes a JSON report:
+php vendor/bin/contao-console auriga:migrate-recordings --env=prod
+# Apply unambiguous assignments, with automatic backup:
+php vendor/bin/contao-console auriga:migrate-recordings --apply --env=prod
+```
+
+No schema change is required. This is not run automatically by `contao:migrate`.
+Review the dry-run report first. Both modes print counts and the report filename.
+Use `--report=/absolute/path/new-report.json` to select a report destination; existing
+reports are never overwritten. Default reports and backups are stored outside the
+public directory in `var/auriga-recording-migration/` with mode 0600.
+
+Resolution uses existing MP3 entries in `tl_files`: an exact path or UUID first,
+otherwise the filename within `ptw/NNN/` for the broadcast's adventure number.
+It does not crawl the filesystem, register new files, or guess across adventures.
+Missing `tl_files` entries and ambiguous matches skip the entire broadcast, with
+reasons in the JSON report. Check these paths in Contao's file manager before
+retrying. Multiple archive roots containing the same adventure/file are ambiguous.
+
+Existing selections retain their order; legacy rows follow `sorting, id` order.
+Duplicates are removed and text UUIDs / old paths are normalized to binary UUIDs.
+Existing invalid selections are reported instead of being discarded. All updates
+use a transaction and reject concurrent changes to `tl_broadcast.files`.
+The automatic JSON backup records byte-exact `before` and `after` values in base64
+(`null` remains null). Keep this backup for recovery; no MP3 or legacy-table row
+is modified. The command is idempotent while the assignments are unchanged, but
+running it again after deliberately removing an old assignment in the backend
+will import that legacy assignment again. It is not a scheduled synchronization.

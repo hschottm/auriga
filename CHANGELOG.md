@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.23 — 2026-11-25
+
+- Add `auriga:migrate-recordings` to transfer historic recording filenames and path-based selections into the backend file tree as binary UUIDs. Preserve multiple recordings and existing selections; report missing or ambiguous references without modifying those broadcasts.
+- Default to a dry-run report; explicit `--apply` creates a byte-exact backup and applies changes transactionally without deleting legacy assignments or touching audio files.
+
 ## 1.4.22 — 2026-11-22
 
 - Load song translations explicitly in DPI so direct search requests render cover, musicbox and marvel labels without undefined-array warnings.

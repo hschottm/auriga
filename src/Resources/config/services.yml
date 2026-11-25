@@ -1,1 +1,6 @@
-services: {}
+services:
+    Hschottm\AurigaBundle\Command\MigrateRecordingsCommand:
+        arguments:
+            $connection: '@database_connection'
+            $projectDir: '%kernel.project_dir%'
+        tags: ['console.command']

@@ -31,3 +31,14 @@ The template-output test uses the real Contao Twig/legacy bridge (no PHP-templat
 The scripts test rendering, backend callbacks, missing records, search input validation, UUID/path handling, real cover persistence and rollback. External image requests are mocked. The manual browser file-upload transport and production data are not covered.
 
 The carousel test checks per-slide selection indexes and CSRF tokens, selected-slide state, guest/admin controls, inherited search/upload forms and empty/single-result states.
+
+## Recording assignment migration
+
+`php tests/recording-migration.php` exercises the standalone planner without a database.
+`tests/recording-migration-integration.php` uses the real DBAL/Symfony dependencies
+from `AURIGA_VENDOR_AUTOLOAD` and a disposable MariaDB database named by
+`AURIGA_RECORDING_TEST_DB` (must start with `auriga57_test_recordings_`). It uses
+`AURIGA_TEST_DB_HOST` (default `mariadb`) and the local fixture account `contao`.
+It drops and recreates four fixture tables; never use a production database.
+Coverage includes dry-run, multiple UUID selections, report/backup permissions,
+idempotence, missing references, transactional rollback and command registration.
