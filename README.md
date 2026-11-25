@@ -1,6 +1,6 @@
 # Auriga for Contao 5.7
 
-Version **1.4.24**, available on `master`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
+Version **1.4.25**, available on `master`, targets **Contao 5.7.x**, **PHP 8.3+** and Symfony 7.4.
 For Contao 4.13, use tag `1.2.1`.
 
 ## Installation / update
@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:1.4.24 --with-all-dependencies
+composer require hschottm/auriga:1.4.25 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -559,3 +559,25 @@ transaction. The report lists registered paths/UUIDs; the backup keeps the origi
 broadcast selections and, on success, their final UUID values. New file entries
 remain available in the file manager if broadcast selections are later restored.
 Missing, unreadable, ambiguous, or out-of-archive files are not imported.
+
+## Adventure text from recording sidecars
+
+The broadcast detail module reads the `.md` beside each locally assigned MP3,
+resolving file UUIDs through Contao. Readable sidecars take precedence over
+`tl_broadcast.storycontent`; the database text is retained as a fallback if none
+can be read. With multiple recordings, available sidecars follow the selection
+order and duplicates are omitted. A partial set of sidecars is not mixed with
+the whole database transcript. Metadata-only sidecars intentionally render no text.
+
+Only timestamp sections are shown: unlabelled sections from DocBook imports,
+`Abenteuer`, `Geschichte`, `Erzählung`, and `Rückblick` (including
+`Rückblick / Einleitung`). The document title, source/transcription preamble,
+moderation, closing credits and separate notes sections are omitted. Timestamp
+ranges and paragraph boundaries are preserved; section labels are not displayed.
+Both MM:SS and HH:MM:SS headings are supported. Sidecars are rendered with the
+existing safe Markdown renderer and must be UTF-8 files of at most 2 MiB under
+the configured Contao upload directory. No remote URLs or archive scans are used.
+
+The broadcast detail module disables page/client caching so edits, additions,
+and removal of sidecars take effect on the next request. Clear the production
+cache once when deploying this feature to remove pages cached by older releases.

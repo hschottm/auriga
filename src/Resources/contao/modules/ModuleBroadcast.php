@@ -51,6 +51,8 @@ class ModuleBroadcast extends ModulePTW
 	{
         $GLOBALS['TL_CSS'][] = 'bundles/hschottmauriga/css/chapter-navigation.css|static';
 		global $objPage;
+        // Sidecars may be edited or added independently of Contao's database.
+        if ($objPage) { $objPage->cache = 0; $objPage->clientCache = 0; }
 		
 		// Redirect to jumpTo page
 		$objPageAdventure = ModulePTW::resolvePage($this->jumpTo_adventure);
@@ -104,7 +106,20 @@ class ModuleBroadcast extends ModulePTW
 			$arrFiles = $this->Database->prepare("SELECT filename FROM tl_broadcast_file WHERE pid = ? ORDER BY sorting ASC")
 				->execute($objBroadcast->id)
 				->fetchEach('filename');
-			$arrFiles = self::recordingUrls(array_merge($arrFiles, \Contao\StringUtil::deserialize($objBroadcast->files, true)));
+            $recordings = array_merge(\Contao\StringUtil::deserialize($objBroadcast->files, true), $arrFiles);
+            $transcriptPaths = [];
+            foreach ($recordings as $reference) {
+                if (!is_string($reference) || $reference === '') continue;
+                if (strlen($reference) === 16 || \Contao\Validator::isUuid($reference)) {
+                    $file = \Contao\FilesModel::findByUuid($reference);
+                    if ($file === null) continue;
+                    $reference = $file->path;
+                }
+                $transcriptPaths[] = $reference;
+            }
+            $storyContent = StoryTranscript::load(self::projectDir(), self::filesRoot(), $transcriptPaths)
+                ?? (string) ($objBroadcast->storycontent ?? '');
+            $arrFiles = self::recordingUrls(array_merge($arrFiles, \Contao\StringUtil::deserialize($objBroadcast->files, true)));
 			$arrSongs = array();
 			$objSong = $this->Database->prepare("SELECT tl_broadcast_song.*, tl_song_cover.cover FROM tl_broadcast_song LEFT JOIN tl_song_cover ON tl_broadcast_song.id = tl_song_cover.song WHERE tl_broadcast_song.pid = ? AND tl_broadcast_song.songtype <> ? ORDER BY sorting ASC")
 				->execute($objBroadcast->id, 3);
@@ -167,8 +182,8 @@ class ModuleBroadcast extends ModulePTW
 				'hour' => $objBroadcast->hour,
 				'chapter' => $objBroadcast->chapter,
 				'isStory' => ($objBroadcast->story) ? true : false,
-				'storycontent' => (string) ($objBroadcast->storycontent ?? ''),
-				'storyhtml' => StoryMarkdown::render((string) ($objBroadcast->storycontent ?? '')),
+				'storycontent' => $storyContent,
+				'storyhtml' => StoryMarkdown::render($storyContent),
 				'isSpecial' => ($objBroadcast->special) ? true : false,
 				'isComplete' => ($objBroadcast->complete) ? true : false,
 				'length' => $objBroadcast->length,
