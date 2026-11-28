@@ -8,7 +8,7 @@ For Contao 4.13, use tag `1.2.1`.
 In a Contao 5.7 project:
 
 ```sh
-composer require hschottm/auriga:1.4.25 --with-all-dependencies
+composer require hschottm/auriga:1.4.26 --with-all-dependencies
 php vendor/bin/contao-console contao:migrate --env=prod
 php vendor/bin/contao-console cache:clear --env=prod
 ```
@@ -426,13 +426,65 @@ Embedded HTML is escaped and unsafe link schemes are disabled. The template
 receives `broadcast.storycontent` as the source and `broadcast.storyhtml` as
 the safely rendered HTML. No additional database migration is required.
 
-### Auriga-Lexikon
+### Auriga-Lexikon mit Markdown-Dateien
 
-Nach dem Update die Contao-Datenbankmigration ausführen. Unter **Auriga → Lexikon** lassen sich Begriffe mit Markdown-Beschreibung und Veröffentlichungsstatus pflegen. Leere Aliasse werden aus dem Begriff erzeugt; doppelte automatisch erzeugte Aliasse erhalten einen eindeutigen Zusatz. Manuell vergebene Aliasse müssen eindeutig sein. Bestehende Aliasse bleiben beim Ändern des Begriffs erhalten.
+Nach dem Update die Contao-Datenbankmigration ausführen (neue Felder
+`tl_auriga_lexicon.markdownFile` und `tl_module.jumpTo_lexicon`) und den
+Produktionscache leeren. Unter **Auriga → Lexikon** wird statt des Textfeldes
+jetzt eine **Markdown-Datei** ausgewählt. Die Datei muss in Contaos Dateiverwaltung
+registriert sein; bei extern angelegten Dateien den betreffenden Ordner
+synchronisieren. Begriff, Alias und Veröffentlichungsstatus werden weiterhin im
+Lexikoneintrag gepflegt. Bereits gespeicherte Beschreibungen bleiben als Übergang
+lesbar, solange keine Datei ausgewählt ist; sie werden nicht gelöscht. Eine
+zugewiesene, aber fehlende oder ungültige Datei zeigt einen Hinweis statt alter Inhalte.
 
-Ein Frontend-Modul vom Typ **Auriga-Lexikon** anlegen und auf einer Seite einfügen. Es zeigt eine alphabetische Übersicht veröffentlichter Einträge; die Links öffnen deren Detailansicht auf derselben Seite. Diese Links können in Markdown-Beschreibungen und Abenteuergeschichten verwendet werden. Bei einer Seite `lexikon.html` lautet ein Detail-Link beispielsweise `lexikon/lexicon/major-renault.html`. Den tatsächlich erzeugten Link aus der Übersicht kopieren, insbesondere bei abweichenden URL-Einstellungen. Nachträgliche Alias-Änderungen ändern die URL; alte Links werden nicht automatisch weitergeleitet.
+Ein Frontend-Modul vom Typ **Auriga-Lexikon** zeigt Übersicht und Detailansichten
+auf seiner eingebetteten Seite. Diese Seite wird automatisch als Ziel für
+Lexikonverweise verwendet. Im Lexikonmodul unter **Weiterleitungsseite zu einer Sendung**
+die Seite mit dem Sendungsdetailmodul auswählen. Im **Sendungsdetailmodul** unter
+**Lexikonseite** die Seite mit dem Lexikonmodul auswählen. Ein zusätzlicher
+Archivordner oder eine fest eingetragene Domain ist dafür nicht erforderlich.
+Contao erzeugt die URLs passend zur gewählten Seite und ihren URL-Einstellungen.
 
-Nicht veröffentlichte oder unbekannte Einträge liefern HTTP 404. Markdown wird wie bei Abenteuergeschichten sicher gerendert: HTML wird als Text behandelt und unsichere Link-Schemata werden verworfen. Das Template `mod_auriga_lexicon.html.twig` bietet die Blöcke `lexicon_list`, `lexicon_entry`, `lexicon_entry_heading`, `lexicon_description` und `lexicon_back` für eigene Gestaltung.
+Links in Markdown werden relativ zur jeweiligen Markdown-Datei geschrieben.
+Beispiel für eine Datei `ptw/Lexikon/Orbia.md`:
+
+```markdown
+[Rita Stefanidis](Rita%20Stefanidis.md)
+[Quelle: Abenteuer 30](../030/ptw_3001_2.md)
+```
+
+Aus `ptw/030/ptw_3001_2.md` lässt sich zurückverweisen:
+
+```markdown
+[Orbia](../Lexikon/Orbia.md)
+```
+
+Die Dateinamen müssen exakt passen (einschließlich Groß-/Kleinschreibung).
+Leerzeichen in Linkzielen als `%20` schreiben. Auriga ordnet Lexikon-Dateien über
+ihre Dateiauswahl dem veröffentlichten Eintrag zu und verwendet dessen aktuellen
+Alias, beispielsweise `/lexikon/lexicon/orbia`. Eine Transkriptdatei wird über die
+gleichnamige MP3 und deren Sendungszuordnung aufgelöst, beispielsweise
+`/sendung/broadcast/730000000`. Der bestehende Sendungsrouter verwendet das
+Sendungsdatum als numerische Kennung, nicht die Datenbank-ID. Moderne UUID-Auswahl
+und historische Dateizuordnungen werden berücksichtigt; die Transkriptdatei selbst
+muss für diesen Link nicht in `tl_files` registriert sein.
+
+Nicht zuordenbare oder mehrdeutige relative `.md`-Verweise sowie Verweise ohne
+konfigurierte Zielseite werden als normaler Text ausgegeben. Externe Links,
+absolute Website-Pfade und reine Sprunganker bleiben unverändert. Ein Fragment
+wie `Orbia.md#herkunft` wird übernommen; Markdown-Überschriften erhalten passende
+HTML-IDs (z. B. `## Herkunft` → `herkunft`). Query-Parameter lokaler Dateiverweise
+werden nicht übernommen. Relative Bildpfade werden durch diese Linkauflösung
+nicht verändert. Die Markdown-Dateien selbst bleiben unverändert und lokal lesbar.
+
+Dateien müssen UTF-8-kodiert, höchstens 2 MiB groß und innerhalb des konfigurierten
+Upload-Verzeichnisses erreichbar sein. Korrekturen an Dateien werden beim nächsten
+Seitenaufruf eingelesen. HTML wird als Text behandelt, unsichere Link-Schemata
+werden verworfen. Unveröffentlichte oder unbekannte Lexikonaliasse liefern HTTP 404.
+Die Template-Blöcke `lexicon_list`, `lexicon_entry`, `lexicon_entry_heading`,
+`lexicon_description` und `lexicon_back` bleiben für eigene Gestaltung verfügbar.
+
 
 ## LRC chapter navigation
 

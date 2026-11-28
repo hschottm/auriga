@@ -19,7 +19,7 @@ $GLOBALS['TL_DCA']['tl_auriga_lexicon'] = [
             'show' => ['href' => 'act=show', 'icon' => 'show.svg'],
         ],
     ],
-    'palettes' => ['default' => '{term_legend},term,alias;{description_legend},description;{publish_legend},published'],
+    'palettes' => ['default' => '{term_legend},term,alias;{description_legend},markdownFile;{publish_legend},published'],
     'fields' => [
         'id' => ['sql' => 'int(10) unsigned NOT NULL auto_increment'],
         'tstamp' => ['sql' => 'int(10) unsigned NOT NULL default 0'],
@@ -34,6 +34,11 @@ $GLOBALS['TL_DCA']['tl_auriga_lexicon'] = [
             'save_callback' => [[LexiconAlias::class, 'save']],
             'sql' => 'varchar(128) DEFAULT NULL',
         ],
+        'markdownFile' => [
+            'inputType' => 'fileTree',
+            'eval' => ['filesOnly' => true, 'extensions' => 'md', 'fieldType' => 'radio', 'tl_class' => 'clr'],
+            'sql' => 'binary(16) NULL',
+        ],
         'description' => [
             'inputType' => 'textarea', 'search' => true,
             'eval' => ['rows' => 20, 'preserveTags' => true, 'tl_class' => 'clr'],
@@ -46,6 +51,6 @@ $GLOBALS['TL_DCA']['tl_auriga_lexicon'] = [
         ],
     ],
 ];
-foreach (['term', 'alias', 'description', 'published'] as $field) {
+foreach (['term', 'alias', 'description', 'markdownFile', 'published'] as $field) {
     $GLOBALS['TL_DCA']['tl_auriga_lexicon']['fields'][$field]['label'] = &$GLOBALS['TL_LANG']['tl_auriga_lexicon'][$field];
 }

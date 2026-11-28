@@ -32,7 +32,7 @@ final class StoryTranscript
     }
 
     /** Null means no readable sidecar; an empty sidecar deliberately yields no story. */
-    public static function load(string $projectDir, string $uploadPath, array $paths): ?string
+    public static function load(string $projectDir, string $uploadPath, array $paths, ?callable $onLoaded = null): ?string
     {
         $root = realpath($projectDir.'/'.$uploadPath);
         if ($root === false) return null;
@@ -47,7 +47,9 @@ final class StoryTranscript
             $text = @file_get_contents($real, false, null, 0, 2 * 1024 * 1024 + 1);
             if ($text === false || strlen($text) > 2 * 1024 * 1024 || !mb_check_encoding($text, 'UTF-8')) continue;
             $seen[$real] = true;
-            $texts[] = self::extract($text);
+            $extracted = self::extract($text);
+            $texts[] = $extracted;
+            if ($onLoaded !== null) $onLoaded($extracted, substr($path, 0, -4).'.md');
         }
         return $texts === [] ? null : implode("\n\n", array_filter($texts, static fn ($text) => $text !== ''));
     }

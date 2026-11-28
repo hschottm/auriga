@@ -9,3 +9,6 @@ $GLOBALS['TL_LANG']['tl_auriga_lexicon'] = [
  'duplicateAlias'=>'This alias is already in use.',
  'back'=>'Back to the lexicon', 'empty'=>'No lexicon entries available yet.',
 ];
+
+$GLOBALS['TL_LANG']['tl_auriga_lexicon']['markdownFile'] = ['Markdown file', 'Select the Markdown file for this entry. Relative links to assigned Markdown files become page links. Existing descriptions remain available until a file is selected.'];
+$GLOBALS['TL_LANG']['tl_auriga_lexicon']['fileUnavailable'] = 'The description is currently unavailable.';

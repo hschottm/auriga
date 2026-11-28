@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.26 — 2026-11-28
+
+- Select Markdown files for lexicon entries; preserve existing database descriptions as a fallback until a file is assigned.
+- Resolve relative Markdown links between lexicon entries and broadcast transcripts using file assignments and configurable Contao target pages. Preserve fragments, add heading anchors, and render unresolved references as text without scanning archive directories.
+
 ## 1.4.25 — 2026-11-25
 
 - Prefer Markdown sidecars of assigned recordings for broadcast adventure text. Show timestamped narrative/recap sections without document metadata, moderation or closing credits; retain database fallback and disable broadcast page caching so file edits appear on the next request.

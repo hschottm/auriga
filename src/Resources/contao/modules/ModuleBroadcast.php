@@ -84,6 +84,7 @@ class ModuleBroadcast extends ModulePTW
 		{
 			$genres[$genre['id']] = $genre;
 		}
+		$markdownLinks = new MarkdownLinkResolver(\Contao\System::getContainer()->get('database_connection'), self::filesRoot(), \Contao\PageModel::findByPk($this->jumpTo_lexicon), $objPage);
 		$broadcast_ids = array();
 		$arrBroadcasts = array();
 		$objBroadcast = $this->Database->prepare("SELECT * FROM tl_broadcast WHERE `date` = ? ORDER BY sorting ASC")
@@ -117,8 +118,13 @@ class ModuleBroadcast extends ModulePTW
                 }
                 $transcriptPaths[] = $reference;
             }
-            $storyContent = StoryTranscript::load(self::projectDir(), self::filesRoot(), $transcriptPaths)
-                ?? (string) ($objBroadcast->storycontent ?? '');
+            $storyHtmlParts = [];
+            $storyContent = StoryTranscript::load(self::projectDir(), self::filesRoot(), $transcriptPaths,
+                static function (string $text, string $path) use (&$storyHtmlParts, $markdownLinks): void {
+                    $storyHtmlParts[] = StoryMarkdown::render($text, static fn (string $url) => $markdownLinks->resolve($url, $path));
+                });
+            $storyHtml = $storyContent !== null ? implode("\n", $storyHtmlParts) : StoryMarkdown::render((string) ($objBroadcast->storycontent ?? ''));
+            $storyContent ??= (string) ($objBroadcast->storycontent ?? '');
             $arrFiles = self::recordingUrls(array_merge($arrFiles, \Contao\StringUtil::deserialize($objBroadcast->files, true)));
 			$arrSongs = array();
 			$objSong = $this->Database->prepare("SELECT tl_broadcast_song.*, tl_song_cover.cover FROM tl_broadcast_song LEFT JOIN tl_song_cover ON tl_broadcast_song.id = tl_song_cover.song WHERE tl_broadcast_song.pid = ? AND tl_broadcast_song.songtype <> ? ORDER BY sorting ASC")
@@ -183,7 +189,7 @@ class ModuleBroadcast extends ModulePTW
 				'chapter' => $objBroadcast->chapter,
 				'isStory' => ($objBroadcast->story) ? true : false,
 				'storycontent' => $storyContent,
-				'storyhtml' => StoryMarkdown::render($storyContent),
+				'storyhtml' => $storyHtml,
 				'isSpecial' => ($objBroadcast->special) ? true : false,
 				'isComplete' => ($objBroadcast->complete) ? true : false,
 				'length' => $objBroadcast->length,

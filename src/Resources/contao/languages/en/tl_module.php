@@ -63,3 +63,5 @@ $GLOBALS['TL_LANG']['tl_module']['song_cover_remove_help'] = 'Removes cover assi
 $GLOBALS['TL_LANG']['tl_module']['adventure_story'] = 'Adventure story';
 
 $GLOBALS['TL_LANG']['tl_module']['auriga_no_results'] = 'No results found. Please change the search term or search field.';
+
+$GLOBALS['TL_LANG']['tl_module']['jumpTo_lexicon'] = ['Lexicon page', 'Page containing the Auriga lexicon for local Markdown links in broadcasts.'];

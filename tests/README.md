@@ -48,3 +48,11 @@ API in a disposable installed project (`AURIGA_TEST_PROJECT`, `DATABASE_URL` wit
 an `auriga57_test_` database). It checks physical-but-unregistered recordings,
 ancestor registration, UUID selection, idempotence, unrelated files staying
 unregistered, and Dbafs participation in the same rollback transaction.
+
+### Markdown file crosslinks
+
+`AURIGA_VENDOR_AUTOLOAD=/path/to/vendor/autoload.php php tests/markdown-links.php`
+uses a disposable in-memory SQLite database (requires `pdo_sqlite`) and the actual
+Contao/DBAL/CommonMark dependencies. It checks file UUID/path mapping, published
+lexicon aliases, broadcast date routes, legacy assignments, ambiguous and unsafe
+links, heading anchors and sidecar source context. No application database is used.

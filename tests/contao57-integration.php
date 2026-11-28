@@ -67,7 +67,7 @@ check(str_contains($html, '&lt;script&gt;') && !str_contains($html, '<script>ale
 $markdown = "## Small Talk\n\n[10:42] **Paul:** *Hallo!*\nNächste Zeile\n\n[Renault](/personen/renault.html)\n\n[Unsicher](javascript:alert(1))\n\n<script>alert(1)</script>\n\n`**Code**`";
 $db->update('tl_broadcast', ['storycontent'=>$markdown], ['id'=>$broadcast]);
 $html = (new BroadcastView($model))->render();
-check(str_contains($html, '<h2>Small Talk</h2>') && str_contains($html, '<strong>Paul:</strong>') && str_contains($html, '<em>Hallo!</em>'), 'Markdown not rendered');
+check(str_contains($html, '<h2 id="small-talk">Small Talk</h2>') && str_contains($html, '<strong>Paul:</strong>') && str_contains($html, '<em>Hallo!</em>'), 'Markdown not rendered');
 check(str_contains($html, '[10:42]') && str_contains($html, 'href="/personen/renault.html"') && str_contains($html, '<code>**Code**</code>'), 'Timestamps, links or code lost');
 check(!str_contains($html, 'href="javascript:') && !str_contains($html, '<script>alert(1)</script>'), 'Unsafe Markdown output');
 foreach ([null, '', " \n\t"] as $emptyStory) {
